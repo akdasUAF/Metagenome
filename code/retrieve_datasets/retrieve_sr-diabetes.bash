@@ -1,0 +1,13 @@
+
+#!/bin/bash
+
+## Sets working directory to the Short read Gut Diabetes folder
+## Uses this dataset: https://www.ncbi.nlm.nih.gov/sra/?term=SRR341725
+## This uses the SRA toolkit from NCBI to retrieve the reads
+
+
+cd data/raw/sr-diabetes
+~/mailroom/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
+~/mailroom/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR341725
+cd SRR341725/
+~/mailroom/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR341725.sra
