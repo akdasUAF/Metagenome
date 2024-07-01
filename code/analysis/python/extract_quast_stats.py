@@ -1,3 +1,4 @@
+import sys
 
 def extract_lines(filename):
 
@@ -10,24 +11,17 @@ def extract_lines(filename):
 	return text
 
 
-def find_LD50(text):
-  """
-  This function takes in a text string and reports the value of X 
-  when it hits the line under the schema "LD50  X".
 
-  Args:
-      text: The text string to search.
-
-  Returns:
-      The value of X as an integer, or None if not found.
-  """
-  for line in text.splitlines():
-    if line.startswith("LD50"):
-      try:
-        return int(line.split()[1])
-      except ValueError:
-        return None
-  return None
+def find_L50(text):
+	for line in text.splitlines():
+		
+		if "L50" in line:
+			try:
+				return(int(line.split()[1]))
+			
+			except ValueError:
+				return None
+	return None
 
 
 
@@ -42,7 +36,7 @@ else:
 	sys.exit(1)
 
 text = extract_lines(filename= filename)
-ld50_value = find_LD50(text)
+l50_value = find_LD50(text)
 
-
-print(f"LD50: {ld50_value}")
+filename_short = filename.split("/")[-1].split(".")[0]
+print(f"{filename_short}: {l50_value}")
