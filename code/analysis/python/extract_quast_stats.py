@@ -36,7 +36,7 @@ else:
 	sys.exit(1)
 
 text = extract_lines(filename= filename)
-l50_value = find_LD50(text)
+l50_value = find_L50(text)
 
 filename_short = filename.split("/")[-1].split(".")[0]
 print(f"{filename_short}: {l50_value}")
