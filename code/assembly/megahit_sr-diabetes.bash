@@ -1,5 +1,6 @@
 #!/bin/bash
 ## Dataset: Short read Diabetes
+## Uses this Database
 ## Assembler: MEGAHIT
 
 mkdir -p data/process/megahit/sr-diabetes/logs
