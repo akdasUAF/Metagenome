@@ -5,8 +5,8 @@
 ## Assembler: Canu
 
 mkdir -p data/process/canu/lr-soil/log
-touch data/process/canu/lr-soil/logs/log_canu_lr-marine_sediment.txt
+touch data/process/canu/lr-soil/log/log_canu_lr-soil.txt
 {
-./tools/assemblers/canu-2.2/bin/canu -p lr-soil -d data/process/canu/lr-soil/ genomeSize=162.3M -nanopore data/raw/lr-soil/SRR21053856/SRR21053856.fastq
+./tools/assemblers/canu-2.2/bin/canu -p lr-soil -d data/process/canu/lr-soil/ genomeSize=1620000 corOutCoverage=10000 corMhapSensitivity=high corMinCoverage=0 -nanopore data/raw/lr-soil/SRR21053856/SRR21053856.fastq
 
 } > data/process/canu/lr-soil/logs/log_canu_lr-soil.txt

@@ -6,6 +6,6 @@
 mkdir -p data/process/metaspades/sr-bsc/logs
 touch data/process/metaspades/sr-bsc/logs/log_metaspades_sr-bsc.txt
 {
-
-	python3 tools/assemblers/SPAdes-3.15.5-Linux/bin/spades.py -1 data/raw/sr-bsc/SRR28765359/SRR28765359_1.fastq -2 data/raw/sr-bsc/SRR28765359/SRR28765359_2.fastq -o data/process/metaspades/sr-bsc/asm_sr-bsc_SRR341725.metaspades_asm --meta
+ 
+	python3 tools/assemblers/SPAdes-3.40-Linux/bin/metaspades.py -1 data/raw/sr-bsc/SRR28765359/SRR28765359_1.fastq -2 data/raw/sr-bsc/SRR28765359/SRR28765359_2.fastq -o data/process/metaspades/sr-bsc/ > data/process/metaspades/sr-bsc/logs/log_metaspades_sr-bsc.txt
 } > data/process/metaspades/sr-bsc/logs/metaspades_sr-bsc.txt

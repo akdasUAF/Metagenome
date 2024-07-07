@@ -2,9 +2,9 @@
 
 ## Script to analyze the quality of the metagenomes
 ## Assembler: Canu
-## Dataset: Long read Soil
+## Dataset: Long read Ecoli
 ## Uses this dataset: 
 ## Analyzer: METAQUAST
 
-mkdir data/process/canu/lr-soil/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/canu/lr-soil/quast data/process/canu/lr-soil/lr-soil.contigs.fasta
+mkdir data/process/canu/lr-ecoli/quast
+python3 tools/analysis/quast/metaquast.py -o data/process/canu/lr-ecoli/quast data/process/canu/lr-ecoli/lr-ecoli.contigs.fasta
