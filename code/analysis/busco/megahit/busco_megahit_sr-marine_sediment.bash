@@ -9,3 +9,5 @@
 mkdir -p data/process/megahit/sr-marine_sediment/asm_sr-marine_sediment_SRR27456520.megahit_asm/quast
 python3 tools/analysis/quast/metaquast.py -o  data/process/megahit/sr-marine_sediment/asm_sr-marine_sediment_SRR27456520.megahit_asm/quast data/process/megahit/sr-marine_sediment/asm_sr-marine_sediment_SRR27456520.megahit_asm/final.contigs.fa
 
+busco --auto-lineage-prok -m genome -i data/process/megahit/sr-marine_sediment/assembly.fasta -o data/process/megahit/sr-marine_sediment/busco
+
