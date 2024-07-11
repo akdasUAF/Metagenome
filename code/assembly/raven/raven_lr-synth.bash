@@ -3,9 +3,6 @@
 ## Uses this dataset: https://www.ncbi.nlm.nih.gov/sra/PRJNA903965
 ## Assembler: Flye 
 
-mkdir -p data/process/flye/lr-synth/logs
-touch data/process/flye/lr-gut/logs/log_flye_lr-synth.txt
-{
-	flye -meta --nano-raw data/raw/lr-synth/SRR22366767/SRR22366767.fastq --out-dir data/process/flye/lr-synth --threads 12
+mkdir -p data/process/flye/lr-synth/
+./tools/assemblers/raven/build/bin/raven -t 12 data/raw/lr-soil/SRR21053856/SRR21053856.fastq > data/process/raven/lr-soil/assembly_raven_lr-soil.fasta 2> data/process/raven/lr-soil/logs/log_raven_lr-soil.txt
 
-} > data/process/flye/lr-synth/logs/log_flye_lr-synth.txt

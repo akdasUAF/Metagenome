@@ -1,4 +1,3 @@
-# retrieve_datasets.sh
 #!/bin/bash
 # Retrieving datasets
 # Dataset: Short read Diabetes
