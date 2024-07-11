@@ -10,3 +10,4 @@ mkdir -p data/process/miniasm/lr-synth/
 
 
 
+python3 code/processing/gfa_to_fa.py data/process/miniasm/lr-synth/assembly_minimap_lr-synth.gfa
