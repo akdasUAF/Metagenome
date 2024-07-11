@@ -2,7 +2,8 @@
 
 
 ### Install Dependencies
-conda install cmake zlib clang openssl libcurl liblzma gnuplot
+conda install cmake zlib clang
+conda install openssl libcurl liblzma
 cd tools/
 curl -L https://github.com/marbl/canu/releases/download/v2.2/canu-2.2.Linux-amd64.tar.xz --output canu-2.2.Linux.tar.xz 
 
