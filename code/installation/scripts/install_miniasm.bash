@@ -1,7 +1,9 @@
 #!/bin/bash
 
-cd tools/
+conda install gcc_linux-64 zlib
+
+cd tools/assembly
 
 # Install minimap and miniasm (requiring gcc and zlib)
-git clone https://github.com/lh3/minimap2 && (cd minimap2 && make)
-git clone https://github.com/lh3/miniasm  && (cd miniasm  && make)
+git clone https://github.com/lh3/minimap2 && cd minimap2 && make
+git clone https://github.com/lh3/miniasm && cd miniasm && make
