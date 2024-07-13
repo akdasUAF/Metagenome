@@ -5,7 +5,7 @@
 conda install cmake zlib bz2file gcc_linux-64 autoconf automake
 
 
-cd tools/
+cd tools/assemblers/
 git clone https://github.com/loneknightpy/idba.git
 
 cd idba/
