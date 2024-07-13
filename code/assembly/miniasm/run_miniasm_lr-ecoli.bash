@@ -3,3 +3,5 @@
 ## Dataset: Long Read Ecoli
 
 conda run -n asm_miniasm bash code/assembly/miniasm/scripts/miniasm_lr-ecoli.bash | tee logs/assembly/log_assemble_miniasm_lr-ecoli.log
+
+conda run -n pro_python bash code/processing/gfa_to_fa.py data/process/miniasm/lr-ecoli/assembly_minimap_lr-ecoli.gfa | tee logs/processing/log_gfa_to_fa_miniasm_lr-ecoli.log

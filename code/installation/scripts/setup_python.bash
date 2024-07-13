@@ -1,3 +1,3 @@
 #!/bin/bash
 
-conda install -c biopython
+conda install -c anaconda biopython
