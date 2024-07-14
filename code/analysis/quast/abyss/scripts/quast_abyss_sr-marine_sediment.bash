@@ -7,4 +7,4 @@
 ## Analyzer: METAQUAST
 
 mkdir -p data/process/abyss/sr-marine_sediment/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/abyss/sr-marine_sediment/quast data/process/abyss/sr-marine_sediment/abyss_sr-marine_sediment-contigs.fa
+python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/abyss/sr-marine_sediment/quast data/process/abyss/sr-marine_sediment/abyss_sr-marine_sediment-contigs.fa

@@ -8,5 +8,5 @@
 
 mkdir data/process/flye/lr-synth/busco
 
-busco --auto-lineage-prok -m genome -i data/process/flye/lr-synth/assembly.fasta -o data/process/flye/lr-synth/busco
+busco --auto-lineage -c 12 -m genome -i data/process/flye/lr-synth/assembly.fasta -o data/process/flye/lr-synth/busco
 

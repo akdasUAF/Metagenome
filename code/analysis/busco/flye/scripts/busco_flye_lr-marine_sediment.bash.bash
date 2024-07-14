@@ -7,6 +7,6 @@
 ## Analyzer: Busco
 
 mkdir data/process/flye/lr-marine_sediment/busco
-busco --auto-lineage -m genome -i data/process/flye/lr-marine_sediment/assembly.fasta -o data/process/flye/lr-marine_sediment/busco
+busco --auto-lineage -c 12 -m genome -i data/process/flye/lr-marine_sediment/assembly.fasta -o data/process/flye/lr-marine_sediment/busco
 
 

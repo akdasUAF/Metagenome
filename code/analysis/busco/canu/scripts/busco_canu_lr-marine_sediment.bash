@@ -7,4 +7,4 @@
 ## Analyzer: busco
 
 mkdir data/process/canu/lr-marine_sediment/busco
-busco --auto-lineage -m genome -i data/process/canu/lr-marine_sediment/lr-marine_sediment.contigs.fasta -o data/process/canu/lr-marine_sediment/busco
+busco --auto-lineage -c 12 -m genome -i data/process/canu/lr-marine_sediment/lr-marine_sediment.contigs.fasta -o data/process/canu/lr-marine_sediment/busco

@@ -8,4 +8,4 @@
 
 
 mkdir -p data/process/flye/lr-soil/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/flye/lr-soil/quast/ data/process/flye/lr-soil/assembly.fasta
+python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/flye/lr-soil/quast/ data/process/flye/lr-soil/assembly.fasta

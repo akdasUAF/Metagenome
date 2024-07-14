@@ -7,4 +7,4 @@
 ## Analyzer: Busco
 
 mkdir -p data/process/abyss/sr-bsc/busco
-busco --auto-lineage -m genome -i data/process/abyss/sr-bsc/sr-bsc.contigs.fasta -o data/process/abyss/sr-bsc/busco
+busco --auto-lineage -c 12 -m genome -i data/process/abyss/sr-bsc/sr-bsc.contigs.fasta -o data/process/abyss/sr-bsc/busco

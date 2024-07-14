@@ -8,5 +8,5 @@
 
 mkdir data/process/flye/lr-gut/busco
 
-busco --auto-lineage -m genome -i data/process/flye/lr-gut/assembly.fasta -o data/process/flye/lr-gut/busco
+busco --auto-lineage -c 12 -m genome -i data/process/flye/lr-gut/assembly.fasta -o data/process/flye/lr-gut/busco
 

@@ -7,4 +7,4 @@
 ## Analyzer: METAQUAST
 
 mkdir data/process/canu/lr-gut/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/canu/lr-gut/quast data/process/canu/lr-gut/lr-gut.contigs.fasta
+python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/canu/lr-gut/quast data/process/canu/lr-gut/lr-gut.contigs.fasta

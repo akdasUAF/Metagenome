@@ -7,4 +7,4 @@
 ## Analyzer: busco
 
 mkdir data/process/canu/lr-synth/busco
-busco --auto-lineage -m genome -i data/process/canu/lr-synth/lr-synth.contigs.fasta -o data/process/canu/lr-synth/busco
+busco --auto-lineage -c 12 -m genome -i data/process/canu/lr-synth/lr-synth.contigs.fasta -o data/process/canu/lr-synth/busco

@@ -7,4 +7,4 @@
 ## Analyzer: METAQUAST
 
 mkdir data/process/miniasm/lr-soil/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/miniasm/lr-soil/quast data/process/miniasm/lr-soil/assembly_minimap_lr-soil.gfa
+python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/miniasm/lr-soil/quast data/process/miniasm/lr-soil/assembly_minimap_lr-soil.gfa

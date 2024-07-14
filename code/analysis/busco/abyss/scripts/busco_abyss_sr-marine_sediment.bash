@@ -7,4 +7,4 @@
 ## Analyzer: busco
 
 mkdir -p data/process/abyss/sr-marine_sediment/busco
-busco --auto-lineage -m genome -i data/process/abyss/sr-marine_sediment/sr-marine_sediment.contigs.fasta -o data/process/abyss/sr-marine_sediment/busco
+busco --auto-lineage -c 12 -m genome -i data/process/abyss/sr-marine_sediment/sr-marine_sediment.contigs.fasta -o data/process/abyss/sr-marine_sediment/busco

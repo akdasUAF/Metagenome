@@ -7,5 +7,5 @@
 ## Analyzer: Busco
 
 mkdir data/process/idba/sr-gut/busco
-busco --auto-lineage -m genome -i data/process/idba/sr-gut/assembly.fasta -o data/process/idba/sr-gut/busco
+busco --auto-lineage -c 12 -m genome -i data/process/idba/sr-gut/assembly.fasta -o data/process/idba/sr-gut/busco
 

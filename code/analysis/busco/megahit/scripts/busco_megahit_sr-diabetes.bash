@@ -6,5 +6,5 @@
 ## Uses this dataset: 
 ## Analyzer: Busco
 
-busco --auto-lineage -m genome -i data/process/megahit/sr-diabetes/final.contigs.fa -o data/process/megahit/sr-diabetes/busco
+busco --auto-lineage -c 12 -m genome -i data/process/megahit/sr-diabetes/final.contigs.fa -o data/process/megahit/sr-diabetes/busco
 

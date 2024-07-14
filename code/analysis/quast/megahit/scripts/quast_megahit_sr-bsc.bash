@@ -7,6 +7,6 @@
 ## Analyzer: METAQUAST
 
 mkdir -p data/process/megahit/sr-bsc/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/megahit/sr-bsc/quast data/process/megahit/sr-bsc/final.contigs.fa --glimmer
+python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/megahit/sr-bsc/quast data/process/megahit/sr-bsc/final.contigs.fa --glimmer
 
 # -r data/process/megahit/sr-bsc/quast/quast_corrected_input/combined_reference.fasta

@@ -7,4 +7,4 @@
 ## Analyzer: METAQUAST
 
 mkdir data/process/canu/lr-ecoli/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/canu/lr-ecoli/quast data/process/canu/lr-ecoli/lr-ecoli.contigs.fasta
+python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/canu/lr-ecoli/quast data/process/canu/lr-ecoli/lr-ecoli.contigs.fasta

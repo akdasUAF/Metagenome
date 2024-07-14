@@ -7,4 +7,4 @@
 ## Analyzer: Busco
 
 mkdir data/process/metaspades/sr-marine_sediment/busco
-busco --auto-lineage -m genome -i data/process/megahit/sr-marine_sediment/assembly.fasta -o data/process/megahit/sr-marine_sediment/busco
+busco --auto-lineage -c 12 -m genome -i data/process/megahit/sr-marine_sediment/assembly.fasta -o data/process/megahit/sr-marine_sediment/busco

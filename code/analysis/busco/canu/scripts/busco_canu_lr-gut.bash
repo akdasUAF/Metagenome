@@ -7,4 +7,4 @@
 ## Analyzer: Busco
 
 mkdir data/process/canu/lr-gut/busco
-busco --auto-lineage -m genome -i data/process/canu/lr-gut/lr-gut.contigs.fasta -o data/process/canu/lr-gut/busco
+busco --auto-lineage -c 12 -m genome -i data/process/canu/lr-gut/lr-gut.contigs.fasta -o data/process/canu/lr-gut/busco
