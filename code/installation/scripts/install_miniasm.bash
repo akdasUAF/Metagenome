@@ -1,6 +1,6 @@
 #!/bin/bash
 
-conda install gcc_linux-64 zlib
+conda install gcc_linux-64 zlib bioconda::minipolish
 
 cd tools/assemblers/
 
