@@ -2,4 +2,6 @@
 
 ### Install Dependencies
 conda install pkg-config matplotlib
-conda install -c bioconda quast
+
+cd tools/analysis/
+git clone https://github.com/ablab/quast.git

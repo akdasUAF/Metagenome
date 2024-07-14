@@ -12,4 +12,5 @@ mkdir -p data/process/
 mkdir -p data/raw/
 
 
-mkdir -p tools/assemblers
+mkdir -p tools/assemblers/
+mkdir -p tools/analysis/
