@@ -6,7 +6,5 @@
 ## Uses this dataset: 
 ## Analyzer: Busco
 
-mkdir -p data/process/megahit/sr-bsc/busco
-
 busco --auto-lineage -m genome -i data/process/megahit/sr-bsc/assembly.fasta -o data/process/megahit/sr-bsc/busco
 
