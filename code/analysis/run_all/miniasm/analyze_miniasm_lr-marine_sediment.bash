@@ -1,0 +1,7 @@
+#!/bin/bash
+## Assembler: miniasm
+## Dataset: Long read Marine Sediment
+
+bash ./code/analysis/quast/miniasm/run_quast_miniasm_lr-marine_sediment.bash
+bash ./code/analysis/busco/miniasm/run_busco_miniasm_lr-marine_sediment.bash
+
