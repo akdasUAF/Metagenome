@@ -21,8 +21,3 @@ auN	3142.6
 L50	121810
 L90	427904
 # N's per 100 kbp	0.00
-# predicted genes (unique)	493585
-# predicted genes (>= 0 bp)	417003 + 77055 part
-# predicted genes (>= 300 bp)	317389 + 69905 part
-# predicted genes (>= 1500 bp)	19029 + 1718 part
-# predicted genes (>= 3000 bp)	2474 + 129 part
