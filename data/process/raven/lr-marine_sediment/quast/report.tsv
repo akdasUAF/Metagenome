@@ -1,0 +1,28 @@
+Assembly	assembly_raven_lr-marine_sediment
+# contigs (>= 0 bp)	4
+# contigs (>= 1000 bp)	4
+# contigs (>= 5000 bp)	3
+# contigs (>= 10000 bp)	2
+# contigs (>= 25000 bp)	0
+# contigs (>= 50000 bp)	0
+Total length (>= 0 bp)	41222
+Total length (>= 1000 bp)	41222
+Total length (>= 5000 bp)	37011
+Total length (>= 10000 bp)	30873
+Total length (>= 25000 bp)	0
+Total length (>= 50000 bp)	0
+# contigs	4
+Largest contig	15529
+Total length	41222
+GC (%)	36.66
+N50	15344
+N90	4211
+auN	12905.6
+L50	2
+L90	4
+# N's per 100 kbp	0.00
+# predicted genes (unique)	18
+# predicted genes (>= 0 bp)	18 + 0 part
+# predicted genes (>= 300 bp)	9 + 0 part
+# predicted genes (>= 1500 bp)	2 + 0 part
+# predicted genes (>= 3000 bp)	1 + 0 part

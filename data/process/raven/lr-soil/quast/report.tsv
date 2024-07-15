@@ -1,0 +1,28 @@
+Assembly	assembly_raven_lr-soil
+# contigs (>= 0 bp)	52
+# contigs (>= 1000 bp)	52
+# contigs (>= 5000 bp)	52
+# contigs (>= 10000 bp)	52
+# contigs (>= 25000 bp)	40
+# contigs (>= 50000 bp)	23
+Total length (>= 0 bp)	3333078
+Total length (>= 1000 bp)	3333078
+Total length (>= 5000 bp)	3333078
+Total length (>= 10000 bp)	3333078
+Total length (>= 25000 bp)	3114641
+Total length (>= 50000 bp)	2499308
+# contigs	52
+Largest contig	216819
+Total length	3333078
+GC (%)	66.23
+N50	94074
+N90	29693
+auN	102684.2
+L50	12
+L90	36
+# N's per 100 kbp	0.00
+# predicted genes (unique)	3978
+# predicted genes (>= 0 bp)	3960 + 19 part
+# predicted genes (>= 300 bp)	3324 + 17 part
+# predicted genes (>= 1500 bp)	206 + 1 part
+# predicted genes (>= 3000 bp)	4 + 0 part

@@ -1,0 +1,30 @@
+All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
+
+Assembly                        lr-ecoli.contigs
+# contigs (>= 0 bp)             2               
+# contigs (>= 1000 bp)          2               
+# contigs (>= 5000 bp)          1               
+# contigs (>= 10000 bp)         0               
+# contigs (>= 25000 bp)         0               
+# contigs (>= 50000 bp)         0               
+Total length (>= 0 bp)          9687            
+Total length (>= 1000 bp)       9687            
+Total length (>= 5000 bp)       8492            
+Total length (>= 10000 bp)      0               
+Total length (>= 25000 bp)      0               
+Total length (>= 50000 bp)      0               
+# contigs                       2               
+Largest contig                  8492            
+Total length                    9687            
+GC (%)                          46.28           
+N50                             8492            
+N90                             1195            
+auN                             7591.8          
+L50                             1               
+L90                             2               
+# N's per 100 kbp               0.00            
+# predicted genes (unique)      7               
+# predicted genes (>= 0 bp)     7 + 0 part      
+# predicted genes (>= 300 bp)   6 + 0 part      
+# predicted genes (>= 1500 bp)  1 + 0 part      
+# predicted genes (>= 3000 bp)  0 + 0 part      
