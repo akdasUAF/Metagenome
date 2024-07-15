@@ -7,4 +7,7 @@
 ## Analyzer: METAQUAST
 
 mkdir data/process/miniasm/lr-ecoli/quast
-python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/miniasm/lr-ecoli/quast data/process/miniasm/lr-ecoli/assembly_minimap_lr-ecoli.gfa
+python3 tools/analysis/quast/metaquast.py --glimmer -t 12 -o data/process/miniasm/lr-ecoli/quast data/process/miniasm/lr-ecoli/assembly_minimap_lr-ecoli.gfa
+
+
+awk '/^S/{print ">"$2"\n"$3}' data/process/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.gfa | fold > data/process/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.fa

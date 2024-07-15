@@ -6,5 +6,5 @@
 ## Uses this dataset: 
 ## Analyzer: METAQUAST
 
-mkdir data/process/flye/lr-/asm_sr-bsc_SRR341725.megahit_asm/quast
-python3 tools/analysis/quast/metaquast.py -c 12 -o data/process/megahit/sr-diabetes/asm_sr-bsc_SRR341725.megahit_asm/quast/ -r data/reference/
+mkdir data/process/flye/lr-ecoli/quast
+python3 tools/analysis/quast/metaquast.py --glimmer -t 12 -o data/process/raven/lr-ecoli/quast/ data/process/raven/lr-ecoli/assembly_raven_lr-ecoli.fasta

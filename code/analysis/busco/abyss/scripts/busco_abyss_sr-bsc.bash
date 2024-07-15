@@ -6,5 +6,4 @@
 ## Uses this dataset: 
 ## Analyzer: Busco
 
-mkdir -p data/process/abyss/sr-bsc/busco
-busco --auto-lineage -c 12 -m genome -i data/process/abyss/sr-bsc/sr-bsc.contigs.fasta -o data/process/abyss/sr-bsc/busco
+busco --auto-lineage -c 12 -m genome -i data/process/abyss/sr-bsc/abyss_sr-bsc-contigs.fa -o data/process/abyss/sr-bsc/busco

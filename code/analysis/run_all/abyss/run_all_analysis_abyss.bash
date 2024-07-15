@@ -12,4 +12,4 @@ bash code/analysis/run_all/abyss/analyze_abyss_sr-bsc.bash || echo "Abyss: sr-bs
 # bash code/analysis/run_all/abyss/analyze_abyss_sr-gut.bash
 
 ## sr-marine_sediment
-bash code/analysis/run_all/abyss/analyze_abyss_sr-marine_sediment.bash
+bash code/analysis/run_all/abyss/analyze_abyss_sr-marine_sediment.bash || echo "Abyss: sr-bsc: Failed" | tee -a logs/analysis/log_analysis_abyss_sr-bsc.log

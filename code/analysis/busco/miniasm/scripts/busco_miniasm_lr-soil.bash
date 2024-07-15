@@ -4,7 +4,7 @@
 ## Assembler: miniasm
 ## Dataset: Long read soil
 ## Uses this dataset: 
-## Analyzer: METAQUAST
+## Analyzer: Busco
 
-mkdir data/process/miniasm/lr-soil/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/miniasm/lr-soil/quast data/process/miniasm/lr-soil/assembly_minimap_lr-soil.gfa
+busco --auto-lineage -c 12 -m genome -i data/process/miniasm/lr-soil/polished_assembly_minimap_lr-soil.fa -o data/process/miniasm/lr-soil/busco
+

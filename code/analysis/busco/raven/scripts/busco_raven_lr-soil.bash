@@ -4,7 +4,7 @@
 ## Assembler: Raven
 ## Dataset: Long read Soil
 ## Uses this dataset: 
-## Analyzer: METAQUAST
+## Analyzer: Busco
 
-mkdir data/process/raven/lr-soil/quast
-python3 tools/analysis/quast/metaquast.py -o data/process/raven/lr-soil/quast/ data/process/raven/lr-soil/assembly_raven_lr-soil.fasta
+
+busco --auto-lineage -c 12 -m genome -i data/process/raven/lr-soil/assembly_raven_lr-soil.fasta -o data/process/raven/lr-soil/busco/
