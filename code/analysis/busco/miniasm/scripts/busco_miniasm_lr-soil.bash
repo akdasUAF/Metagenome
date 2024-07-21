@@ -2,7 +2,7 @@
 
 ## Script to analyze the quality of the metagenomes
 ## Assembler: miniasm
-## Dataset: Long read soil
+## Dataset: lr-soil
 ## Uses this dataset: 
 ## Analyzer: Busco
 
