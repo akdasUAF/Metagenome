@@ -2,8 +2,4 @@
 ## Assembler: canu
 ## Dataset: Long read Soil
 
-time {
-
 conda run -n asm_canu bash code/assembly/canu/scripts/canu_lr-soil.bash | tee logs/assembly/log_assemble_canu_lr-soil.log
-
-} | tee -a logs/assembly/log_assemble_canu_lr-soil.log

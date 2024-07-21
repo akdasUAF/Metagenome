@@ -19,5 +19,6 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/canu/run_canu_lr-marine_sediment.bash
+/usr/bin/time -v bash -c "source code/assembly/canu/run_canu_lr-marine_sediment.bash" 2>&1 | tee -a logs/assembly/log_assemble_canu_lr-marine_sediment.log
+
 
