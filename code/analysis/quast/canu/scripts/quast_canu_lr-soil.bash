@@ -7,4 +7,4 @@
 ## Analyzer: METAQUAST
 
 mkdir data/process/canu/lr-soil/quast
-python3 tools/analysis/quast/metaquast.py --glimmer -t 12 -o data/process/canu/lr-soil/quast data/process/canu/lr-soil/lr-soil.contigs.fasta
+python3 tools/analysis/quast/metaquast.py --glimmer -t 4 -o data/process/canu/lr-soil/quast data/process/canu/lr-soil/lr-soil.contigs.fasta
