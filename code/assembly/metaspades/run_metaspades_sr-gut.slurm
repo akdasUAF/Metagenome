@@ -8,16 +8,17 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_metaspades_sr-soil"
+#SBATCH --job-name="panmeta_asm_metaspades_sr-gut"
 
 ## Clean out any modules, then reload slurm
-# Since conda will be used, no other modules will be loaded
 module purge
+module load GCCcore/12.3.0
+module load Python/3.11.3
 module load slurm
 
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/metaspades/run_metaspades_sr-soil.bash" 2>&1 | tee -a logs/assembly/log_assemble_metaspades_sr-soil.log
+/usr/bin/time -v bash -c "source code/assembly/metaspades/run_metaspades_sr-gut.bash" 2>&1 | tee -a logs/assembly/log_assemble_metaspades_sr-gut.log
 
 

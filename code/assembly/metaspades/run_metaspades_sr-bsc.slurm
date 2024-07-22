@@ -11,8 +11,9 @@
 #SBATCH --job-name="panmeta_asm_metaspades_sr-bsc"
 
 ## Clean out any modules, then reload slurm
-# Since conda will be used, no other modules will be loaded
 module purge
+module load GCCcore/12.3.0
+module load Python/3.11.3
 module load slurm
 
 ulimit -l unlimited

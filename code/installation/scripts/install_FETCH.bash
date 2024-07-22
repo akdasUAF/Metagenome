@@ -4,4 +4,6 @@
 conda install numpy
 
 cd tools/
-git clone https://github.com/bwinnett12/FETCH.git
+git clone -b contained https://github.com/bwinnett12/FETCH.git
+cd FETCH/
+python3 setup.py develop --user
