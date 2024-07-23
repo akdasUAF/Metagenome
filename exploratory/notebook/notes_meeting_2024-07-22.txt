@@ -1,0 +1,14 @@
+
+
+2) Finish All tables
+1) Finish paper
+
+Take computing metrics
+- Charts
+- Dstat
+	- Add a hook
+	- There are several variants
+	- How is the memory drained during the assembly [CPU utilization]
+		- How long is running with
+		- How efficient each part
+- 
