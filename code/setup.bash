@@ -5,7 +5,7 @@ mkdir -p logs/retrieve_datasets/
 mkdir -p logs/installation/
 mkdir -p logs/processing/
 mkdir -p logs/assembly/
-mkdir -p logs/analysis/
+mkdir -p logs/analysis/dool
 
 mkdir -p data/process/
 mkdir -p data/raw/

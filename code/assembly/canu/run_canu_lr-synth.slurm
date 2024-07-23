@@ -19,6 +19,8 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/canu/run_canu_lr-synth.bash" 2>&1 | tee -a logs/assembly/log_assemble_canu_lr-synth.log
 
+bash code/analysis/dool/start_dool.bash logs/analysis/dool/log_dool_canu_lr-synth.log
+/usr/bin/time -v bash -c "source code/assembly/canu/run_canu_lr-synth.bash" 2>&1 | tee -a logs/assembly/log_assemble_canu_lr-synth.log || echo 'Assembly failed : canu lr-synth'
+bash code/analysis/dool/kill_dool.bash
 
