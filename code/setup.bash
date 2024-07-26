@@ -5,7 +5,10 @@ mkdir -p logs/retrieve_datasets/
 mkdir -p logs/installation/
 mkdir -p logs/processing/
 mkdir -p logs/assembly/
-mkdir -p logs/analysis/dool
+mkdir -p logs/analysis/dool/
+mkdir -p logs/analysis/metaquast/
+mkdir -p logs/analysis/assembly-stats/
+mkdir -p logs/analysis/busco/
 
 mkdir -p data/process/
 mkdir -p data/raw/

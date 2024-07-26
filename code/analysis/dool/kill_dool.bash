@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Buffer of 10 seconds to capture baseline system processes after capturing tool metrics
+sleep 10
+
 # Get the PID of dool from the file (replace /tmp/dool.pid with your chosen location)
 pid=$(cat /tmp/dool.pid)
 
