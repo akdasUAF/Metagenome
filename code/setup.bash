@@ -17,7 +17,7 @@ mkdir -p code/retrieval/path_retrieval
 mkdir -p code/processing/path_processor
 
 
-mkdir -p data/assembled_MAG//
+mkdir -p data/MAG/
 mkdir -p data/raw/
 mkdir -p data/analysis
 

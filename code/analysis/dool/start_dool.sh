@@ -8,6 +8,7 @@ fi
 
 # Check if filename is empty, use default if so
 path="$1"
+mkdir -p "$(dirname "$path")"
 
 # Delete the file if it exists
 [[ -f "$path" ]] && rm "$path"
