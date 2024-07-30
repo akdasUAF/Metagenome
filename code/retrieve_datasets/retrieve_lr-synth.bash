@@ -12,7 +12,7 @@ root_dir=$(pwd)
 
 mkdir -p data/raw/lr-synth
 cd data/raw/lr-synth
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR22366767 --max-size=40G
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR22366767 --max-size=40G
 cd SRR22366767/
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR22366767.sra
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR22366767.sra

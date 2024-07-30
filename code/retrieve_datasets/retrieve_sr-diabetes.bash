@@ -10,7 +10,7 @@ root_dir=$(pwd)
 
 mkdir -p data/raw/sr-diabetes
 cd data/raw/sr-diabetes
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR341725
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR341725
 cd SRR341725/
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR341725.sra
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR341725.sra

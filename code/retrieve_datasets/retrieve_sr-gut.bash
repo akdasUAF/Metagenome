@@ -9,7 +9,7 @@ root_dir=$(pwd)
 
 mkdir -p data/raw/sr-gut
 cd data/raw/sr-gut
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR18491254
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR18491254
 cd SRR18491254/
-${root_dir}/tools/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR18491254.sra
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR18491254.sra
