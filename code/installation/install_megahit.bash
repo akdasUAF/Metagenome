@@ -4,4 +4,3 @@
 ## Install dependencies using conda
 conda install cmake zlib bz2file conda-forge::m2-libbz2
 conda install -c bioconda megahit
-echo 'megahit' > code/assembly/path_assembler/megahit.txt || echo 'MEGAHIT not installed'
