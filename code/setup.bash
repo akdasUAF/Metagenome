@@ -26,6 +26,7 @@ mkdir -p data/analysis
 
 mkdir -p tools/assemblers/
 mkdir -p tools/analysis/
+mkdir -p tool/retrieval/
 
 
 
