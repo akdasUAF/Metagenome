@@ -1,0 +1,4 @@
+--glimmer
+-t 12
+-o data/process/canu/lr-ecoli/quast
+data/MAG/canu/lr-ecoli/lr-ecoli.contigs.fasta
