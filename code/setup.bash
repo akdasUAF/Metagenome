@@ -4,24 +4,15 @@
 mkdir -p logs/retrieve_datasets/
 mkdir -p logs/installation/
 mkdir -p logs/processing/
-mkdir -p logs/assembly/
 mkdir -p logs/analysis/dool/
 mkdir -p logs/analysis/metaquast/
 mkdir -p logs/analysis/assembly-stats/
 mkdir -p logs/analysis/busco/
 
-mkdir -p code/assembly/args_assembler
-mkdir -p code/assembly/path_assembler
-mkdir -p code/analysis/path_analyzer
-mkdir -p code/retrieval/path_retrieval
-mkdir -p code/processing/path_processor
-
 
 mkdir -p data/MAG/
 mkdir -p data/raw/
-mkdir -p data/analysis
-
-
+mkdir -p data/analysis/
 
 
 mkdir -p tools/assemblers/

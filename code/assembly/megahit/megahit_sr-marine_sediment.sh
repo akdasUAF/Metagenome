@@ -5,6 +5,8 @@
 ## Assembler: megahit
 
 rm -rf data/MAG/megahit/sr-marine_sediment/
+mkdir -p data/analysis/megahit/sr-marine_sediment/
+
 
 megahit -1 data/raw/sr-marine_sediment/SRR27456520/SRR27456520_1.fastq -2 data/raw/sr-marine_sediment/SRR27456520/SRR27456520_2.fastq -o data/MAG/megahit/sr-marine_sediment/
 
