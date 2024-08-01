@@ -15,20 +15,30 @@ mkdir -p "$(dirname "$path")"
 
 # Run dool in the background with user-provided filename
 ## Runs these settings:
-# -a: all
+# -afr: all
+bash code/analysis/dool/dool_scripts/dool_afr.sh "$path"_dool-afr.log
 # --aio:
-## fs
-# -r
+bash code/analysis/dool/dool_scripts/dool_aio.sh "$path"_dool-aio.log
 # -s:
-# --cpufreq 
-# --disk-avgqu 
-# --disk-avgrq 
-# --disk-inflight 
-# --disk-svctm 
-# --disk-util 
-# --mem-percent 
 
-dool -afr --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --mem-percent --output "$path" &
+# --cpufreq 
+bash code/analysis/dool/dool_scripts/dool_cpufreq.sh "$path"_dool-cpufreq.log
+# --disk-avgqu 
+bash code/analysis/dool/dool_scripts/dool_disk-avgqu.sh "$path"_disk-avgqu.log
+# --disk-avgrq 
+bash code/analysis/dool/dool_scripts/dool_avgrq.sh "$path"_dool-avgrq.log
+# --disk-inflight 
+bash code/analysis/dool/dool_scripts/dool_disk-inflight.sh "$path"_dool-disk-inflight.log
+# --disk-svctm 
+bash code/analysis/dool/dool_scripts/dool_svctm.sh "$path"_dool-svctm.log
+# --disk-util 
+bash code/analysis/dool/dool_scripts/dool_disk-util.sh "$path"_dool-disk-util.log
+# --mem-percent 
+bash code/analysis/dool/dool_scripts/dool_mem-percent.sh "$path"_dool-mempercent.log
+
+#dool -afr --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --mem-percent --output "$path" &
+
+
 
 # Capture the background process PID
 pid=$!
