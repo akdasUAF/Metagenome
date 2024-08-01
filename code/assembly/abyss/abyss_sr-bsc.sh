@@ -3,7 +3,7 @@
 ## Assembler: abyss
 ## Dataset: sr-bsc
 
-mkdir -p data/process/abyss/sr-bsc/
+mkdir -p data/MAG/abyss/sr-bsc/
 mkdir -p data/analysis/abyss/sr-bsc/
 
 abyss-pe k=41 name=abyss_sr-bsc B=4G \

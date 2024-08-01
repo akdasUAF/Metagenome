@@ -37,6 +37,6 @@ pid=$!
 echo $pid > /tmp/dool.pid
 
 ### Buffer of 10 seconds to capture baseline system processes before capturing tool metrics
-#sleep 10
+sleep 10
 
 
