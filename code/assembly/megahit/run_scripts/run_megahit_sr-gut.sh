@@ -3,7 +3,7 @@
 ## Assembler: megahit
 ## Dataset: sr-gut
 
-bash code/analysis/dool/start_dool.sh data/analysis/megahit/dool_asm_megahit_sr-gut.csv
+bash code/analysis/dool/start_dool.sh data/analysis/megahit/sr-gut/dool_asm_megahit_sr-gut.csv
 
 conda run -n asm_megahit bash code/assembly/megahit/megahit_sr-gut.sh | tee data/analysis/megahit/sr-gut/log_assemble_megahit_sr-gut.log
 

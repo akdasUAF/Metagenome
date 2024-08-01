@@ -28,7 +28,7 @@ mkdir -p "$(dirname "$path")"
 # --disk-util 
 # --mem-percent 
 
-dool -afrs --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --mem-percent --output "$path" &
+dool -afr --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --mem-percent --output "$path" &
 
 # Capture the background process PID
 pid=$!
