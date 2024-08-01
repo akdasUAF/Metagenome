@@ -9,6 +9,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_megahit_sr-diabetes"
+#SBATCH --output=data/analysis/megahit/log_slurm_megahit_sr-bsc_bio.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
