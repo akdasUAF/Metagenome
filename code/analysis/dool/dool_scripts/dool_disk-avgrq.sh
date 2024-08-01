@@ -14,6 +14,6 @@ mkdir -p "$(dirname "$path")"
 [[ -f "$path" ]] && rm "$path"
 
 
-dool --avgrq --output "$path" &
+dool --disk-avgrq --output "$path" &
 
 echo $pid >> /tmp/dool.pid
