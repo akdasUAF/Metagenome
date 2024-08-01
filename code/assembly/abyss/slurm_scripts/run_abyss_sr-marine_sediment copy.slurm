@@ -8,7 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_megahit_sr-bsc"
+#SBATCH --job-name="panmeta_asm_abyss_sr-marine_sediment"
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -18,4 +18,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/megahit/run_scripts/run_megahit_sr-bsc.sh" 2>&1 | tee -a data/analysis/megahit/log_assemble_megahit_sr-bsc_slurm.log || echo 'Assembly failed : megahit sr-bsc'
+/usr/bin/time -v bash -c "source code/assembly/abyss/run_scripts/run_abyss_sr-marine_sediment.sh" 2>&1 | tee -a data/analysis/abyss/log_assemble_abyss_sr-marine_sediment_slurm.log || echo 'Assembly failed : abyss sr-marine_sediment'
