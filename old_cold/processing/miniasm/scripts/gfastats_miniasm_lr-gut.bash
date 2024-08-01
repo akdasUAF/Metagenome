@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/bash
 
 ./tools/processing/gfastats/build/bin/gfastats data/process/miniasm/lr-soil/polished_assembly_minimap_lr-soil.gfa -o data/process/miniasm/lr-soil/polished_assembly_minimap_lr-soil.fa
 

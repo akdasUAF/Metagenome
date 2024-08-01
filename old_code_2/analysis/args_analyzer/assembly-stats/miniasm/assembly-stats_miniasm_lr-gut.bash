@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/bash
 # Analyzer: assembly-stats
 ## Assembler: miniasm
 ## Dataset: lr-gut

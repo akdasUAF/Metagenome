@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/bash
 ## Analyzer: kmergenie
 
 conda install bioconda::kmergenie zlib r-base

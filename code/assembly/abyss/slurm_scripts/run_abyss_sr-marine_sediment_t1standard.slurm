@@ -9,6 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_abyss_sr-marine_sediment"
+#SBATCH --output=data/analysis/abyss/sr-marine_sediment/log_slurm_abyss_sr-marine_sediment_t1standard.log
+#SBATCH --error=data/analysis/abyss/sr-marine_sediment/log_slurm_abyss_sr-marine_sediment_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded

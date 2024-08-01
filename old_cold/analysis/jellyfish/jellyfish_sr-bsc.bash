@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/bash
 
 ./tools/analysis/jellyfish-2.3.1/bin/jellyfish count -t 12 -C -m 19 -s 5G -o 19mer_out --min-qual-char=? data/raw/sr-bsc/SRR28765359/SRR28765359_1.fastq data/raw/sr-bsc/SRR28765359/SRR28765359_2.fastq
 

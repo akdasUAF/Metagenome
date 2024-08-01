@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/bash
 
 conda install autoconf automake libtool gettext pkg-config yaggo gcc bioconda::yaggo
 

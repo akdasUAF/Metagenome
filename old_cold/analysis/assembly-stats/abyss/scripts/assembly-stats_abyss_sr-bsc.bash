@@ -1,4 +1,4 @@
-#!/bin/bash/
+#!/bin/bash
 # Analyzer: assembly-stats
 ## Assembler: abyss
 ## Dataset: sr-bsc

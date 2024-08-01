@@ -9,7 +9,9 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_abyss_sr-gut_bio"
-#SBATCH --output=data/analysis/abyss/sr-gut/log_slurm_abyss_sr-diabetes_.log
+#SBATCH --output=data/analysis/abyss/sr-gut/log_slurm_abyss_sr-gut_bio_%j.log
+#SBATCH --error=data/analysis/abyss/sr-gut/log_slurm_abyss_sr-gut_bio_error_%j.err
+
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
