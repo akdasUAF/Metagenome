@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_abyss_sr-diabetes_bio"
-#SBATCH --output=data/analysis/abyss/sr-diabetes/log_slurm_abyss_sr-diabetes_bio_%j.log
-#SBATCH --error=data/analysis/abyss/sr-diabetes/log_slurm_abyss_sr-diabetes_err_%j.log
+#SBATCH --job-name="panmeta_asm_canu_lr-gut_bio"
+#SBATCH --output=data/analysis/canu/lr-gut/log_slurm_canu_lr-gut_%j.log
+#SBATCH --error=data/analysis/canu/lr-gut/log_slurm_canu_lr-gut_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/abyss/run_scripts/run_abyss_sr-diabetes.sh" 2>&1 | tee -a data/analysis/abyss/sr-diabetes/log_assemble_abyss_sr-diabetes_slurm.log || echo 'Assembly failed : abyss sr-diabetes'
+/usr/bin/time -v bash -c "source code/assembly/canu/run_scripts/run_canu_lr-gut.sh" 2>&1 | tee -a data/analysis/canu/log_assemble_canu_lr-gut_slurm.log || echo 'Assembly failed : canu lr-gut'
