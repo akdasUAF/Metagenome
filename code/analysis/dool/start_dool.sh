@@ -30,7 +30,7 @@ bash code/analysis/dool/dool_scripts/dool_avgrq.sh "$path"_dool-avgrq.log
 # --disk-inflight 
 bash code/analysis/dool/dool_scripts/dool_disk-inflight.sh "$path"_dool-disk-inflight.log
 # --disk-svctm 
-bash code/analysis/dool/dool_scripts/dool_svctm.sh "$path"_dool-svctm.log
+bash code/analysis/dool/dool_scripts/dool_disk-svctm.sh "$path"_dool-svctm.log
 # --disk-util 
 bash code/analysis/dool/dool_scripts/dool_disk-util.sh "$path"_dool-disk-util.log
 # --mem-percent 
