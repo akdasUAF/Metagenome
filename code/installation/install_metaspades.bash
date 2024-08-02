@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### Install Dependencies
-conda install cmake zlib bz2file conda-forge::m2-libbz2
+conda install cmake zlib bz2file conda-forge::m2-libbz2 python=3.11
 
 cd tools/assemblers/ || exit
 

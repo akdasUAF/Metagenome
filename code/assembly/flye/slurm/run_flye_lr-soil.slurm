@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-synth_bio"
-#SBATCH --output=data/analysis/canu/lr-synth/log_slurm_canu_lr-synth_%j.log
-#SBATCH --error=data/analysis/canu/lr-synth/log_slurm_canu_lr-synth_err_%j.log
+#SBATCH --job-name="panmeta_asm_flye_lr-soil_bio"
+#SBATCH --output=data/analysis/flye/lr-soil/log_slurm_flye_lr-soil_%j.log
+#SBATCH --error=data/analysis/flye/lr-soil/log_slurm_flye_lr-soil_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/canu/run_scripts/run_canu_lr-synth.sh" 2>&1 | tee -a data/analysis/canu/log_assemble_canu_lr-synth_slurm.log || echo 'Assembly failed : canu lr-synth'
+/usr/bin/time -v bash -c "source code/assembly/flye/run_scripts/run_flye_lr-soil.sh" 2>&1 | tee -a data/analysis/flye/log_assemble_flye_lr-soil_slurm.log || echo 'Assembly failed : flye lr-soil'

@@ -6,6 +6,6 @@
 mkdir -p data/MAG/abyss/sr-diabetes/
 mkdir -p data/analysis/abyss/sr-diabetes/
 
-abyss-pe k=41 name=abyss_sr-diabetes B=4G \
+abyss-pe k=41 name=abyss_sr-diabetes B=214G \
 	in='data/raw/sr-diabetes/SRR341725/SRR341725_1.fastq data/raw/sr-diabetes/SRR341725/SRR341725_2.fastq' \
 	out='data/MAG/abyss/sr-diabetes/'

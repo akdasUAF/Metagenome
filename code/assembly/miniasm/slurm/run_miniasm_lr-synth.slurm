@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-gut_bio"
-#SBATCH --output=data/analysis/canu/lr-gut/log_slurm_canu_lr-gut_%j.log
-#SBATCH --error=data/analysis/canu/lr-gut/log_slurm_canu_lr-gut_err_%j.log
+#SBATCH --job-name="panmeta_asm_miniasm_lr-synth_bio"
+#SBATCH --output=data/analysis/miniasm/lr-synth/log_slurm_miniasm_lr-synth_%j.log
+#SBATCH --error=data/analysis/miniasm/lr-synth/log_slurm_miniasm_lr-synth_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/canu/run_scripts/run_canu_lr-gut.sh" 2>&1 | tee -a data/analysis/canu/log_assemble_canu_lr-gut_slurm.log || echo 'Assembly failed : canu lr-gut'
+/usr/bin/time -v bash -c "source code/assembly/miniasm/run_scripts/run_miniasm_lr-synth.sh" 2>&1 | tee -a data/analysis/miniasm/log_assemble_miniasm_lr-synth_slurm.log || echo 'Assembly failed : miniasm lr-synth'
