@@ -4,7 +4,7 @@
 ## Dataset: sr-gut
 
 mkdir -p data/analysis/metaspades/sr-gut/
-bash code/analysis/dool/start_dool.sh data/analysis/metaspades/dool_asm_metaspades_sr-gut.csv
+bash code/analysis/dool/start_dool.sh data/analysis/metaspades/sr-gut/dool_asm_metaspades_sr-gut
 
 conda run -n asm_metaspades bash code/assembly/metaspades/metaspades_sr-gut.sh | tee data/analysis/metaspades/sr-gut/log_assemble_metaspades_sr-gut.log
 

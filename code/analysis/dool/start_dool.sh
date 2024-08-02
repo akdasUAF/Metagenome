@@ -24,7 +24,7 @@ bash code/analysis/dool/dool_scripts/dool_aio.sh "$path"_dool-aio.csv
 # --cpufreq 
 bash code/analysis/dool/dool_scripts/dool_cpufreq.sh "$path"_dool-cpufreq.csv
 # --disk-avgqu 
-bash code/analysis/dool/dool_scripts/dool_disk-avgqu.sh "$path"_disk-avgqu.csv
+bash code/analysis/dool/dool_scripts/dool_disk-avgqu.sh "$path"_dool_disk-avgqu.csv
 # --disk-avgrq 
 bash code/analysis/dool/dool_scripts/dool_disk-avgrq.sh "$path"_dool-avgrq.csv
 # --disk-inflight 
