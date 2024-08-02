@@ -43,9 +43,6 @@ bash code/analysis/dool/dool_scripts/dool_mem-percent.sh "$path"_dool-mempercent
 # Capture the background process PID
 pid=$!
 
-# Store the PID in a file (replace /tmp/dool.pid with your chosen location)
-echo $pid > /tmp/dool.pid
-
 ### Buffer of 10 seconds to capture baseline system processes before capturing tool metrics
 sleep 10
 
