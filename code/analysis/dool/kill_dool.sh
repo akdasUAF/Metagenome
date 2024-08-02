@@ -5,6 +5,7 @@ sleep 10
 
 # Read PIDs from the file
 pids=( $(cat /tmp/dool.pid) )
+echo "$pids"
 
 # Loop through PIDs and kill processes
 for pid in "${pids[@]}"; do

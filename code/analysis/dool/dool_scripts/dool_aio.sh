@@ -6,16 +6,11 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
-# Check if filename is empty, use default if so
 path="$1"
-mkdir -p "$(dirname "$path")"
-
-# Delete the file if it exists
-[[ -f "$path" ]] && rm "$path"
-
 
 dool --aio --output "$path" &
 
 pid=$!
-echo $pid >> /tmp/dool.pid
+
+echo $pid >> /tmp/dool.pid  # Append PID to the file
 exit 0

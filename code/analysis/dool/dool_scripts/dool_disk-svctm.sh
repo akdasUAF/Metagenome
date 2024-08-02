@@ -6,13 +6,7 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
-# Check if filename is empty, use default if so
 path="$1"
-mkdir -p "$(dirname "$path")"
-
-# Delete the file if it exists
-[[ -f "$path" ]] && rm "$path"
-
 
 dool --disk-svctm --output "$path" &
 
