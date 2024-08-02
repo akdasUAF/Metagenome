@@ -17,7 +17,5 @@
 module purge
 module load slurm
 
-ulimit -l unlimited
-
 eval "$(conda shell.bash hook)"
 /usr/bin/time -v bash -c "source code/assembly/flye/run_scripts/run_flye_lr-marine_sediment.sh" 2>&1 | tee -a data/analysis/flye/log_assemble_flye_lr-marine_sediment_slurm.log || echo 'Assembly failed : flye lr-marine_sediment'
