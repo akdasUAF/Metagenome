@@ -4,7 +4,7 @@
 conda run -n asm_flye bash code/installation/install_flye.bash | tee logs/installation/log_install_flye.log
 
 # Define the base directory
-base_dir="code/analysis/flye"
+base_dir="data/analysis/flye"
 
 # Array of folder names
 folders=("lr-ecoli" "lr-gut" "lr-soil" "lr-synth" "lr-marine_sediment")

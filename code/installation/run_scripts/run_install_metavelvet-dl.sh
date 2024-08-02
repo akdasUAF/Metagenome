@@ -1,7 +1,7 @@
 
 
 # Define the base directory
-base_dir="code/analysis/metavelvet"
+base_dir="data/analysis/metavelvet"
 
 # Array of folder names
 folders=("sr-diabetes" "sr-gut" "sr-bsc" "sr-marine_sediment")

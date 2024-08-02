@@ -5,7 +5,7 @@ conda run -n asm_metaspades bash code/installation/install_metaspades.bash | tee
 
 
 # Define the base directory
-base_dir="code/analysis/metaspades"
+base_dir="data/analysis/metaspades"
 
 # Array of folder names
 folders=("sr-diabetes" "sr-gut" "sr-bsc" "sr-marine_sediment")
