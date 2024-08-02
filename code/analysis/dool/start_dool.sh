@@ -26,7 +26,7 @@ bash code/analysis/dool/dool_scripts/dool_cpufreq.sh "$path"_dool-cpufreq.log
 # --disk-avgqu 
 bash code/analysis/dool/dool_scripts/dool_disk-avgqu.sh "$path"_disk-avgqu.log
 # --disk-avgrq 
-bash code/analysis/dool/dool_scripts/dool_avgrq.sh "$path"_dool-avgrq.log
+bash code/analysis/dool/dool_scripts/dool_disk-avgrq.sh "$path"_dool-avgrq.log
 # --disk-inflight 
 bash code/analysis/dool/dool_scripts/dool_disk-inflight.sh "$path"_dool-disk-inflight.log
 # --disk-svctm 

@@ -16,4 +16,6 @@ mkdir -p "$(dirname "$path")"
 
 dool --disk-inflight --output "$path" &
 
+pid=$!
 echo $pid >> /tmp/dool.pid
+exit 0
