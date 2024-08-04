@@ -1,6 +1,6 @@
 #!/bin/bash
 
-config_file="code/retrieve_datasets/reference/FETCH_config/all.config"
+config_file="code/retrieve_datasets/reference/FETCH_config/config_paths.config"
 declare -A config_files
 
 while IFS='=' read -r key value; do
