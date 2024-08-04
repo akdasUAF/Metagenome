@@ -13,7 +13,7 @@ cd tools/retrieval/FETCH/
 python3 FETCH.py -s
 
 ## Retrieve references
-python3 FETCH.py -f code/retrieve_datasets/reference/references_by_accession/references_sr-bsc.txt
+python3 FETCH.py -f "${top_dir}"/code/retrieve_datasets/reference/references_by_accession/references_sr-bsc.txt
 
 cd "$top_dir"
 
