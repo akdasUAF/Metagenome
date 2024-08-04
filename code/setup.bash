@@ -1,5 +1,16 @@
 #!/bin/bash
 
+function run_script() {
+  local script_name="$1"
+  local script_path="$2"
+
+  echo "Running script: $script_name..."
+  bash "$script_path"
+  if [ $? -ne 0 ]; then
+    echo "Error running script: $script_name"
+  fi
+}
+
 ### Create several base folders
 mkdir -p logs/retrieve_datasets/
 mkdir -p logs/installation/
@@ -36,3 +47,17 @@ for env_name in "${env_names[@]}"; do
 done
 
 echo "All environment creation checks complete."
+
+# Install retrieval tools
+run_script "Install retrieval tools" "code/installation/run_scripts/run_install_all_retrieval.sh"
+
+# Retrieve datasets
+run_script "Retrieve datasets" "code/retrieve_datasets/run_scripts/run_retrieve_all.sh"
+
+# Install analyzers
+run_script "Install analyzers" "code/installation/run_scripts/run_install_all_analyzers.sh"
+
+# Install assemblers
+run_script "Install assemblers" "code/installation/run_scripts/run_install_all_assemblers.sh"
+
+echo "Script execution complete."
