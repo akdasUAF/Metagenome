@@ -17,6 +17,6 @@ python3 FETCH.py -f "${top_dir}"/code/retrieve_datasets/reference/references_by_
 
 cd "$top_dir"
 
-cat data/reference/sr-bsc/storage/*.fasta > data/reference/sr-bsc/ref_combined_sr-bsc.fasta
+cat data/reference/sr-bsc/storage/genome/*.fa > data/reference/sr-bsc/ref_combined_sr-bsc.fasta
 
 switch_config "code/retrieve_datasets/reference/config/fetch_default.config"
