@@ -11,7 +11,7 @@ wget https://github.com/ablab/spades/releases/download/v4.0.0/SPAdes-4.0.0-Linux
 ## Unzip tar.gz
 tar -xvzf SPAdes-4.0.0-Linux.tar.gz
 
-## Compile spades
-cd SPAdes-4.0.0-Linux/ || exit
-./spades_compile.sh
+# ## Compile spades
+# cd SPAdes-4.0.0-Linux/ || exit
+# ./spades_compile.sh
 
