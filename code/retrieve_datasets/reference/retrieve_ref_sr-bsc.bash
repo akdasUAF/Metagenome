@@ -5,7 +5,7 @@ top_dir="$PWD"
 mkdir -p data/reference/sr-bsc/
 
 source code/retrieve_datasets/reference/misc_scripts/switch_config.sh
-switch_config "sr-bsc"
+switch_config "code/retrieve_datasets/reference/config/fetch_sr-bsc.config"
 
 cd tools/retrieval/FETCH/
 
@@ -19,4 +19,4 @@ cd "$top_dir"
 
 cat data/reference/sr-bsc/storage/*.fasta > data/reference/sr-bsc/ref_combined_sr-bsc.fasta
 
-reset_config
+switch_config "code/retrieve_datasets/reference/config/fetch_default.config"
