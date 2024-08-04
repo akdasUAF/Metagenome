@@ -15,8 +15,14 @@ script_filename=$(basename "$script_name")
 # Extract assembler and dataset names (assuming underscore separation)
 IFS="_" read -r assembler dataset <<< "$script_filename"
 
-# Build custom output filename (modify separator if needed)
-time_output_file="time_${assembler}_${dataset}.csv"
+# Build base output directory
+output_dir="data/analysis/$assembler/$dataset"
+
+# Create the output directory if it doesn't exist
+mkdir -p "$output_dir"
+
+# Build custom output filename
+time_output_file="$output_dir/time_${assembler}_${dataset}.csv"
 
 # Run the script with time measurement and capture output
 time_output=$(/usr/bin/time -v bash -c "source $script_name" 2>&1)
@@ -32,4 +38,3 @@ fi
 echo "$time_output" >> "$time_output_file"
 
 echo "Script '$script_name' execution time recorded in $time_output_file"
-
