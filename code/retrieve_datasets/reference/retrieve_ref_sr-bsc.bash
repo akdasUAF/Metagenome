@@ -20,3 +20,4 @@ cd "$top_dir"
 cat data/reference/sr-bsc/storage/genome/*.fa > data/reference/sr-bsc/ref_combined_sr-bsc.fasta
 
 switch_config "code/retrieve_datasets/reference/config/fetch_default.config"
+
