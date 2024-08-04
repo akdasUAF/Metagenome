@@ -28,7 +28,6 @@ install_tool "raven lr-ecoli" "code/assembly/raven/run_scripts/run_flye_lr-ecoli
 install_tool "canu lr-soil" "code/assembly/canu/run_scripts/run_canu_lr-soil.sh"
 install_tool "canu lr-marine_sediment" "code/assembly/canu/run_scripts/run_canu_lr-marine_sediment.sh"
 install_tool "canu lr-gut" "code/assembly/canu/run_scripts/run_canu_lr-gut.sh"
-install_tool "canu lr-ecoli" "code/assembly/canu/run_scripts/run_canu_lr-ecoli.sh"
 
 
 
