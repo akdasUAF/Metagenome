@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Assembly over, Echo
+echo "Assembly over: Waiting before killing"
+
 ## Buffer of 10 seconds to capture baseline system processes after capturing tool metrics
 sleep 10
 

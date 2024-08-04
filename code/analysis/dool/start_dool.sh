@@ -43,4 +43,5 @@ bash code/analysis/dool/dool_scripts/dool_full.sh "$path"
 ### Buffer of 10 seconds to capture baseline system processes before capturing tool metrics
 sleep 10
 
-
+## Echo that the timer is over:
+echo "Timer is over: Beginning assembly"
