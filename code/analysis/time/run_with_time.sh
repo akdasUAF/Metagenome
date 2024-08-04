@@ -19,7 +19,7 @@ IFS="_" read -r assembler dataset <<< "$script_filename"
 time_output_file="time_${assembler}_${dataset}.csv"
 
 # Run the script with time measurement and capture output
-time_output=$(time -v bash -c "source $script_name" 2>&1)
+time_output=$(/usr/bin/time -v bash -c "source $script_name" 2>&1)
 
 # Check if script execution was successful
 if [ $? -ne 0 ]; then
