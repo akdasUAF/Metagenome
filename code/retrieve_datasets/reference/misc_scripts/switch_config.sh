@@ -1,10 +1,12 @@
 #!/bin/bash
 
-config_file_path="code/retrieve_datasets/reference/FETCH_config/all.config"
+config_file="code/retrieve_datasets/reference/FETCH_config/all.config"
+declare -A config_files
 
-# Read config file paths from config_paths.conf
-config_parser=$(configparser -f "$config_file_path")
-config_files=("${config_parser:config_files}")
+while IFS='=' read -r key value; do
+  config_files[$key]="$value"
+done < "$config_file"
+
 
 # Function to switch config file
 function switch_config() {
