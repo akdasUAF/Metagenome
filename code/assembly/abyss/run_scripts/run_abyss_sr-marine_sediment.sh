@@ -5,6 +5,6 @@
 
 bash code/analysis/dool/start_dool.sh data/analysis/abyss/sr-abyss/dool_asm_abyss_sr-marine_sediment.csv
 
-conda run -n asm_abyss bash code/assembly/abyss/abyss_sr-marine_sediment.sh | tee data/analysis/abyss/sr-marine_sediment/log_assemble_abyss_sr-marine_sediment.log
+conda run -n asm_abyss bash -c "source code/analysis/time/run_with_time.sh code/assembly/abyss/abyss_sr-marine_sediment.sh" | tee data/analysis/abyss/sr-marine_sediment/log_assemble_abyss_sr-marine_sediment.log
 
 bash code/analysis/dool/kill_dool.sh
