@@ -9,5 +9,5 @@ mkdir -p data/MAG/miniasm/lr-ecoli/
 ./tools/assemblers/miniasm/miniasm -f data/raw/lr-ecoli/Loman_E.coli_MAP006-1_2D_50x.fasta data/MAG/miniasm/lr-ecoli/overlap_minimap_lr-ecoli.paf > data/MAG/miniasm/lr-ecoli/assembly_minimap_lr-ecoli.gfa
 minipolish -t 12 data/raw/lr-ecoli/Loman_E.coli_MAP006-1_2D_50x.fasta data/MAG/miniasm/lr-ecoli/assembly_minimap_lr-ecoli.gfa > data/MAG/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.gfa
 
-./tools/processing/gfastats/build/bin/gfastats data/MAG/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.gfa -o data/MAG/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.fasta
+./tools/processing/gfastats/build/bin/gfastats data/MAG/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.gfa data/MAG/miniasm/lr-ecoli/polished_assembly_minimap_lr-ecoli.fasta
 
