@@ -8,15 +8,5 @@ fi
 input_file="$1"
 output_file="$2"
 
+awk '/^S/{header=">"$2; for(i=4; i<=NF; i++) {header=header" "$i}; print header; printf "%s", $3 | "fold -w 80"; close("fold -w 80"); print ""}' "$input_file" > "$output_file"
 
-awk '
-/^S/{
-  seq_id = $2
-  next
-}
-/^L/{
-  if (seq_id) {
-    printf ">%s\n%s\n", seq_id, $9
-    seq_id = ""
-  }
-}' "$input_file" > "$output_file"
