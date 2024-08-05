@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --partition=bio
+#SBATCH --partition=t1standard
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
-#SBATCH --mem=214G
+###SBATCH --mem=214G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_miniasm_lr-ecoli_bio"
+#SBATCH --job-name="panmeta_asm_miniasm_lr-ecoli_t1standard"
 #SBATCH --output=data/analysis/miniasm/lr-ecoli/log_slurm_miniasm_lr-ecoli_%j.log
 #SBATCH --error=data/analysis/miniasm/lr-ecoli/log_slurm_miniasm_lr-ecoli_err_%j.log
 

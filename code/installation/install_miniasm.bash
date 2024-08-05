@@ -4,11 +4,9 @@ conda install gcc_linux-64 zlib bioconda::minipolish
 
 cd tools/assemblers/ || exit
 
-path_assemblers=$(pwd)
-
 # Install minimap and miniasm (requiring gcc and zlib)
-git clone https://github.com/lh3/minimap2 && cd minimap2 && make
-cd "$path_assemblers"
+curl -L https://github.com/lh3/minimap2/releases/download/v2.28/minimap2-2.28_x64-linux.tar.bz2 | tar -jxvf -
+mv minimap2-2.28_x64-linux/ minimap2
 
 git clone https://github.com/lh3/miniasm && cd miniasm && make
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=bio
+#SBATCH --partition=t1standard
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
@@ -8,7 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_miniasm_lr-marine_sediment_bio"
+#SBATCH --job-name="panmeta_asm_miniasm_lr-marine_sediment_t1standard"
 #SBATCH --output=data/analysis/miniasm/lr-marine_sediment/log_slurm_miniasm_lr-marine_sediment_%j.log
 #SBATCH --error=data/analysis/miniasm/lr-marine_sediment/log_slurm_miniasm_lr-marine_sediment_err_%j.log
 
