@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-soil_bio"
-#SBATCH --output=data/analysis/canu/lr-soil/log_slurm_canu_lr-soil_%j.log
-#SBATCH --error=data/analysis/canu/lr-soil/log_slurm_canu_lr-soil_err_%j.log
+#SBATCH --job-name="panmeta_asm_raven_lr-soil_bio"
+#SBATCH --output=data/analysis/raven/lr-soil/log_slurm_raven_lr-soil_%j.log
+#SBATCH --error=data/analysis/raven/lr-soil/log_slurm_raven_lr-soil_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/canu/run_scripts/run_canu_lr-soil.sh" 2>&1 | tee -a data/analysis/canu/log_assemble_canu_lr-soil_slurm.log || echo 'Assembly failed : canu lr-soil'
+/usr/bin/time -v bash -c "source code/assembly/raven/run_scripts/run_raven_lr-soil.sh" 2>&1 | tee -a data/analysis/raven/log_assemble_raven_lr-soil_slurm.log || echo 'Assembly failed : raven lr-soil'
