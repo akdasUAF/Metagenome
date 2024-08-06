@@ -4,7 +4,9 @@ conda install tensorflow keras numpy zlib gcc_linux-64 bzip2 libcurl libdeflate 
 conda install -c bioconda samtools
 conda install -c bioconda dwgsim
 conda install -c bioconda metavelvet
+conda install -c bioconda metavelvet-sl
 conda install -c bioconda libsvm
+
 conda install -c bioconda MetaPhlAn
 
 conda install matplotlib-base pysam libzlib libgcc-ng zlib libdeflate libcurl r-rbiom
@@ -12,6 +14,33 @@ conda install matplotlib-base pysam libzlib libgcc-ng zlib libdeflate libcurl r-
 mkdir -p tools/assembly/metavelvet-dl/ && cd tools/assembly/metavelvet-dl/ || exit
 
 path_mvtop=$(pwd)
+
+
+
+
+
+
+
+
+
+wget http://www.dna.bio.keio.ac.jp/metavelvet-dl/metavelvet_dl_inference.py
+wget http://www.dna.bio.keio.ac.jp/metavelvet-dl/metavelvet_dl_training.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### Installing htslib

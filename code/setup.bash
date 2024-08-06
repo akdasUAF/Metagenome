@@ -35,7 +35,7 @@ mkdir -p tools/retrieval/
 
 
 # Define list of environment names as an array
-env_names=("asm_abyss" "asm_canu" "asm_flye" "asm_megahit" "asm_metaspades" "asm_metavelvet" "asm_miniasm" "asm_raven" "ana_assembly-stats" "ana_busco" "ana_metaquast" "ana_jellyfish" "pro_fetch" "pro_gfastats" "sra_toolkit")
+env_names=("asm_abyss" "asm_canu" "asm_flye" "asm_megahit" "asm_metamdbg" "asm_metaspades" "asm_metavelvet" "asm_miniasm" "asm_raven" "ana_assembly-stats" "ana_busco" "ana_metaquast" "ana_jellyfish" "pro_fetch" "pro_trimmomatic" "pro_fastqc" "pro_gfastats" "sra_toolkit")
 
 # Loop through the list
 for env_name in "${env_names[@]}"; do
@@ -51,15 +51,15 @@ done
 echo "All environment creation checks complete."
 
 # Install retrieval tools
-run_script "Install retrieval tools" "code/installation/run_scripts/run_install_all_retrieval.sh"
+#run_script "Install retrieval tools" "code/installation/run_scripts/run_install_all_retrieval.sh"
 
 # Retrieve datasets
-run_script "Retrieve datasets" "code/retrieve_datasets/run_scripts/run_retrieve_all.sh"
+#run_script "Retrieve datasets" "code/retrieve_datasets/run_scripts/run_retrieve_all.sh"
 
 # Install analyzers
-run_script "Install analyzers" "code/installation/run_scripts/run_install_all_analyzers.sh"
+#run_script "Install analyzers" "code/installation/run_scripts/run_install_all_analyzers.sh"
 
 # Install assemblers
-run_script "Install assemblers" "code/installation/run_scripts/run_install_all_assemblers.sh"
+#run_script "Install assemblers" "code/installation/run_scripts/run_install_all_assemblers.sh"
 
 echo "Script execution complete."
