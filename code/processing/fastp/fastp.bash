@@ -17,9 +17,9 @@ for read_id in $(ls "$path_raw"forward/*.fastq | cut -d '/' -f 5 | cut -d '_' -f
   output_prefix="$path_output""trimmed/sr-bsc_trimmed_${read_id}"
   output_paired_1="${output_prefix}_1.fastq.gz"
   output_paired_2="${output_prefix}_2.fast.gz"
-  output_report="${path_analysis}/${read_id}_report.html
+  output_report="${path_analysis}/${read_id}_report.html"
 
-  fastp -i "$forward_file" -I "$reverse_file" -o "$output_paired_1" -O "$output_paired_2" -h report.html -q 20 -p 95 -l 30 -n 5
+  fastp -i "$forward_file" -I "$reverse_file" -o "$output_paired_1" -O "$output_paired_2" -h "$output_report" -q 20 -p 95 -l 30 -n 5
 done
 
 
