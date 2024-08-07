@@ -11,25 +11,29 @@ fi
 filename="$1"
 path_output="$2"
 
+## Gets into dataset path
 cd "$path_output"
 
+## Makes folders for each set of reads
 mkdir -p forward/
 mkdir -p reverse/
-
 forward=forward/
 reverse=reverse/
 
 
+## current working directory to prefetch location
 ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
 
-
+## Loops through each 
 while IFS= read -r line; do
   ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch "$line"
   ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump "$line"/"$line".sra -O "$line"/
   ## Fasterq dump
   
   mv "$line"/*_1.fastq "$forward"/
-  mv "$line"_2.fastq "$reverse"/
+  mv "$line"/*_2.fastq "$reverse"/
 
 done < "$root_dir"/"$filename"
 
+
+cd "$path_output"
