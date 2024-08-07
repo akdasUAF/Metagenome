@@ -26,3 +26,4 @@ for file in "$raw_dir"reverse/*_2.fastq; do
 
   fastqc "$file" -o "$output_dir"
 done
+

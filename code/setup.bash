@@ -23,6 +23,7 @@ mkdir -p logs/analysis/busco/
 
 mkdir -p data/MAG/
 mkdir -p data/raw/
+mkdir -p data/process/
 mkdir -p data/analysis/
 mkdir -p data/reference/
 mkdir -p data/polished/
