@@ -1,0 +1,2 @@
+
+scp wwinnett@137.229.25.190:metagenome_replicates/full_datasets/Metagenome/data/analysis/sr-bsc/fastqc/SRR*/*.html ../Moving/fastqc/
