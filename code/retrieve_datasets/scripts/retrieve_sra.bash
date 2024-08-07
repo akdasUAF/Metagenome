@@ -31,5 +31,5 @@ while IFS= read -r line; do
   mv "$line"/*_1.fastq "$forward"/
   mv "$line"_2.fastq "$reverse"/
 
-done < "$filename"
+done < "$root_dir"/"$filename"
 
