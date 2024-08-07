@@ -13,11 +13,11 @@ path_output="$2"
 
 cd "$path_output"
 
-mkdir -p /forward/
-mkdir -p /reverse/
+mkdir -p forward/
+mkdir -p reverse/
 
-forward=/forward/
-reverse=/reverse/
+forward=forward/
+reverse=reverse/
 
 
 ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
