@@ -26,14 +26,15 @@ ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-
 
 ## Loops through each 
 while IFS= read -r line; do
+
+  ## Fetches each line
   ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch "$line"
+
+  ## Separates reads
   ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump "$line"/"$line".sra -O "$line"/
-  ## Fasterq dump
-  
+
+  ## Moves reads into forward and reverse
   mv "$line"/*_1.fastq "$forward"/
   mv "$line"/*_2.fastq "$reverse"/
 
 done < "$root_dir"/"$filename"
-
-
-cd "$path_output"

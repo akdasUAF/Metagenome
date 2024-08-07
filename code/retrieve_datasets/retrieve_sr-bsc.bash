@@ -8,9 +8,17 @@
 # Store the current working directory
 root_dir=$(pwd)
 
-mkdir -p data/raw/sr-bsc/
 cd data/raw/sr-bsc
 ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch -db code/retrieve_datasets/sra_lists/sra-list_sr-bsc.txt
+
+
+
+bash code/retrieve_datasets/scripts/retrieve_sra.bash 
+
+
 ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch SRR28765359
+
+
 cd SRR28765359/
 ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump SRR28765359.sra
