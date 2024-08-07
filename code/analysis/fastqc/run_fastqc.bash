@@ -11,11 +11,11 @@ fastqc_output="$path_analysis"/fastqc
 
 mkdir -p "$fastqc_output"
 
-for file in "$raw_dir"/forward/*_1.fastq.gz; do
-  base_name=$(basename "$file" _1.fastq.gz)
+for file in "$raw_dir"forward/*_1.fastq; do
+  base_name=$(basename "$file" _1.fastq)
   output_dir="$fastqc_output/$base_name"
   mkdir -p "$output_dir"
 
   fastqc "$file" -o "$output_dir"
-  fastqc "${file%_1.fastq.gz}_2.fastq.gz" -o "$output_dir"
+  fastqc "${file%_1.fastq.gz}_2.fastq" -o "$output_dir"
 done
