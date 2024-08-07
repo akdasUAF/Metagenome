@@ -10,6 +10,4 @@ path_analysis=$2
 
 bash_to_run="code/processing/trimmomatic/trimmomatic_basic.bash ""$path_reads" "$path_analysis"
 
-mkdir -p path_analysis
-
 conda run -n asm_megahit bash $bash_to_run
