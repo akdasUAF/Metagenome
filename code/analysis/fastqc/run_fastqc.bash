@@ -17,5 +17,12 @@ for file in "$raw_dir"forward/*_1.fastq; do
   mkdir -p "$output_dir"
 
   fastqc "$file" -o "$output_dir"
-  fastqc "${file%_1.fastq}_2.fastq" -o "$output_dir"
+done
+
+for file in "$raw_dir"backward/*_2.fastq; do
+  base_name=$(basename "$file" _2.fastq)
+  output_dir="$fastqc_output/$base_name"
+  mkdir -p "$output_dir"
+
+  fastqc "$file" -o "$output_dir"
 done
