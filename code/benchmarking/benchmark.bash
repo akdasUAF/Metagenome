@@ -64,26 +64,22 @@ mkdir -p "$dir_output"
 
 log_dool="${dir_output}/log_dool_${task}_${dataset}_${assembler}.log"
 log_time="${dir_output}/log_time_${task}_${dataset}_${assembler}.log"
-log_perf="${dir_output}/log_perf_${task}_${dataset}_${assembler}.log"
 
 
 # Start dool
 bash code/benchmarking/scripts/start_dool.sh "${log_dool}"
 
 #### Buffer of 10 seconds to capture baseline system processes before capturing tool metrics
-sleep 10
+#sleep 10
 
 ## Run script:
-(bash code/benchmarking/scripts/run_with_time.sh "$file_to_run" "$log_time")
+(bash code/benchmarking/scripts/run_with_time.sh "$file_to_run" "$log_time" &)
 
-# Find the PID of your process
-process_pid=$(pgrep -f "$file_to_run")
+process_pid=$!
 
-# Run perf to profile the process process
-conda run -n ana_perf bash -c "source code/benchmarking/scripts/run_perf.sh $process_pid $log_perf"
-
+# Wait for the subshell process to finish
 wait $process_pid
 
-
+#sleep 10
 
 bash code/benchmarking/scripts/kill_dool.sh
