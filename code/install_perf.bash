@@ -5,12 +5,14 @@ env_names=("pro_fastp" "asm_abyss" "asm_canu" "asm_flye" "asm_megahit" "asm_meta
 
 # Loop through the list
 for env_name in "${env_names[@]}"; do
-  # Check if environment exists (using silent grep)
-  if ! conda env list | grep -q "$env_name"; then
-    echo "Creating environment: $env_name"
-    conda activate "$env_name" # Add any base package specifications here
-	bash code/installation/install_perf.bash
+  # Check if environment exists
+  if conda env list | grep -q "^$env_name$" >/dev/null; then
+    echo "Activating environment: $env_name"
+    conda activate "$env_name"
+    # Replace with your desired script or command
+    bash code/installation/install_perf.bash
+    conda deactivate
   else
-    echo "Environment '$env_name' already exists."
+    echo "Environment '$env_name' does not exist."
   fi
 done
