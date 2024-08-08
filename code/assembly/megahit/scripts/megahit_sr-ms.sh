@@ -1,6 +1,6 @@
 #!/bin/bash
 benchmark_script="code/benchmarking/benchmark.bash"
-path_megahit="code/processing/megahit/run_megahit.bash"
+path_megahit="megahit"
 raw_dir="data/raw/sr-ms/"
 MAG_output="data/process/sr-ms/"
 path_log="data/logs/sr-ms/megahit/"
