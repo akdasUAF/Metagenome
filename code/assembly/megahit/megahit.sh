@@ -12,8 +12,8 @@ path_log=$3
 
 rm -rf $path_output
 
-forward_reads=($(find "$path_reads" -name "*_1.fastq"))
-reverse_reads=($(find "$path_reads" -name "*_2.fastq"))
+forward_reads=($(find "$path_reads" -name "*_1.fastq*"))
+reverse_reads=($(find "$path_reads" -name "*_2.fastq*"))
 
 if [[ ${#forward_reads[@]} -ne ${#reverse_reads[@]} ]]; then
   echo "Error: Unequal number of forward and reverse reads. Please check your data."
