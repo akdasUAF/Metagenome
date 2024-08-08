@@ -10,9 +10,10 @@ for env_name in "${env_names[@]}"; do
     echo "Activating environment: $env_name"
     conda activate "$env_name"
     # Replace with your desired script or command
-    bash code/installation/install_perf.bash
+    bash your_script.sh
     conda deactivate
   else
     echo "Environment '$env_name' does not exist."
+    # Consider logging or error handling here
   fi
 done
