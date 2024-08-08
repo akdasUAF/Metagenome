@@ -15,10 +15,7 @@ function run_script() {
 mkdir -p logs/retrieve_datasets/
 mkdir -p logs/installation/
 mkdir -p logs/processing/
-mkdir -p logs/analysis/dool/
-mkdir -p logs/analysis/metaquast/
-mkdir -p logs/analysis/assembly-stats/
-mkdir -p logs/analysis/busco/
+mkdir -p logs/analysis/
 
 
 mkdir -p data/MAG/
@@ -43,7 +40,7 @@ for env_name in "${env_names[@]}"; do
   # Check if environment exists (using silent grep)
   if ! conda env list | grep -q "$env_name"; then
     echo "Creating environment: $env_name"
-    conda create -n "$env_name"  # Add any base package specifications here
+    conda create -n "$env_name" linux-perf  # Add any base package specifications here
   else
     echo "Environment '$env_name' already exists."
   fi

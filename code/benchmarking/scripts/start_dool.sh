@@ -38,10 +38,7 @@ mkdir -p "$(dirname "$path")"
 
 # Full command 
 #dool -afr --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --mem-percent --output "$path" &
-bash code/analysis/dool/dool_full.sh "$path"
-
-### Buffer of 10 seconds to capture baseline system processes before capturing tool metrics
-sleep 10
+bash code/benchmarking/scripts/dool_full.sh "$path"
 
 ## Echo that the timer is over:
 echo "Timer is over: Beginning assembly"
