@@ -17,6 +17,7 @@ time_output=$(/usr/bin/time -v bash -c "source $script_name" 2>&1)
 # Check if script execution was successful
 if [ $? -ne 0 ]; then
   echo "Error: Script '$script_name' failed to execute."
+  echo "$time_output"
 else
   # Append time output to custom filename
   echo "$time_output" >> "$time_output_file"
