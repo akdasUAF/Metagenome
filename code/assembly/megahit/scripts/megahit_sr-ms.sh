@@ -1,8 +1,8 @@
 #!/bin/bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-raw_dir="data/raw/sr-ms/"
-MAG_output="data/process/sr-ms/"
+raw_dir="data/process/sr-ms/trimmed/"
+MAG_output="data/MAG/megahit/sr-ms/"
 path_log="data/logs/sr-ms/megahit/"
 dataset="sr-ms"
 task="megahit"

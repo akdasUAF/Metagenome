@@ -8,8 +8,8 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_megahit_sr-bsc_t1standard"
-#SBATCH --output=data/analysis/megahit/sr-bsc/log_slurm_megahit_sr-bsc_t1standard.log
+#SBATCH --job-name="panmeta_asm_fastp_sr-bsc_t1standard"
+#SBATCH --output=data/logs/log_slurm_fastp_sr-bsc_t1standard.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -19,4 +19,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/megahit/scripts/megahit_sr-bsc.sh | tee -a data/analysis/megahit/sr-bsc/log_assemble_megahit_sr-bsc_slurm.log || echo 'Assembly failed : megahit sr-bsc'
+bash code/processing/fastp/scripts/fastp_sr-bsc.bash | tee -a data/analysis/sr-bsc/log_fastp_sr-bsc_slurm.log || echo 'Fastp failed : sr-bsc'

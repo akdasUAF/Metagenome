@@ -1,5 +1,20 @@
 #!/bin/bash
+benchmark_script="code/benchmarking/benchmark.bash"
+path_megahit="code/assembly/megahit/run_megahit.sh"
+raw_dir="data/process/sr-bsc/trimmed/"
+MAG_output="data/MAG/megahit/sr-bsc/"
+path_log="data/logs/sr-bsc/megahit/"
+dataset="sr-bsc"
+task="megahit"
 
 
+mkdir -p ${path_log}
+log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
-bash code/assembly/megahit/run_megahit_with_options.sh data/process/sr-bsc/ data/MAG/sr-bsc/ data/analysis/megahit/sr-bsc/
+
+# Construct the command to be executed
+command="$path_megahit $raw_dir $MAG_output $log_file"
+
+# Execute the benchmark script with the constructed command
+"$benchmark_script" "$command" -d "$dataset" -t "$task"
+

@@ -15,5 +15,5 @@ rm -rf $path_output
 forward_reads=($(find "$path_reads" -name "*_1.fastq"))
 reverse_reads=($(find "$path_reads" -name "*_2.fastq"))
 
-megahit -1 $forward_reads -2 $reverse_reads -o $path_output --min-contig-len 1000 2>&1 | tee "${path_log}"
+megahit -t 24 -1 $forward_reads -2 $reverse_reads -o $path_output --min-contig-len 1000 2>&1 | tee "${path_log}"
 
