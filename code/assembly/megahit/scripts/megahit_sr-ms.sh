@@ -7,12 +7,6 @@ path_log="data/logs/sr-ms/megahit/log_asm_megahit_sr-ms.sh"
 dataset="sr-ms"
 task="megahit"
 
-
-path_reads=$1
-path_output=$2
-
-
-
 # Construct the command to be executed
 command="$path_megahit $raw_dir $MAG_output $path_log"
 
