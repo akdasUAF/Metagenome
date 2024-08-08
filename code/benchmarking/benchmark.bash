@@ -13,8 +13,6 @@ shift
 dataset=""
 assembler=""
 task=""
-conda_env=""
-
 
 # Parse command-line options
 while getopts "d:a:t:c:" opt; do
@@ -27,9 +25,6 @@ while getopts "d:a:t:c:" opt; do
       ;;
 	t)
       task="$OPTARG"
-      ;;
-	c)
-      conda_env="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
@@ -54,17 +49,13 @@ if [ -z "$task" ]; then
   exit 1
 fi
 
-if [ -z "$conda_env" ]; then
-  echo "Error: -c or --conda-env is required."
-  exit 1
-fi
 
 # Now you can use the task, dataset, and assembler variables
 echo "Task: $task"
 echo "Dataset: $dataset"
 echo "assembler: $assembler"
 echo "file_to_run :$file_to_run"
-echo "conda_env :$conda_env"
+
 
 # Check if filename is empty, use default if so
 dir_output="data/logs/${dataset}/${assembler}/${task}/"
@@ -83,18 +74,16 @@ bash code/benchmarking/scripts/start_dool.sh "${log_dool}"
 sleep 10
 
 ## Run script:
-bash code/benchmarking/scripts/run_with_time.sh "$file_to_run" "$log_time"
+(bash code/benchmarking/scripts/run_with_time.sh "$file_to_run" "$log_time")
 
 # Find the PID of your process
-process_pid=$(pidof "${file_to_run}")
+process_pid=$(pgrep -f "$file_to_run")
 
 # Run perf to profile the process process
-perf stat -p $process_pid -o $log_perf -e cycles,instructions,cache-misses
+conda run -n ana_perf bash -c "source code/benchmarking/scripts/run_perf.sh $process_pid $log_perf"
 
-script_name="myscript.bash"
+wait $process_pid
 
-# Start the script in the background
-$script_name &
-pid=$(pgrep -f "$script_name")
 
-echo "PID of $script_name is $pid"
+
+bash code/benchmarking/scripts/kill_dool.sh
