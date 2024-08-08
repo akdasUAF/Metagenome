@@ -7,7 +7,7 @@ if [ $# -eq 0 ]; then
 fi
 
 # Script name provided by the user
-script_name="$1"
+script_name=$1
 time_output_file=$2
 
 
