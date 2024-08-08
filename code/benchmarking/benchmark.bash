@@ -73,7 +73,7 @@ bash code/benchmarking/scripts/start_dool.sh "${log_dool}"
 #sleep 10
 
 ## Run script:
-(bash code/benchmarking/scripts/run_with_time.sh "$file_to_run" "$log_time" &)
+bash code/benchmarking/scripts/run_with_time.sh "$file_to_run" "$log_time"
 
 process_pid=$!
 
