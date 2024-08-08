@@ -9,7 +9,7 @@ path_raw=$1
 path_output=$2
 path_analysis=$3
 
-bash_to_run="code/processing/fastp/fastp.bash ""$path_raw" "$path_output" "$path_analysis"
+bash_to_run="code/processing/fastp/fastp.bash $path_raw $path_output $path_analysis"
 
 conda run -n pro_fastp bash $bash_to_run
 
