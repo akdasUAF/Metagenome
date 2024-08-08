@@ -1,5 +1,9 @@
 #!/bin/bash
 
-bash_to_run="bash code/processing/fastp/run_fastp.bash data/raw/sr-ms/ data/process/sr-ms/ data/analysis/sr-ms/"
+benchmark_script="code/benchmarking/benchmark.bash"
+fastp_script="code/processing/fastp/run_fastp.bash"
+raw_dir="data/raw/sr-ms/"
+trimmed_dir="data/process/sr-ms/"
+analysis_dir="data/analysis/sr-ms/"
 
-bash code/benchmarking/benchmark.bash "${bash_to_run}" -d sr-ms -t fastp
+"$benchmark_script" "$fastp_script" "$raw_dir" "$trimmed_dir" "$analysis_dir" -d sr-ms -t fastp
