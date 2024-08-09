@@ -9,6 +9,7 @@ task="assembly-stats"
 mkdir -p ${path_log}
 log_file="${path_log}/log_as_${task}_${dataset}.log"
 
+touch "${log_file}"
 
 # Construct the command to be executed
 command="$path_megahit $path_assembly $log_file"
