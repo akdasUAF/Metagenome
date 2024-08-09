@@ -1,6 +1,6 @@
 #!/bin/bash
 
-directory="/path/to/my/data"
+directory="data/raw/sr-bcs/"
 command="python my_script.py"
 
 
