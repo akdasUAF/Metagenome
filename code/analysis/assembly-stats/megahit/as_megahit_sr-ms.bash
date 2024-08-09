@@ -6,16 +6,12 @@ path_log="data/logs/sr-ms/megahit/"
 dataset="sr-ms"
 task="assembly-stats"
 
-
-path_assembly=$1
-path_log_file=$2
-
 mkdir -p ${path_log}
 log_file="${path_log}/log_as_${task}_${dataset}.log"
 
 
 # Construct the command to be executed
-command="$path_megahit $path_assembly $MAG_output $log_file"
+command="$path_megahit $path_assembly $log_file"
 
 # Execute the benchmark script with the constructed command
 "$command"

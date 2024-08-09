@@ -7,9 +7,6 @@ dataset="sr-bsc"
 task="assembly-stats"
 
 
-path_assembly=$1
-path_log_file=$2
-
 mkdir -p ${path_log}
 log_file="${path_log}/log_as_${task}_${dataset}.log"
 
