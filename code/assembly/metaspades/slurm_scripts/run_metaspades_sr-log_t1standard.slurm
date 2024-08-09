@@ -19,4 +19,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/metaspades/scripts/metaspades_sr-log.sh | tee -a data/analysis/metaspades/sr-log/log_assemble_metaspades_sr-log_slurm.log || echo 'Assembly failed : metaspades sr-log'
+bash code/assembly/metaspades/run_scripts/metaspades_sr-log.sh | tee -a data/analysis/metaspades/sr-log/log_assemble_metaspades_sr-log_slurm.log || echo 'Assembly failed : metaspades sr-log'

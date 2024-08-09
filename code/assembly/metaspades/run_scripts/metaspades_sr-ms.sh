@@ -2,7 +2,7 @@
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
 raw_dir="data/process/sr-ms/trimmed/"
-MAG_output="data/MAG/sr-ms/"
+MAG_output="data/MAG/metaspades/sr-ms/"
 path_log="data/logs/sr-ms/metaspades/"
 dataset="sr-ms"
 task="metaspades"
