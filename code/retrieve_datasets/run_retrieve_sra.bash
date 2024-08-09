@@ -7,7 +7,7 @@ fi
 
 path_txt_file=$1
 path_output=$2
-bash_to_run="code/retrieve_datasets/retrieve_sra.bash ""$path_txt_file" "$path_output"
+bash_to_run="code/retrieve_datasets/retrieve_sra.bash ${path_txt_file} ${path_output}"
 
 
 rm -rf $path_output
