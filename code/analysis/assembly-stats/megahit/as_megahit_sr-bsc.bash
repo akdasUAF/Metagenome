@@ -18,5 +18,5 @@ log_file="${path_log}/log_as_${task}_${dataset}.log"
 command="$path_megahit $path_assembly $MAG_output $log_file"
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d "$dataset" -t "$task"
+"$command"
 

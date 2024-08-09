@@ -1,5 +1,4 @@
 #!/bin/bash
-benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/analysis/assembly-stats/run_assembly-stats.sh"
 path_assembly="data/MAG/megahit/sr-log/final.contigs.fa"
 path_log="data/logs/sr-log/megahit/"
@@ -18,5 +17,5 @@ log_file="${path_log}/log_as_${task}_${dataset}.log"
 command="$path_megahit $path_assembly $MAG_output $log_file"
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d "$dataset" -t "$task"
+"$command"
 
