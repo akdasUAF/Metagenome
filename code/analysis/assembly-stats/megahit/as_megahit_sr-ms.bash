@@ -11,6 +11,10 @@ log_file="${path_log}/log_as_${task}_${dataset}.log"
 
 touch "${log_file}"
 
+echo "Path to assembly: $path_megahit"
+echo "Path to log file: $log_file"
+
+
 # Construct the command to be executed
 command="$path_megahit $path_assembly $log_file"
 
