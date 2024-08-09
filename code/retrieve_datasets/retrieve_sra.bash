@@ -11,6 +11,7 @@ fi
 filename="$1"
 path_output="$2"
 
+mkdir -p "$path_output"
 ## Gets into dataset path
 cd "$path_output"
 
