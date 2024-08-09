@@ -1,9 +1,9 @@
 #!/bin/bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/analysis/assembly-stats/run_assembly-stats.sh"
-path_assembly="data/MAG/megahit/sr-bsc/final.contigs.fa"
-path_log="data/logs/sr-bsc/megahit/"
-dataset="sr-bsc"
+path_assembly="data/MAG/megahit/sr-ms/final.contigs.fa"
+path_log="data/logs/sr-ms/megahit/"
+dataset="sr-ms"
 task="assembly-stats"
 
 
