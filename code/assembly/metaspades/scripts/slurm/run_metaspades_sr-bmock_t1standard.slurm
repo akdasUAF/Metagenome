@@ -19,4 +19,4 @@ module load Python/3.11.3
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/metaspades/run_scripts/run_metaspades_sr-bmock.sh" 2>&1 | tee -a data/analysis/metaspades/log_assemble_metaspades_sr-bmock_slurm.log || echo 'Assembly failed : metaspades sr-bmock'
+bash code/assembly/metaspades/scripts/metaspades_sr-bmock.sh | tee -a data/analysis/sr-bmock/metaspades/log_assemble_metaspades_sr-bmock_slurm.log || echo 'Assembly failed : metaspades sr-bmock'
