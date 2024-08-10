@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <raw_directory> <output_directory> <analysis_directory>"
+  echo "Usage: $0 <raw_directory> <output_directory>"
   exit 1
 fi
 

@@ -31,11 +31,11 @@ while IFS= read -r line; do
   ## Fetches each line
   ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch "$line"
 
-  ## Separates reads
-  ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump "$line"/"$line".sra -O "$line"/
-
-  ## Moves reads into forward and reverse
-  mv "$line"/*_1.fastq "$forward"/
-  mv "$line"/*_2.fastq "$reverse"/
-
 done < "$root_dir"/"$filename"
+
+## Separates reads
+${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump */*.fastq
+
+## Moves reads into forward and reverse
+mv */*_1.fastq "$forward"/
+mv */*_2.fastq "$reverse"/

@@ -9,8 +9,7 @@ path_raw=$1
 path_output=$2
 path_analysis=$3
 
-
-mkdir -p "$path_output""trimmed/"
+mkdir -p "${path_output}/trimmed/"
 
 for read_id in $(ls "$path_raw"forward/*.fastq | cut -d '/' -f 5 | cut -d '_' -f 1); do
   forward_file="${path_raw}/forward/${read_id}_1.fastq"
