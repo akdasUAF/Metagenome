@@ -18,21 +18,19 @@ mkdir -p "$paired_trimmed_path"
 fastq_files=($unpaired_in/*.fastq)
 
 # Group FASTQ files by prefix
-for file in "${fastq_files[@]}"; do
-  prefix="${file%%_*}"
-  pairs[$prefix]+="$file "
-done
+forward_reads=($(find "$path_reads" -name "*_1.fastq*"))
+reverse_reads=($(find "$path_reads" -name "*_2.fastq*"))
 
-# Process each pair
-for prefix in "${!pairs[@]}"; do
-  read1="${pairs[$prefix]}"
-  read1="${read1% }" # Remove trailing space
-  read2="${pairs[$prefix]}"
-  read2="${read2##* }" # Extract last file
-  output="${paired_trimmed_path}${prefix}.fa"
+for forward_read in "${forward_reads[@]}"; do
+  base_name="${forward_read%_1.fastq}"
+  reverse_read="${base_name}_2.fastq"
 
-  if ! tools/assemblers/idba/bin/fq2fa --merge --filter "$read1" "$read2" "$output"; then
-    echo "Error running fq2fa for $read1 and $read2"
-    exit 1
+  # Check if the reverse read exists
+  if [[ -f "$reverse_read" ]]; then
+    # Run your command with forward and reverse reads
+    tools/assemblers/idba/bin/fq2fa --merge --filter "$read1" "$read2" "$output"
+  else
+    echo "Reverse read not found for $forward_read"
   fi
 done
+
