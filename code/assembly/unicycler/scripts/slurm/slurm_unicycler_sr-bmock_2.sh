@@ -20,4 +20,5 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-conda run -n asm_unicycler code/assembly/unicycler/scripts/slurm/slurm_unicycler_sr-bmock.sh | tee -a data/analysis/sr-bmock/unicycler/log_slurm_assemble_unicycler_sr-bmock_slurm.log 
+conda activate asm_unicycler
+bash code/benchmarking/benchmark.bash "unicycler -1 data/process/sr-bmock/trimmed/sr-bmock_trimmed_SRR8073716_1.fastq.gz -2 data/process/sr-bmock/trimmed/sr-bmock_trimmed_SRR8073716_2.fastq.gz -o data/MAG/unicycler/sr-bmock/" -d "sr-bmock" -t "unicycler"
