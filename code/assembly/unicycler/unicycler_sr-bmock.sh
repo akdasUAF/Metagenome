@@ -14,7 +14,7 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 #  $MAG_output $log_file
 
 # Construct the command to be executed
-command="conda run -n my_env $path_unicycler | tee $log_files"
+command="conda run -n asm_unicycler $path_unicycler | tee $log_files"
 
 
 # Execute the benchmark script with the constructed command
