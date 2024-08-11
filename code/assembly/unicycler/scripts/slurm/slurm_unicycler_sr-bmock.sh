@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_raven_lr-ecoli_t1standard"
-#SBATCH --output=data/analysis/raven/lr-ecoli/log_slurm_raven_lr-ecoli_%j.log
-#SBATCH --error=data/analysis/raven/lr-ecoli/log_slurm_raven_lr-ecoli_err_%j.log
+#SBATCH --job-name="panmeta_asm_unicycler_sr-bmock_t1standard"
+#SBATCH --output=data/analysis/unicycler/sr-bmock/log_slurm_unicycler_sr-bmock_%j.log
+#SBATCH --error=data/analysis/unicycler/sr-bmock/log_slurm_unicycler_sr-bmock_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
