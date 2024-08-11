@@ -21,5 +21,5 @@ ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
 conda activate asm_unicycler
-command="unicycler -1 data/process/sr-bmock/trimmed/sr-bmock_trimmed_SRR8073716_1.fastq.gz -2 data/process/sr-bmock/trimmed/sr-bmock_trimmed_SRR8073716_2.fastq.gz -o data/MAG/unicycler/sr-bmock/"
+command="code/assembly/unicycler/scripts/run_env.sh"
 bash code/benchmarking/benchmark.bash "${command}" -d "sr-bmock" -t "unicycler"
