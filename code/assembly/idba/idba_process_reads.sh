@@ -18,8 +18,8 @@ mkdir -p "$paired_trimmed_path"
 fastq_files=($unpaired_in/*.fastq)
 
 # Group FASTQ files by prefix
-forward_reads=($(find "$path_reads" -name "*_1.fastq*"))
-reverse_reads=($(find "$path_reads" -name "*_2.fastq*"))
+forward_reads=($(find "$unpaired_in" -name "*_1.fastq*"))
+reverse_reads=($(find "$unpaired_in" -name "*_2.fastq*"))
 
 for forward_read in "${forward_reads[@]}"; do
   base_name="${forward_read%_1.fastq}"
