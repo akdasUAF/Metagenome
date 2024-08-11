@@ -7,7 +7,9 @@ fi
 
 # Directory containing FASTQ files
 unpaired_in="$1"
-paired_trimmed_path="$2"
+
+# Remove trailing slash from paired_trimmed_path (optional)
+paired_trimmed_path="${2%%/}"  # Removes trailing slash, if any
 
 # Find all FASTQ files
 fastq_files=($unpaired_in/*.fastq)
