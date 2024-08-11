@@ -13,9 +13,9 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 #  $MAG_output $log_file
 # Construct the command to be executed
-command="conda run -n asm_unicycler $path_unicycler"
+command="$path_unicycler"
 
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d "$dataset" -t "$task"
+"$benchmark_script" "$path_unicycler" -d "$dataset" -t "$task"
 
