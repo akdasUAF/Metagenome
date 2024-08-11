@@ -1,6 +1,6 @@
 #!/bin/bash
 benchmark_script="code/benchmarking/benchmark.bash"
-path_unicycler="code/assembly/unicycler/scripts/unicycler_sr-bmock.sh"
+path_unicycler="code/assembly/unicycler/scripts/run_unicycler_sr-bmock.sh"
 raw_dir="data/process/sr-bmock/trimmed/"
 MAG_output="data/MAG/unicycler/sr-bmock/"
 path_log="data/logs/sr-bmock/unicycler/"

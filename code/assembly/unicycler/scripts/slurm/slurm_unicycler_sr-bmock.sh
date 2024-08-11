@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/unicycler/scripts/slurm/unicycler_sr-bmock.sh | tee -a data/analysis/sr-bmock/unicycler/log_slurm_assemble_unicycler_sr-bmock_slurm.log || echo 'Assembly failed : Unicycler sr-bmock'
+bash code/assembly/unicycler/unicycler_sr-bmock.sh | tee -a data/analysis/sr-bmock/unicycler/log_slurm_assemble_unicycler_sr-bmock_slurm.log || echo 'Assembly failed : Unicycler sr-bmock'
