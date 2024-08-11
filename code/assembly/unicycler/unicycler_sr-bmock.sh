@@ -13,9 +13,9 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 #  $MAG_output $log_file
 # Construct the command to be executed
-command="conda run -n asm_unicycler $path_unicycler"
+command="unicycler -1 data/process/sr-bmock/trimmed/sr-bmock_trimmed_SRR8073716_1.fastq.gz -2 data/process/sr-bmock/trimmed/sr-bmock_trimmed_SRR8073716_2.fastq.gz -o data/MAG/unicycler/sr-bmock/"
 
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "$path_unicycler" -d "$dataset" -t "$task"
+"$benchmark_script" "$command" -d "$dataset" -t "$task"
 
