@@ -17,3 +17,5 @@ command="$path_megahit $raw_dir $MAG_output $log_file"
 # Execute the benchmark script with the constructed command
 "$benchmark_script" "$command" -d "$dataset" -t "$task"
 
+
+bash code/assembly/idba/idba_process_reads.sh data/process/sr-bsc/trimmed data/process/sr-bsc/paired_untrimmed

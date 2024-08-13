@@ -87,3 +87,14 @@ make ['MAXKMERLENGTH = 31'] ['CATEGORIES = 2']
 
 cd "$path_mvtop"
 
+
+
+
+
+
+
+
+
+
+############# SL only
+conda install condaforge:perl

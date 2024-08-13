@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
 raw_dir="data/process/sr-bmock/trimmed/"
