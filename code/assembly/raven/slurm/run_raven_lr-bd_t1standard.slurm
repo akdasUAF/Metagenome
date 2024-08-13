@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/raven/run_scripts/run_raven_lr-ecoli.sh" 2>&1 | tee -a data/analysis/raven/log_assemble_raven_lr-ecoli_slurm.log || echo 'Assembly failed : raven lr-ecoli'
+bash code/assembly/raven/run_scripts/run_raven_lr-bd.sh | tee data/analysis/lr-bd/raven/log_assemble_raven_lr-bd_slurm.log
