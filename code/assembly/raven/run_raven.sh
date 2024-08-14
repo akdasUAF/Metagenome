@@ -13,6 +13,6 @@ bash_to_run="code/assembly/raven/raven.sh ${path_raw} ${path_MAG} ${path_log_fil
 
 echo "${bash_to_run}"
 
-conda run -n asm_raven "${bash_to_run}"
+conda run -n asm_raven "${bash_to_run}" > run_raven.txt
 
 
