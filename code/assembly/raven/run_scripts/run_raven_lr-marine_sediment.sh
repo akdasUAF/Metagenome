@@ -16,5 +16,5 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 command="tools/assemblers/raven/build/bin/raven -t 24 data/raw/lr-ms/SRR27145287/SRR27145287.fastq > data/MAG/raven/lr-ms/assembly_raven_lr-ms.fasta 2> data/analysis/raven/lr-ms/log_assemble_raven_lr-ms.log"
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "conda run -n asm_raven bash "$command"" -d "$dataset" -t "$task"
+"$benchmark_script" "conda run -n asm_raven bash '$command'" -d "$dataset" -t "$task"
 
