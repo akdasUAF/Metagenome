@@ -1,10 +1,20 @@
-#!/bin/bash
+#!/bin/env bash
+benchmark_script="code/benchmarking/benchmark.bash"
+path_metaspades="./tools/assemblers/raven/build/bin/raven"
+raw_dir="data/process/lr-bd/trimmed/"
+MAG_output="data/MAG/metaspades/sr-bmock/"
+path_log="data/logs/lr-bd/metaspades/"
+dataset="lr-bd"
+task="raven"
 
-## Assembler: raven
-## Dataset: lr-marine_sediment
 
-mkdir -p data/analysis/raven/lr-marine_sediment/
-bash code/analysis/dool/start_dool.sh data/analysis/raven/lr-marine_sediment/dool_asm_raven_lr-marine_sediment.csv
+mkdir -p ${path_log}
+log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
-conda run -n asm_raven bash -c "source code/analysis/time/run_with_time.sh code/assembly/raven/raven_lr-marine_sediment.sh" | tee data/analysis/raven/lr-marine_sediment/log_assemble_raven_lr-marine_sediment.log
-bash code/analysis/dool/kill_dool.sh
+
+# Construct the command to be executed
+command="./tools/assemblers/raven/build/bin/raven -t 24 data/raw/lr-ms/SRR27145287/SRR27145287.fastq > data/MAG/raven/lr-ms/assembly_raven_lr-ms.fasta 2> data/analysis/raven/lr-ms/log_assemble_raven_lr-ms.log"
+
+# Execute the benchmark script with the constructed command
+"$benchmark_script" "conda run -n asm_raven bash $command" -d "$dataset" -t "$task"
+
