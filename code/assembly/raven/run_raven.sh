@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # if [ $# -ne 3 ]; then
 #   echo "Usage: $0 <raw_directory> <MAG_out_dir> <path_log_file>"
@@ -13,6 +13,6 @@ bash_to_run="./tools/assemblers/raven/build/bin/raven -t 24 data/raw/lr-bd/SRR22
 
 echo "${bash_to_run}"
 
-conda run -n asm_raven bash $bash_to_run
+conda run -n asm_raven bash "${bash_to_run}"
 
 
