@@ -1,64 +1,27 @@
 #!/bin/bash
 
-# Check for at least one argument
-if [ $# -lt 1 ]; then
-  echo "Error: Please provide a file to benchmark."
+# Check for required arguments
+if [ $# -lt 3 ]; then
+  echo "Usage: $0 <command_to_run> <dataset> <task>"
   exit 1
 fi
 
 file_to_run="$1"
-shift
+dataset="$2"
+task="$3"
 
-# Initialize variables
-dataset=""
-assembler=""
-task=""
 
-# Parse command-line options
-while getopts "d:a:t:c:" opt; do
-  case $opt in
-    d)
-      dataset="$OPTARG"
-      ;;
-    a)
-      assembler="$OPTARG"
-      ;;
-	t)
-      task="$OPTARG"
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument."
-      exit 1
-      ;;
-  esac
-done
-shift $((OPTIND - 1))
-
+echo "File_to_run is: ${file_to_run}"
 echo "Dataset is: ${dataset}"
-
-# Check if mandatory dataset option is provided
-if [ -z "$dataset" ]; then
-  echo "Error: -d or --dataset is required."
-  exit 1
-fi
-
-if [ -z "$task" ]; then
-  echo "Error: -t or --task is required."
-  exit 1
-fi
-
+echo "Task is: ${task}"
 
 # Check if filename is empty, use default if so
-dir_output="data/logs/${dataset}/${assembler}/${task}/"
+dir_output="data/logs/${dataset}/${task}/"
 mkdir -p "$dir_output"
 
 
-log_dool="${dir_output}/log_dool_${task}_${dataset}_${assembler}.log"
-log_full="${dir_output}/log_full_${task}_${dataset}_${assembler}.log"
+log_dool="${dir_output}/log_dool_${task}_${dataset}.log"
+log_full="${dir_output}/log_full_${task}_${dataset}.log"
 
 
 # Start dool
