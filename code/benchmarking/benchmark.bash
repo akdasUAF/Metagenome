@@ -38,6 +38,8 @@ while getopts "d:a:t:c:" opt; do
 done
 shift $((OPTIND - 1))
 
+echo "Dataset is: ${dataset}"
+
 # Check if mandatory dataset option is provided
 if [ -z "$dataset" ]; then
   echo "Error: -d or --dataset is required."
