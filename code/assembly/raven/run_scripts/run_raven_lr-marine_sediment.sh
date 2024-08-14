@@ -15,4 +15,4 @@ log_file="${log_dir}/log_asm_${task}_${dataset}.log"
 command="$path_raven $raw_path $MAG_output $log_file"
 
 # Execute the benchmark script with the constructed command
-bash $benchmark_script $command $dataset $task
+bash $benchmark_script "$command" $dataset $task
