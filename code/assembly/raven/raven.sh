@@ -10,5 +10,6 @@ path_reads=$1
 path_output=$2
 path_log=$3
 
+echo $PWD
 
 ./tools/assemblers/raven/build/bin/raven -t 24 $path_reads > $path_output 2> $path_log
