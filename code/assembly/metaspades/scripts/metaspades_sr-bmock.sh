@@ -8,11 +8,11 @@ dataset="sr-bmock"
 task="metaspades"
 
 mkdir -p $(dirname "$MAG_output")
-mkdir -p ${log_dir}
-log_file="${log_dir}/log_asm_${task}_${dataset}.log"
+mkdir -p ${path_log}
+log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 # Construct the command to be executed
 command="$path_metaspades $raw_path $MAG_output $log_file"
 
 # Execute the benchmark script with the constructed command
-bash $benchmark_script "$command" $dataset $task
+bash $benchmark_script $command $dataset $task
