@@ -8,7 +8,7 @@ fi
 
 path="$1"
 
-dool -afr --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --output "$path" &
+tools/analysis/dool/dool -afr --aio --fs --ipc --socket --tcp --unix --vm --vm-adv --zones --cpufreq --disk-avgqu --disk-avgrq --disk-inflight --disk-svctm --disk-util --output "$path" &
 
 
 pid=$!
