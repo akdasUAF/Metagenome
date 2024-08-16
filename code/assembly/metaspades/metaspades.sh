@@ -24,4 +24,4 @@ if [[ ${#forward_reads[@]} -ne ${#reverse_reads[@]} ]]; then
   exit 1
 fi
 
-python3 tools/assemblers/SPAdes-4.0.0-Linux/bin/metaspades.py -1 $forward_reads -2 $reverse_reads -o $path_output | tee "${path_log}/log_metaspades.txt"
+python3 tools/assemblers/SPAdes-4.0.0-Linux/bin/metaspades.py -1 $forward_reads -2 $reverse_reads -o $path_output | tee ${path_log}

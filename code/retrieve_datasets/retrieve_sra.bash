@@ -8,12 +8,12 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
-filename="$1"
-path_output="$2"
+filename=$1
+path_output=$2
 
-mkdir -p "$path_output"
+mkdir -p $path_output
 ## Gets into dataset path
-cd "$path_output"
+cd $path_output
 
 ## Makes folders for each set of reads
 mkdir -p forward/
