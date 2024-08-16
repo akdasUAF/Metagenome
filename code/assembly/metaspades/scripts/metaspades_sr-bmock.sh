@@ -12,7 +12,7 @@ mkdir -p ${path_log}
 log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 # Construct the command to be executed
-command="$path_metaspades $raw_path $MAG_output $log_file"
+command="$path_metaspades $raw_dir $MAG_output $log_file"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
