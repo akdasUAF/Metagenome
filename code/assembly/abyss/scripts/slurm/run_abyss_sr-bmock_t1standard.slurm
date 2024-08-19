@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_abyss_sr-bsc"
-#SBATCH --output=data/MAG/sr-bmock/abyss/log_slurm_abyss_sr-bmock_%j.log
-#SBATCH --error=data/MAG/sr-bmock/abyss/log_slurm_abyss_sr-bmock_err_%j.log
+#SBATCH --output=data/MAG/sr-bmock/logs/log_slurm_abyss_sr-bmock_%j.log
+#SBATCH --error=data/MAG/sr-bmock/logs/log_slurm_abyss_sr-bmock_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
