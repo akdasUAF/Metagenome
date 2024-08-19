@@ -1,11 +1,11 @@
 #!/bin/env bash
 
-if [ $# -ne 6 ]; then
+if [ $# -ne 5 ]; then
   echo "Usage: $0 <raw_directory> <MAG_directory> <analysis_directory> <name_assembly> <kmer_size> <bloom_filter_size>"
   exit 1
 fi
 
-path_reads=$1
+raw_reads=("$@")
 path_output="$2"
 path_log=$3
 name_assembly=$4
