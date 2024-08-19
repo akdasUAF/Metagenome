@@ -10,6 +10,7 @@ mkdir -p $(dirname "$analysis_output")
 mkdir -p ${log_dir}
 log_file="${log_dir}/log_busco_${dataset}_${assembler}.log"
 
+analysis_output="${analysis_output}/busco/"
 
 # Execute the benchmark script with the constructed command
 bash $script_to_execute $contig_path $analysis_output $log_file
