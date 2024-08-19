@@ -16,7 +16,7 @@ bloom=$6
 mkdir -p $path_output
 mkdir -p "$(dirname "$path_log")"
 
-bash_to_run="code/assembly/abyss/abyss.sh ${path_raw} ${path_MAG} ${path_log_file} ${name_assembly} ${kmer} ${bloom}"
+bash_to_run="code/assembly/abyss/abyss.sh ${path_reads} ${path_output} ${path_log} ${name_assembly} ${kmer} ${bloom}"
 
 echo "${bash_to_run}"
 echo $PWD
