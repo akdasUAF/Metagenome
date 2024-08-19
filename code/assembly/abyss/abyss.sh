@@ -28,4 +28,4 @@ abyss_pe_in="${forward_reads}_${reverse_reads}"
 
 abyss-pe k=$kmer name=$name_assembly B=$bloom j = 24 \
 	in=$abyss_pe_in \
-	out=$path_output
+	out=$path_output 2>&1 | tee "${path_log}"
