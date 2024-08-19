@@ -22,6 +22,6 @@ echo "${bash_to_run}"
 echo $PWD
 echo "Starting ABySS on ${name_assembly}..."
 
-conda run -n asm_raven $bash_to_run
+conda run -n asm_abyss $bash_to_run
 
 
