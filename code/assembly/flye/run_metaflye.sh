@@ -13,7 +13,7 @@ bash_to_run="code/assembly/flye/metaflye.sh ${path_raw} ${path_MAG} ${path_log_f
 
 echo "${bash_to_run}"
 echo $PWD
-echo "Starting Raven..."
+echo "Starting Metaflye..."
 
 conda run -n asm_flye $bash_to_run
 
