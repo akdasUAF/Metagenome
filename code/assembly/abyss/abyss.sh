@@ -13,8 +13,6 @@ name_assembly=$4
 kmer=$5
 bloom=$6
 
-rm -rf $path_output
-
 forward_reads=($(find "$path_reads" -name "*_1.fastq*"))
 concatenated_forward_reads=$(IFS=' ' ; echo "${forward_reads[*]}")
 reverse_reads=($(find "$path_reads" -name "*_2.fastq*"))
@@ -29,7 +27,12 @@ if [[ ${#concatenated_forward_reads[@]} -ne ${#concatenated_reverse_reads[@]} ]]
   exit 1
 fi
 
-
+echo "path_reads: $path_reads"
+echo "path_output: $path_output"
+echo "path_log: $path_log"
+echo "name_assembly: $name_assembly"
+echo "kmer: $kmer"
+echo "bloom: $bloom"
 
 reads_in="$concatenated_forward_reads $concatenated_reverse_reads"
 
