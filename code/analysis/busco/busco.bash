@@ -12,4 +12,4 @@ path_contigs=$1
 path_output=$2
 path_log=$3
 
-busco --auto-lineage-prok -c 24 -i $path_contigs -o $path_output -m genome | $path_log
+busco --auto-lineage-prok -c 24 -i $path_contigs -o $path_output -m genome | tee $path_log
