@@ -11,4 +11,4 @@ path_log=$3
 
 echo $PWD
 
-flye --meta --nano-raw $path_reads --out-dir $path_output --threads 24 2>&1 | tee "${path_log}"
+flye --meta --plasmids --nano-raw $path_reads --out-dir $path_output --threads 24 2>&1 | tee "${path_log}"
