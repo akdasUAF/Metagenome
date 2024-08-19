@@ -13,7 +13,7 @@ task="abyss"
 #~~~ Abyss Only
 kmer=117
 bloom=10G
-name_assembly="$dataset"_"$task"
+name_assembly="${dataset}_${task}"
 
 ## Building a log and making a directory for results
 mkdir -p $(dirname "$MAG_output")
