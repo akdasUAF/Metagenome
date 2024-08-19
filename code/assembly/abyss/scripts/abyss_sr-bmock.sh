@@ -5,7 +5,7 @@ benchmark_script="code/benchmarking/benchmark.bash"
 path_raven="code/assembly/abyss/run_abyss.sh"
 raw_path="data/process/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq data/process/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq"
 MAG_output="data/MAG/sr-bmock/abyss/"
-log_dir="data/MAG/sr-bmock/abyss/"
+log_dir="data/analysis/sr-bmock/abyss/logs/"
 dataset="sr-bmock"
 task="abyss"
 
