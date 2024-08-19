@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_raven_lr-bd_t1standard"
-#SBATCH --output=data/analysis/lr-bd/raven/log_slurm_raven_lr-bd_%j.log
-#SBATCH --error=data/analysis/lr-bd/raven/log_slurm_raven_lr-bd_err_%j.log
+#SBATCH --output=data/MAG/lr-bd/raven/log_slurm_raven_lr-bd_%j.log
+#SBATCH --error=data/MAG/lr-bd/raven/log_slurm_raven_lr-bd_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded

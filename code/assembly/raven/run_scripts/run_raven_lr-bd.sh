@@ -3,7 +3,7 @@ benchmark_script="code/benchmarking/benchmark.bash"
 path_raven="code/assembly/raven/run_raven.sh"
 raw_path="data/raw/lr-bd/SRR22366767/SRR22366767.fastq"
 MAG_output="data/MAG/lr-bd/raven/assembly_raven_lr-bd.fasta"
-log_dir="data/logs/lr-bd/raven/"
+log_dir="data/MAG/lr-bd/"
 dataset="lr-bd"
 task="raven"
 

@@ -10,7 +10,7 @@ path_output=$2
 path_log_file=$3
 
 bash_to_run="code/analysis/busco/busco.bash $path_contigs $path_output $path_log_file"
-echo "${bash_to_run}"
+echo "Running Busco with: ${bash_to_run}"
 
 conda run -n ana_busco $bash_to_run
 
