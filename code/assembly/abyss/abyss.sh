@@ -1,8 +1,8 @@
 #!/bin/bash
 ## Assembler: Abyss
 
-if [ $# -ne 5 ]; then
-  echo "Usage: $0 <raw_directory> <MAG_directory> <analysis_directory> <name_assembly> <kmer_size> <bloom_filter_size>"
+if [ $# -ne 7 ]; then
+  echo "Usage: $0 <forward_reads> <reverse_reads> <MAG_directory> <analysis_directory> <name_assembly> <kmer_size> <bloom_filter_size>"
   exit 1
 fi
 
@@ -14,7 +14,7 @@ name_assembly=$5
 kmer=$6
 bloom=$7
 
-
+echo "    "
 echo "forward_in: $forward_reads"
 echo "reverse_in: $reverse_reads"
 echo "path_output: $path_output"
@@ -22,6 +22,7 @@ echo "path_log: $path_log"
 echo "name_assembly: $name_assembly"
 echo "kmer: $kmer"
 echo "bloom: $bloom"
+echo "    "
 
 abyss_pe_in="${forward_reads}_${reverse_reads}"
 
