@@ -25,8 +25,3 @@ command="$path_raven $raw_path $MAG_output $log_file $name_assembly $kmer $bloom
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
-
-"data/process/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq data/process/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq"
-abyss-pe k=117 name=$name_assembly B=$bloom j=24 \
-	in="data/process/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq data/process/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq" \
-	out=data/MAG/sr-bmock/abyss/ v=-v 
