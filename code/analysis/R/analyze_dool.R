@@ -63,13 +63,13 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
   
   # dool_raw <- read.csv(dool_log_file)
   dool_raw <- read.csv(dool_log_file)
-
-  dool_raw <- trim_dool(dool_raw) %>%
+  
+  dool_raw <- dool_raw %>%
     rownames_to_column(var = "time") 
   
   
   dool_raw_filtered <- dool_raw %>%
-    select(time, used, free, cach, avai, majpf, minpf, alloc, free.1) %>%
+    select(time, used, free, cach, avai) %>%
     mutate(time = as.integer(as.character(time))) %>%
     mutate(used = as.numeric(bits_to_mb(used))) %>% 
     mutate(free = as.numeric(bits_to_mb(free))) %>% 
@@ -84,16 +84,14 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
   plot_title = paste(assembler, " assembly (", dataset, "): Memory Performance over time", sep="")
 
   dool_plot_memory <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
-    labs(title = plot_title, x = "Time (s)", y = "Memory (Bytes)", color = "Memory Allocated") +
-    geom_line(size = 0.75) +
+    labs(title = plot_title, x = "Time (s)", y = "Memory (MB)", color = "Memory Allocated") +
+    geom_line(linewidth = 0.75) +
     #geom_point(size = 0.05) + 
     scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
     scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
     theme_classic() + 
-    scale_color_manual(values = c("used" = "#48448EFF", "free" = "#8CCC58FF", "cach" = "#FC4D97FF","avai" = "#B82578FF",
-                                  "majpf" = "red", "minpf" = "blue", "alloc" = "green", "vfree" = "purple"),
-                       labels = c("Available Memory", "Cached Memory", "Free Memory", "Used Memory",
-                                  "Virtual Majpf", "Virtual Minpf", "Virtual Allocated", "Virtual Free"))
+    scale_color_manual(values = c("used" = "#48448EFF", "free" = "#8CCC58FF", "cach" = "#FC4D97FF","avai" = "#B82578FF"),
+                       labels = c("Available Memory", "Cached Memory", "Free Memory", "Used Memory"))
   
   return (dool_plot_memory)
 }
@@ -136,6 +134,71 @@ make_dool_plot_virtmemory <- function(dool_log_file, assembler="", dataset="") {
   
   return (dool_plot_virtmemory)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dool_megahit_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_megahit_no-head.csv", "MEGAHIT", "sr-bmock")
+dool_megahit_bmock_memory
+
+ggsave("exploratory/figures/dool_plots/doolplot_megahit_sr-bmock.png", dool_megahit_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+dool_metaspades_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_metaspades_no-head.csv", "MetaSPAdes", "sr-bmock")
+dool_metaspades_bmock_memory
+
+ggsave("exploratory/figures/dool_plots/doolplot_metaspades_sr-bmock.png", dool_metaspades_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+dool_unicycler_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_unicycler_no-head.csv", "Unicycler", "sr-bmock")
+dool_unicycler_bmock_memory
+
+ggsave("exploratory/figures/dool_plots/doolplot_unicycler_sr-bmock.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+
+
+
+
+
+
+
+
+dool_megahit_bmock_cpu <- make_dool_plot_cpu("data/dool_logs/dool_sr-bmock_megahit_no-head.csv", "MEGAHIT", "sr-bmock")
+dool_megahit_bmock_cpu
+
+ggsave("exploratory/figures/dool_plots/doolplot_megahit_sr-bmock.png", dool_megahit_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+dool_metaspades_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_metaspades_no-head.csv", "MetaSPAdes", "sr-bmock")
+dool_metaspades_bmock_memory
+
+ggsave("exploratory/figures/dool_plots/doolplot_metaspades_sr-bmock.png", dool_metaspades_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+dool_unicycler_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_unicycler_no-head.csv", "Unicycler", "sr-bmock")
+dool_unicycler_bmock_memory
+
+ggsave("exploratory/figures/dool_plots/doolplot_unicycler_sr-bmock.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+
+
+
+
+
+
+
 
 
 dool_plot_virtmemory <- make_dool_plot_virtmemory("data/dool_logs/log_dool_megahit_sr-bmock_no-header.csv", "Megahit", "sr-bmock")

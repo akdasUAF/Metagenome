@@ -1,15 +1,12 @@
-#!/bin/bash
-## Assembler: megahit
+#!/bin/env bash
+
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <path_assembly> <path_log_file>"
+  echo "Usage: $0 <contigs_path> <log_path>"
   exit 1
 fi
 
-path_assembly=$1
-path_log_file=$2
+path_contigs=$1
+path_log=$2
 
-rm -rf $path_output
-
-./tools/analysis/assembly-stats/build/assembly-stats $path_assembly | tee $path_log_file
-
+./tools/analysis/assembly-stats/build/assembly-stats $path_contigs | tee $path_log

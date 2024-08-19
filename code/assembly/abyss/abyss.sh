@@ -7,12 +7,12 @@ if [ $# -ne 3 ]; then
 fi
 
 path_reads=$1
-path_output=$2
+path_output="$2"
 path_log=$3
 
 rm -rf $path_output
 
-forward_reads=($(find "$path_reads" -name *_1.fastq*))
+forward_reads=($(find "$path_reads" -name "*_1.fastq*"))
 concatenated_forward_reads=$(IFS=' ' ; echo "${forward_reads[*]}")
 reverse_reads=($(find "$path_reads" -name "*_2.fastq*"))
 concatenated_reverse_reads=$(IFS=' ' ; echo "${reverse_reads[*]}")
@@ -30,6 +30,6 @@ fi
 
 abyss_in="$concatenated_forward_reads $concatenated_reverse_reads"
 
-abyss-pe k=41 name=abyss_sr-bsc B=214G j = 24 \
-	in='$concatenated_forward_reads $concatenated_reverse_reads' \
-	out='data/MAG/abyss/sr-bsc/'
+abyss-pe k=41 name=abyss_sr-bsc B=246G j = 24 \
+	in=$abyss_in \
+	out=${path_output}

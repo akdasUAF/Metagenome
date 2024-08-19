@@ -25,3 +25,5 @@ scp wwinnett@chinook04.alaska.edu:metagenome_replicates/test/Metagenome/data/ana
 
 
 fastp -i data/raw/sr-bmock/SRR8073716/SRR8073716_1.fastq -I data/raw/sr-bmock/SRR8073716/SRR8073716_2.fastq -o data/process/sr-bmock/trimmed/sr-bmock_SRR8073716_1.fastq -O data/process/sr-bmock/trimmed/sr-bmock_SRR8073716_2.fastq -h data/analysis/sr-bmock -q 20 -p 95 -l 30 -n 10
+
+rsync -avz wwinnett@chinook04.alaska.edu:metagenome_replicates/test/Metagenome/data/process/sr-bmock/trimmed/ data/process/sr-bmock/trimmed/

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <path_assembly> <path_log_file>"
+  echo "Usage: $0 <path_contigs> <path_log_file>"
   exit 1
 fi
 
-path_assembly=$1
-path_log_file=$2
+path_contigs=$1
+path_log=$2
 
-bash_to_run="code/assembly/megahit/megahit.sh $path_assembly $path_log_file"
-echo "${bash_to_run}"
+bash_to_run="code/analysis/assembly-stats/busco.bash $path_contigs $path_log"
+echo "Running: ${bash_to_run}........"
 
 conda run -n ana_assembly-stats bash $bash_to_run
 
