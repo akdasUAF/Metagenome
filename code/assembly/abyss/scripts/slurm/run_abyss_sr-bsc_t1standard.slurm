@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_abyss_sr-bsc"
-#SBATCH --output=data/analysis/abyss/sr-bsc/log_slurm_abyss_sr-bsc_%j.log
-#SBATCH --error=data/analysis/abyss/sr-bsc/log_slurm_abyss_sr-bsc_err_%j.log
+#SBATCH --output=data/MAG/sr-bmock/abyss/log_slurm_abyss_sr-bmock_%j.log
+#SBATCH --error=data/MAG/sr-bmock/abyss/log_slurm_abyss_sr-bmock_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/abyss/run_scripts/run_abyss_sr-bsc.sh" 2>&1 | tee -a data/analysis/abyss/log_assemble_abyss_sr-bsc_slurm.log || echo 'Assembly failed : abyss sr-bsc'
+bash code/assembly/abyss/scripts/abyss_sr-bmock.sh

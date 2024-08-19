@@ -1,14 +1,17 @@
 #!/bin/bash
 ## Assembler: megahit
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <raw_directory> <MAG_directory> <analysis_directory>"
+if [ $# -ne 6 ]; then
+  echo "Usage: $0 <raw_directory> <MAG_directory> <analysis_directory> <name_assembly> <kmer_size> <bloom_filter_size>"
   exit 1
 fi
 
 path_reads=$1
 path_output="$2"
 path_log=$3
+name_assembly=$4
+kmer=$5
+bloom=$6
 
 rm -rf $path_output
 
@@ -28,8 +31,8 @@ fi
 
 
 
-abyss_in="$concatenated_forward_reads $concatenated_reverse_reads"
+reads_in="$concatenated_forward_reads $concatenated_reverse_reads"
 
-abyss-pe k=41 name=abyss_sr-bsc B=246G j = 24 \
-	in=$abyss_in \
-	out=${path_output}
+abyss-pe k=$kmer name=$name_assembly B=$bloom j = 24 \
+	in=$reads_in \
+	out=$path_output
