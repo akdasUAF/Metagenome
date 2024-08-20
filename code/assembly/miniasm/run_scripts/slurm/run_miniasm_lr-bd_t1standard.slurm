@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_miniasm_lr-gut_t1standard"
-#SBATCH --output=data/analysis/miniasm/lr-gut/log_slurm_miniasm_lr-gut_%j.log
-#SBATCH --error=data/analysis/miniasm/lr-gut/log_slurm_miniasm_lr-gut_err_%j.log
+#SBATCH --job-name="panmeta_asm_miniasm_lr-bd_t1standard"
+#SBATCH --output=data/MAG/lr-bd/miniasm/lr-bd_%j.log
+#SBATCH --error=data/MAG/lr-bd/miniasm/lr-bd_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/miniasm/run_scripts/run_miniasm_lr-gut.sh" 2>&1 | tee -a data/analysis/miniasm/log_assemble_miniasm_lr-gut_slurm.log || echo 'Assembly failed : miniasm lr-gut'
+bash code/assembly/miniasm/run_scripts/miniasm_lr-bd.sh
