@@ -10,9 +10,9 @@ path_output=$2
 path_log_file=$3
 path_reference=$4
 
-bash_to_run="code/analysis/busco/busco.bash $path_contigs $path_output $path_log_file $path_reference"
+bash_to_run="code/analysis/metaquast/metaquast.bash $path_contigs $path_output $path_log_file $path_reference"
 echo "${bash_to_run}"
 
-conda run -n ana_busco $bash_to_run
+conda run -n ana_metaquast $bash_to_run
 
 

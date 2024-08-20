@@ -10,5 +10,5 @@ path_output=$2
 path_log=$3
 path_reference=$4
 
-python3 tools/analysis/quast/metaquast.py -t 24 -o $path_output data/MAG/megahit/sr-bmock/megahit_sr-bmock_contigs.fa --glimmer \
+python3 tools/analysis/quast/metaquast.py -t 24 -o $path_output $path_contigs --glimmer \
 -r $path_reference | tee $path_log
