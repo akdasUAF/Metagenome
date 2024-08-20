@@ -1,7 +1,7 @@
 #!/bin/env bash
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <raw_directory> <MAG_out_dir> <path_log_file>"
+if [ $# -ne 4 ]; then
+  echo "Usage: $0 <raw_directory> <MAG_out_dir> <path_log_file> <path_reference>"
   exit 1
 fi
 
