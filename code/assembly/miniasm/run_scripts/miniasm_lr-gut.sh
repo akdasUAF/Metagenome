@@ -10,3 +10,5 @@ mkdir -p data/MAG/miniasm/lr-gut/
 minipolish -t 12 data/raw/lr-gut/SRR18491310/SRR18491310.fastq data/MAG/miniasm/lr-gut/assembly_minimap_lr-gut.gfa > data/MAG/miniasm/lr-gut/polished_assembly_minimap_lr-gut.gfa
 
 bash code/processing/convert_gfa_to_fasta.bash data/MAG/miniasm/lr-gut/polished_assembly_minimap_lr-gut.gfa data/MAG/miniasm/lr-gut/polished_assembly_minimap_lr-gut.fasta
+
+reads_in="data/raw/lr-synth/SRR22366767/SRR22366767.fastq"
