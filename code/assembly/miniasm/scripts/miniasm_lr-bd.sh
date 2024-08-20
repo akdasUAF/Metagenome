@@ -1,7 +1,7 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_miniasm="code/assembly/miniasm/run_miniasm.sh"
-reads_in="data/raw/lr-synth/SRR22366767/SRR22366767.fastq"
+reads_in="data/raw/lr-bd/SRR22366767/SRR22366767.fastq"
 mag_output="data/MAG/lr-bd/miniasm/"
 dataset="lr-bd"
 task="miniasm"
