@@ -24,6 +24,19 @@ log_polish="${path_output}/log_polish_${dataset}.log"
 log_contigs="${path_output}/log_contigs_${dataset}.log"
 
 
+echo "reads_in: $reads_in"
+echo "path_output: $path_output"
+echo "dataset: $dataset"
+echo "overlap: $overlap"
+echo "assembly: $assembly"
+echo "polished: $polished"
+echo "contigs: $contigs"
+echo "log_overlap: $log_overlap"
+echo "log_assembly: $log_assembly"
+echo "log_polish: $log_polish"
+echo "log_contigs: $log_contigs"
+
+
 ./tools/assemblers/minimap2/minimap2 -x ava-ont $reads_in $reads_in > $overlap | tee $log_overlap
 ./tools/assemblers/miniasm/miniasm -f $reads_in $overlap > $assembly | tee $log_assembly
 minipolish -t 24 $reads_in $assembly > $polished | tee $log_polish

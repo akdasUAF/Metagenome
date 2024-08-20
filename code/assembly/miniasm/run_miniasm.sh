@@ -9,7 +9,7 @@ reads_in=$1
 path_output=$2
 dataset=$3
 
-bash_to_run="code/assembly/miniasm/miniasm.sh ${path_raw} ${path_output} ${dataset}"
+bash_to_run="code/assembly/miniasm/miniasm.sh ${reads_in} ${path_output} ${dataset}"
 
 echo "Starting MiniASM..."
 echo "Running: ${bash_to_run}"
