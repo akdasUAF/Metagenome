@@ -15,7 +15,7 @@ dataset=$3
 
 overlap="${path_output}/overlap_minimap_${dataset}.paf"
 assembly="${path_output}/assembly_miniasm_${dataset}.gfa"
-polished="${$path_output}/polished_miniasm_${dataset}.gfa"
+polished="${path_output}/polished_miniasm_${dataset}.gfa"
 contigs="${path_output}/${dataset}_miniasm_contigs.fasta"
 
 log_overlap="${path_output}/log_overlap_${dataset}.log"
