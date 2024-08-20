@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/miniasm/run_scripts/miniasm_lr-bd.sh
+bash code/assembly/miniasm/scripts/miniasm_lr-bd.sh

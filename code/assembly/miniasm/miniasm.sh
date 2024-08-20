@@ -5,7 +5,7 @@
 
 
 if [ $# -ne 3 ]; then
-  echo "Usage: $0 <reads_in> <MAG_directory> <dataset"
+  echo "Usage: $0 <reads_in> <MAG_directory> <dataset>"
   exit 1
 fi
 
