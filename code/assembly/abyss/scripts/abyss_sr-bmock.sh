@@ -20,9 +20,8 @@ mkdir -p $(dirname "$MAG_output")
 mkdir -p ${log_dir}
 log_file="${log_dir}/log_asm_${task}_${dataset}.log"
 
-
 # Construct the command to be executed
-command="$path_abyss $forward_reads $reverse_reads $MAG_output $log_file $name_assembly $kmer $bloom"
+command="$path_abyss"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
