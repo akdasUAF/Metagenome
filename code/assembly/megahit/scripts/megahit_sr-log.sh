@@ -1,12 +1,11 @@
 #!/bin/bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-raw_dir="data/process/sr-log/trimmed/"
-MAG_output="data/MAG/megahit/sr-log/"
-path_log="data/logs/sr-log/megahit/"
+raw_dir="data/sr-log/trimmed/"
+MAG_output="data/sr-log/megahit/"
+path_log="data/sr-log/log/"
 dataset="sr-log"
 task="megahit"
-
 
 mkdir -p ${path_log}
 log_file="${path_log}/log_asm_${task}_${dataset}.log"

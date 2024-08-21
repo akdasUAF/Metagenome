@@ -19,4 +19,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/megahit/scripts/megahit_sr-log.sh | tee -a data/analysis/megahit/sr-log/log_assemble_megahit_sr-log_slurm.log || echo 'Assembly failed : megahit sr-log'
+bash code/assembly/megahit/scripts/megahit_sr-log.sh
