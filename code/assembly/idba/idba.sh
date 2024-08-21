@@ -2,7 +2,7 @@
 ## Assembler: IDBA
 
 if [ $# -ne 4 ]; then
-  echo "Usage: $0 <path_forward> <path_reverse> <path_combinedy> <path_output>"
+  echo "Usage: $0 <path_forward> <path_reverse> <path_combined> <path_output>"
   exit 1
 fi
 

@@ -4,6 +4,7 @@ library(dplyr)
 library(tidyr)
 library(tidyverse)
 library(broom)
+library(gridExtra)
 
 
 bits_to_mb <- function(bits) {
@@ -52,6 +53,8 @@ make_dool_plot_cpu <- function(dool_log_file, assembler="", dataset="") {
     scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 15), labels = as.integer) +
     scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, length.out = 10), labels = as.integer) + 
     theme_classic() + 
+    theme(legend.position = "bottom",
+          legend.key.size = unit(1.5, "cm")) + 
     scale_color_manual(values = c("usr" = "chocolate3","idl" = "darkseagreen3"),
                        labels = c("Idle CPU", "User CPU"))
   
@@ -89,6 +92,8 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
     scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
     scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
     theme_classic() + 
+    theme(legend.position = "bottom",
+          legend.key.size = unit(1.5, "cm")) + 
     scale_color_manual(values = c("used" = "#48448EFF", "free" = "#8CCC58FF", "cach" = "#FC4D97FF","avai" = "#B82578FF"),
                        labels = c("Available Memory", "Cached Memory", "Free Memory", "Used Memory"))
   
@@ -128,6 +133,8 @@ make_dool_plot_virtmemory <- function(dool_log_file, assembler="", dataset="") {
     scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
     # scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
     theme_classic() + 
+    theme(legend.position = "bottom",
+          legend.key.size = unit(1.5, "cm")) + 
     scale_color_manual(values = c("majpf" = "#48448EFF", "minpf" = "#8CCC58FF", "alloc" = "#FC4D97FF"),
                        labels = c("Virtual Majpf", "Virtual Minpf", "Virtual Allocated"))
   
@@ -265,6 +272,11 @@ dool_unicycler_bmock_memory
 ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_unicycler_memory.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
 ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_unicycler_cpu.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
 
+sbmock_cpu <- grid.arrange(dool_megahit_bmock_cpu, dool_metaspades_bmock_cpu, dool_unicycler_bmock_cpu, ncol = 2)
+sbmock_memory <- grid.arrange(dool_megahit_bmock_memory, dool_metaspades_bmock_memory, dool_unicycler_bmock_memory, ncol = 2)
+
+ggsave("exploratory/figures/dool_plots/sr-bmock_cpu_combined.png", sbmock_cpu)
+ggsave("exploratory/figures/dool_plots/sr-bmock_memory_combined.png", sbmock_memory)
 
 
 
