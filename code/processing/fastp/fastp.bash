@@ -13,5 +13,5 @@ path_report=$5
 
 
 
-fastp -i $path_forward -I $path_reverse -o "$output_paired_1" -O "$output_paired_2" -h "$path_report" -q 20 -p 95 -l 30 -n 10
+fastp -i $path_forward -I $path_reverse -o $forward_trimmed_path -O $reverse_trimmed_path -h $path_report -q 20 -p 95 -l 30 -n 10
 
