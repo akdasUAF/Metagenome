@@ -19,4 +19,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/processing/fastp/scripts/fastp_sr-ms.bash | tee -a data/analysis/sr-ms/log_fastp_sr-ms_slurm.log || echo 'Fastp failed : sr-ms'
+bash code/processing/fastp/scripts/fastp_sr-ms.bash
