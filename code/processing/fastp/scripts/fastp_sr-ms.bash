@@ -14,6 +14,7 @@ task="fastp"
 dataset="lr-bd"
 task="raven"
 
+mkdir -p $(dirname $forward_trimmed_path)
 mkdir -p $(dirname $path_report)
 mkdir -p ${log_dir}
 log_file="${log_dir}/log_fastp_${dataset}.log"
