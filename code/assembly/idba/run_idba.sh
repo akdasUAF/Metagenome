@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]; then
-  echo "Usage: $0 <path_forward> <path_reverse> <path_combinedy> <path_output>"
+if [ $# -ne 5 ]; then
+  echo "Usage: $0 <path_forward> <path_reverse> <path_combinedy> <path_output> <path_log>"
   exit 1
 fi
 

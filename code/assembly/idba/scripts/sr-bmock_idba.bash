@@ -1,6 +1,6 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
-path_idba="code/assembly/miniasm/run_miniasm.sh"
+path_idba="code/assembly/idba/run_idba.sh"
 forward_in="data/process/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq"
 reverse_in="data/process/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq"
 path_output="data/MAG/sr-bmock/idba/"
