@@ -48,8 +48,7 @@ make_dool_plot_cpu <- function(dool_log_file, assembler="", dataset="") {
   
   dool_plot_cpu <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
     labs(title = plot_title, x = "Time (s)", y = "Percentage", color = "CPU Processes") +
-    geom_line(size = 0.75) +
-    geom_point(size = 0.05) + 
+    geom_line(linewidth = 0.75) +
     scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 15), labels = as.integer) +
     scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, length.out = 10), labels = as.integer) + 
     theme_classic() + 
@@ -239,3 +238,43 @@ dool_raven_lr_ms_cpu
 dool_raw <- read.csv("data/dool_logs/log_dool_megahit_sr-bmock_no-header.csv")
 
 ggsave("exploratory/figures/dool_plots/dool_plot_asm_megahit_sr-bmock.png", dool_plot, width = 10, height = 5, units = "in", dpi = 300)
+
+
+###### sr-bmock Short Read Mock Even community
+# Megahit
+dool_megahit_bmock_cpu <- make_dool_plot_cpu("data/dool_logs/dool_sr-bmock_megahit_no-head.csv", "MEGAHIT", "sr-bmock")
+dool_megahit_bmock_cpu
+dool_megahit_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_megahit_no-head.csv", "MEGAHIT", "sr-bmock")
+dool_megahit_bmock_memory
+ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_megahit_memory.png", dool_megahit_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_megahit_cpu.png", dool_megahit_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+dool_metaspades_bmock_cpu <- make_dool_plot_cpu("data/dool_logs/dool_sr-bmock_metaspades_no-head.csv", "MetaSPAdes", "sr-bmock")
+dool_metaspades_bmock_cpu
+dool_metaspades_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_metaspades_no-head.csv", "MetaSPAdes", "sr-bmock")
+dool_metaspades_bmock_memory
+ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_metaspades_memory.png", dool_metaspades_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_metaspades_cpu.png", dool_metaspades_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+dool_unicycler_bmock_cpu <- make_dool_plot_cpu("data/dool_logs/dool_sr-bmock_unicycler_no-head.csv", "Unicycler", "sr-bmock")
+dool_unicycler_bmock_cpu
+dool_unicycler_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmock_unicycler_no-head.csv", "Unicycler", "sr-bmock")
+dool_unicycler_bmock_memory
+ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_unicycler_memory.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+ggsave("exploratory/figures/dool_plots/doolplot_sr-bmock_unicycler_cpu.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+
+
+###### lr-bd Long read Buttler Drown
+dool_bd_raven_memory <- make_dool_plot_memory("data/dool_logs/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
+dool_bd_raven_memory
+
+dool_bd_raven_cpu <- make_dool_plot_cpu("data/dool_logs/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
+dool_bd_raven_cpu
+
+ggsave("exploratory/figures/dool_plots/doolplot_lr-bd_raven_memory.png", dool_bd_raven_memory, width = 10, height = 5, units = "in", dpi = 300)
+ggsave("exploratory/figures/dool_plots/doolplot_lr-bd_raven_cpu.png", dool_bd_raven_cpu, width = 10, height = 5, units = "in", dpi = 300)
+

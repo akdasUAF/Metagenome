@@ -33,7 +33,7 @@ while IFS= read -r line; do
 
 done < "$root_dir"/"$filename"
 
-## Separates reads
+## Separates readse
 ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump */*.fastq
 
 ## Moves reads into forward and reverse
