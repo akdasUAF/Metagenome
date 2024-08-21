@@ -282,11 +282,16 @@ ggsave("exploratory/figures/dool_plots/sr-bmock_memory_combined.png", sbmock_mem
 
 ###### lr-bd Long read Buttler Drown
 dool_bd_raven_memory <- make_dool_plot_memory("data/dool_logs/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
-dool_bd_raven_memory
-
 dool_bd_raven_cpu <- make_dool_plot_cpu("data/dool_logs/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
-dool_bd_raven_cpu
 
-ggsave("exploratory/figures/dool_plots/doolplot_lr-bd_raven_memory.png", dool_bd_raven_memory, width = 10, height = 5, units = "in", dpi = 300)
-ggsave("exploratory/figures/dool_plots/doolplot_lr-bd_raven_cpu.png", dool_bd_raven_cpu, width = 10, height = 5, units = "in", dpi = 300)
+
+dool_bd_miniasm_memory <- make_dool_plot_memory("data/dool_logs/dool_lr-bd_miniasm_midway.csv", "MiniASM", "lr-bd")
+dool_bd_miniasm_cpu <- make_dool_plot_cpu("data/dool_logs/dool_lr-bd_miniasm_midway.csv", "MiniASM", "lr-bd")
+
+
+bd_memory <- grid.arrange(dool_bd_raven_memory, dool_bd_miniasm_memory, ncol = 2)
+bd_cpu <- grid.arrange(dool_bd_raven_cpu, dool_bd_miniasm_cpu, ncol = 2)
+ggsave("exploratory/figures/dool_plots/lr-bd_memory_combined.png", bd_memory)
+ggsave("exploratory/figures/dool_plots/lr-bd_cpu_combined.png", bd_cpu)
+
 

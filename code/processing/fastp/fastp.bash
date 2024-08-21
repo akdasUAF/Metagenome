@@ -1,34 +1,17 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <raw_directory> <trimmed_sequences_out_directory> <analysis_directory>"
+if [ $# -ne 5 ]; then
+  echo "Usage: $0 <path_forward> <path_reverse> <forward_trimmed_path> <reverse_trimmed_path> <path_report>"
   exit 1
 fi
 
-path_raw=$1
-path_output=$2
-path_analysis=$3
+path_forward=$1
+path_reverse=$2
+forward_trimmed_path=$3
+reverse_trimmed_path=$4
+path_report=$5
 
-mkdir -p "${path_output}/trimmed/"
 
-for read_id in $(ls "$path_raw"forward/*.fastq | cut -d '/' -f 5 | cut -d '_' -f 1); do
-  forward_file="${path_raw}/forward/${read_id}_1.fastq"
-  reverse_file="${path_raw}/reverse/${read_id}_2.fastq"
-  
-  mkdir -p "${path_output}/trimmed/"
-  mkdir -p "${path_analysis}/fastp/"
 
-  output_prefix="${path_output}/trimmed/sr-bsc_trimmed_${read_id}"
-  output_paired_1="${output_prefix}_1.fastq.gz"
-  output_paired_2="${output_prefix}_2.fastq.gz"
-  output_report="${path_analysis}/fastp/fastp_${read_id}_report.html"
-
-  fastp -i "$forward_file" -I "$reverse_file" -o "$output_paired_1" -O "$output_paired_2" -h "$output_report" -q 20 -p 95 -l 30 -n 10
-
-   # Check for Fastp errors
-  if [ $? -ne 0 ]; then
-    echo "Error running Fastp for file: $forward_file"
-  fi
-
-done
+fastp -i $path_forward -I $path_reverse -o "$output_paired_1" -O "$output_paired_2" -h "$path_report" -q 20 -p 95 -l 30 -n 10
 
