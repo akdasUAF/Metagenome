@@ -32,4 +32,4 @@
 
 
 abyss-pe k=117 name=sr-bmock_abyss B=10G j=24 in='data/process/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq data/process/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq' \
-out='data/MAG/sr-bmock/abyss/' | tee "${path_log}"
+out='data/MAG/sr-bmock/abyss/'
