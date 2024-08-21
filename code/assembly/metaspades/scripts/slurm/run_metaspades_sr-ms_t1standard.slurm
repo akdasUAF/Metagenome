@@ -9,6 +9,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_metaspades_sr-ms_t1standard"
+#SBATCH --output=data/analysis/metaspades/sr-ms/log_slurm_metaspades_sr-ms_t1standard.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -19,4 +20,4 @@ module load Python/3.11.3
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/metaspades/run_scripts/run_metaspades_sr-ms.sh" 2>&1 | tee -a data/analysis/metaspades/log_assemble_metaspades_sr-ms_slurm.log || echo 'Assembly failed : metaspades sr-ms'
+bash code/assembly/metaspades/scripts/metaspades_sr-ms.sh
