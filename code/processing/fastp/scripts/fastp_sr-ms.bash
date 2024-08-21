@@ -1,6 +1,4 @@
 #!/bin/bash
-
-benchmark_script="code/benchmarking/benchmark.bash"
 fastp_script="code/processing/fastp/run_fastp.bash"
 raw_dir="data/raw/sr-ms/"
 forward_path="data/sr-ms/DRR090555/DRR090555_1.fastq"
@@ -22,6 +20,4 @@ log_file="${log_dir}/log_asm_${task}_${dataset}.log"
 
 # Construct the command to be executed
 command="$fastp_script $forward_path $reverse_path $forward_trimmed_path $reverse_trimmed_path $path_report $log_file"
-
-# Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d "$dataset" -t "$task"
+bash $command
