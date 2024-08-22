@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_quast_megahit_sr-gut"
-#SBATCH --output=data/analysis/megahit/sr-gut/log_slurm_megahit_sr-gut_%j.log
-#SBATCH --error=data/analysis/megahit/sr-gut/log_slurm_megahit_sr-gut_err_%j.log
+#SBATCH --job-name="panmeta_asm_quast_sr-log_megahit"
+#SBATCH --output=data/sr-log/logs/log_slurm_quast_sr-log_megahit_%j.log
+#SBATCH --error=data/sr-log/logs/log_slurm_quast_sr-log_megahit_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/analysis/metaquast/megahit/run_scripts/run_quast_megahit_sr-gut.sh" 2>&1 | tee -a data/analysis/megahit/sr-gut/log_quast_megahit_sr-gut_slurm.log || echo 'Quast failed : megahit sr-gut'
+bash code/analysis/metaquast/sr-log/quast_megahit_sr-log.sh
