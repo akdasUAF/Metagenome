@@ -4,8 +4,7 @@
 ## Dataset: sr-log
 ## Uses this dataset: 
 ## Analyzer: METAQUAST
-benchmark_script="code/analysis/metaquast/run_metaquast.bash"
-path_megahit="code/assembly/megahit/run_megahit.sh"
+path_metaquast="code/analysis/metaquast/run_metaquast.bash"
 path_contigs="data/sr-log/megahit/final.contigs.fa"
 path_output="data/sr-log/"
 dataset="sr-log"
@@ -31,8 +30,6 @@ echo $references
 echo $path_log
 
 # Construct the command to be executed
-command="$path_megahit $path_contigs $quast_output $references $path_log"
-echo $command
+command="$path_metaquast $path_contigs $quast_output $references $path_log"
+$command
 
-# Execute the benchmark script with the constructed command
-bash $benchmark_script "$command" $dataset $assembler
