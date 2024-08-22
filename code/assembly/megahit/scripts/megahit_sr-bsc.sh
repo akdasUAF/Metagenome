@@ -1,10 +1,10 @@
 #!/bin/bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-raw_dir="data/process/sr-bsc/trimmed/"
-MAG_output="data/MAG/sr-bsc/"
-path_log="data/logs/sr-bsc/megahit/"
-dataset="sr-bsc"
+raw_dir="data/sr-crust/trimmed/"
+MAG_output="data/sr-crust/megahit"
+path_log="data/sr-crust/log/megahit/"
+dataset="sr-crust"
 task="megahit"
 
 
