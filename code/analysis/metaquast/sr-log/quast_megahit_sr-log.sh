@@ -23,7 +23,7 @@ quast_output=${path_output}/quast/${assembler}
 path_log="${path_output}/log/log_quast_${assembler}_${dataset}.log"
 
 mkdir -p $quast_output
-mkdir -p "${dirname $path_log}"
+mkdir -p "${dirname{${path_log}}}"
 ###
 
 echo $path_contigs
