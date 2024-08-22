@@ -16,7 +16,7 @@ path_reference="code/analysis/metaquast/sr-bmock/sr-bmock_reference_paths.txt"
 
 
 ### 
-references=$(cat $path_reference)
+references="$(cat $path_reference)"
 echo $references
 
 quast_output=${path_output}/quast/${assembler}
@@ -31,7 +31,7 @@ echo $quast_output
 echo $path_log
 
 # Construct the command to be executed
-command="$path_megahit $path_contigs $quast_output $references $path_log"
+command="$path_megahit $path_contigs $quast_output '$references' $path_log"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $assembler
