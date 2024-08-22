@@ -18,7 +18,7 @@ path_reference="code/analysis/metaquast/sr-bmock/sr-bmock_reference_paths.txt"
 ### 
 references=$(cat $path_reference)
 
-quast_output="${path_output}/quast/${assembler}"
+quast_output=${path_output}/quast/${assembler}
 path_log="${log_dir}/log/log_quast_${assembler}_${dataset}.log"
 
 mkdir -p $quast_output
@@ -27,7 +27,7 @@ mkdir -p "${dirname $path_log}"
 
 
 # Construct the command to be executed
-command="$path_megahit $path_contigs $quast_output $path_reference $path_log"
+command="$path_megahit $path_contigs $quast_output $references $path_log"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $assembler
