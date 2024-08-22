@@ -20,7 +20,7 @@ references=$(cat $path_reference)
 echo $references
 
 quast_output=${path_output}/quast/${assembler}
-path_log="${log_dir}/log/log_quast_${assembler}_${dataset}.log"
+path_log="${path_output}/log/log_quast_${assembler}_${dataset}.log"
 
 mkdir -p $quast_output
 mkdir -p "${dirname $path_log}"
