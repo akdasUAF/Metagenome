@@ -2,6 +2,7 @@
 
 if [ $# -ne 4 ]; then
   echo "Usage: $0 <path_contigs> <path_output> <path_reference> <path_log>"
+  echo $#
   exit 1
 fi
 
