@@ -1,10 +1,38 @@
-#!/bin/bash
-
+#!/bin/env bash
 ## Script to analyze the quality of the metagenomes
 ## Assembler: Megahit
-## Dataset: sr-bmock
+## Dataset: sr-log
 ## Uses this dataset: 
 ## Analyzer: METAQUAST
+benchmark_script="code/analysis/metaquast/run_metaquast.bash"
+path_megahit="code/assembly/megahit/run_megahit.sh"
+path_contigs=""
+path_output="data/sr-log/"
+dataset="sr-log"
+assembler="megahit"
+
+### Metaquast only
+path_references="code/analysis/metaquast/sr-bmock/sr-bmock_reference_paths.txt"
+
+
+quast_output="${path_output}/quast/${assembler}"
+mkdir -p $quast_output
+
+mkdir -p ${log_dir}/log/
+log_file="${log_dir}/log/log_asm_${task}_${dataset}.log"
+
+# Construct the command to be executed
+command="$path_megahit $path_contigs $quast_output $dataset"
+
+# Execute the benchmark script with the constructed command
+bash $benchmark_script "$command" $dataset $assembler
+
+
+path_contigs=$1
+path_output=$2
+path_log=$3
+path_reference=$4
+
 
 mkdir -p data/analysis/sr-bmock/megahit/quast
 python3 tools/analysis/quast/metaquast.py -t 24 -o data/analysis/sr-bmock/megahit/quast data/MAG/megahit/sr-bmock/megahit_sr-bmock_contigs.fa --glimmer --references-list data/reference/sr-bmock_reference/sr-bmock_reference_paths.txt

@@ -1,0 +1,31 @@
+#!/bin/env bash
+## Script to analyze the quality of the metagenomes
+## Assembler: Megahit
+## Dataset: sr-log
+## Uses this dataset: 
+## Analyzer: METAQUAST
+benchmark_script="code/analysis/metaquast/run_metaquast.bash"
+path_megahit="code/assembly/megahit/run_megahit.sh"
+path_contigs="data/sr-log/megahit/final.contigs.fa"
+path_output="data/sr-log/"
+dataset="sr-log"
+assembler="megahit"
+
+### Metaquast only
+path_reference="code/analysis/metaquast/sr-bmock/sr-bmock_reference_paths.txt"
+
+references=$(cat $path_reference)
+
+quast_output="${path_output}/quast/${assembler}"
+mkdir -p $quast_output
+
+mkdir -p ${log_dir}/log/
+path_log="${log_dir}/log/log_quast_${assembler}_${dataset}.log"
+
+
+
+# Construct the command to be executed
+command="$path_megahit $path_contigs $quast_output $path_reference $path_log"
+
+# Execute the benchmark script with the constructed command
+bash $benchmark_script "$command" $dataset $assembler
