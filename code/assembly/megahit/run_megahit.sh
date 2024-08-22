@@ -10,7 +10,7 @@ reverse_reads=$2
 path_output=$3
 path_log_file=$4
 
-bash_to_run="code/assembly/megahit/megahit.sh $forward_reads $reverse_reads $path_output $path_log_file"
+bash_to_run="code/assembly/megahit/megahit.sh $forward_reads $reverse_reads $path_output"
 echo "${bash_to_run}"
 
 conda run -n asm_megahit bash $bash_to_run | tee $path_log_file
