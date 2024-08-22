@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_quast_sr-log_megahit"
-#SBATCH --output=data/sr-log/logs/log_slurm_quast_sr-log_megahit_%j.log
-#SBATCH --error=data/sr-log/logs/log_slurm_quast_sr-log_megahit_err_%j.log
+#SBATCH --output=data/sr-log/log/log_slurm_quast_sr-log_megahit_%j.log
+#SBATCH --error=data/sr-log/log/log_slurm_quast_sr-log_megahit_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
