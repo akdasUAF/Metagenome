@@ -37,7 +37,7 @@ echo "log_polish: $log_polish"
 echo "log_contigs: $log_contigs"
 
 
-./tools/assemblers/minimap2/minimap2 -x ava-ont $reads_in $reads_in > $overlap | tee $log_overlap
+./tools/assemblers/minimap2/minimap2 -x ava-ont -t 24 $reads_in $reads_in > $overlap | tee $log_overlap
 ./tools/assemblers/miniasm/miniasm -f $reads_in $overlap > $assembly | tee $log_assembly
 minipolish -t 24 $reads_in $assembly > $polished | tee $log_polish
 
