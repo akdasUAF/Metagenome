@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 # Assembler: Abyss
 
 if [ $# -ne 6 ]; then
@@ -28,4 +28,4 @@ abyss_pe_in="${forward_reads} ${reverse_reads}"
 abyss-pe k=$kmer name=$name_assembly B=$bloom j=24 \
 	in=$abyss_pe_in \
 	out=$path_output
-	
+
