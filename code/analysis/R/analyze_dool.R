@@ -45,13 +45,13 @@ make_dool_plot_cpu <- function(dool_log_file, assembler="", dataset="") {
   dool_raw_long <- dool_raw_filtered %>%
     pivot_longer(cols = -time, names_to = "variable", values_to = "value")
   
-  plot_title = paste(assembler, " assembly (", dataset, "): CPU Performance over time", sep="")
+  plot_title = paste(assembler, " (", dataset, "): CPU", sep="")
   
   dool_plot_cpu <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
     labs(title = plot_title, x = "Time (s)", y = "Percentage", color = "CPU Processes") +
     geom_line(linewidth = 0.75) +
-    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 15), labels = as.integer) +
-    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, length.out = 10), labels = as.integer) + 
+    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
+    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, length.out = 5), labels = as.integer) + 
     theme_classic() + 
     theme(legend.position = "bottom",
           legend.key.size = unit(1.5, "cm")) + 
@@ -83,7 +83,7 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
     pivot_longer(cols = -time, names_to = "variable", values_to = "value")
   
   
-  plot_title = paste(assembler, " assembly (", dataset, "): Memory Performance over time", sep="")
+  plot_title = paste(assembler, " (", dataset, "): Memory", sep="")
 
   dool_plot_memory <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
     labs(title = plot_title, x = "Time (s)", y = "Memory (MB)", color = "Memory Allocated") +
@@ -124,13 +124,13 @@ make_dool_plot_virtmemory <- function(dool_log_file, assembler="", dataset="") {
     pivot_longer(cols = -time, names_to = "variable", values_to = "value")
   
     
-  plot_title = paste(assembler, " assembly (", dataset, "): Virtual Memory Performance over time", sep="")
+  plot_title = paste(assembler, " assembly (", dataset, "): Virtual Memory", sep="")
   
   dool_plot_virtmemory <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
     labs(title = plot_title, x = "Time (s)", y = "Memory (MB)", color = "Memory Allocated") +
     geom_line(size = 0.75) +
     #geom_point(size = 0.05) + 
-    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
+    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 5), labels = as.integer) +
     # scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
     theme_classic() + 
     theme(legend.position = "bottom",
@@ -143,13 +143,55 @@ make_dool_plot_virtmemory <- function(dool_log_file, assembler="", dataset="") {
 
 
 
+### Function to generate a four by four graph
+generate_dool_ggplot <- function(logs_to_plot, save_directory) {
+  
+  plot_list_memory <- list()
+  plot_list_cpu <- list()
+  plot_list_virt <- list()
+  
+  i <- 1
+  
+  for (logg in logs_to_plot) {
+    plot_list_memory[[i]] <- make_dool_plot_memory(logg[[1]], logg[[2]], logg[[3]])
+    plot_list_cpu[[i]] <- make_dool_plot_cpu(logg[[1]], logg[[2]], logg[[3]])
+    plot_list_virt[[i]] <- make_dool_plot_virtmemory(logg[[1]], logg[[2]], logg[[3]])
+    i <- i + 1
+  }
+  
+  
+  full_memory <- grid.arrange(grobs = plot_list_memory, ncol = length(plot_list_memory) / 2)
+  full_cpu <- grid.arrange(grobs = plot_list_cpu, ncol = length(plot_list_cpu) / 2)
+  full_virt <- grid.arrange(grobs = plot_list_virt, ncol = length(plot_list_virt) / 2)
+  
+  
+  
+  ggsave(paste(save_directory, "dool_memory.png", sep = ""), full_memory)
+  ggsave(paste(save_directory, "dool_cpu.png", sep = ""), full_cpu)
+  ggsave(paste(save_directory, "dool_virt.png", sep = ""), full_virt)
+  
+  return (full_memory, full_cpu)
+}
 
 
 
 
 
+generate_dool_ggplot(logs_to_plot, "data/dool_logs/")
 
 
+### Load all dool_charts
+dool_megahit_bmock <- c("data/dool_logs/log_dool_megahit_sr-bmock_clean.csv", "MEGAHIT", "sr-bmock")
+dool_megahit_log <- c("data/dool_logs/log_dool_megahit_sr-log_clean.csv", "MEGAHIT", "sr-log")
+dool_megahit_crust <- c("data/dool_logs/log_dool_megahit_sr-crust_clean.csv", "MEGAHIT", "sr-Soil Crust")
+dool_megahit_ms <- c("data/dool_logs/log_dool_megahit_sr-ms_clean.csv", "MEGAHIT", "sr-Marine Sediment")
+
+logs_to_plot <- list(
+  dool_megahit_bmock,
+  dool_megahit_log,
+  dool_megahit_crust,
+  dool_megahit_ms
+)
 
 
 
