@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_miniasm_lr-bd_t1standard"
-#SBATCH --output=data/lr-bd/logs/lr-bd_%j.log
-#SBATCH --error=data/lr-bd/logs/lr-bd_err_%j.log
+#SBATCH --job-name="panmeta_asm_miniasm_lr-pasture_t1standard"
+#SBATCH --output=data/lr-pasture/logs/lr-pasture_%j.log
+#SBATCH --error=data/lr-pasture/logs/lr-pasture_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/miniasm/scripts/miniasm_lr-bd.sh
+bash code/assembly/miniasm/scripts/miniasm_lr-pasture.sh
