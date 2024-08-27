@@ -9,7 +9,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_metaspades_sr-log_t1standard"
-#SBATCH --output=data/sr-log/log/log_slurm_metaspades_sr-log_t1standard.log
+#SBATCH --output=data/sr-log/logs/log_slurm_metaspades_sr-log_t1standard.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded

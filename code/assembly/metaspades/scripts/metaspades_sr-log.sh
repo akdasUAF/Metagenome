@@ -4,7 +4,7 @@ path_metaspades="code/assembly/metaspades/run_metaspades.sh"
 path_forward="data/sr-log/trimmed/sr-log_trimmed_1.fastq"
 path_reverse="data/sr-log/trimmed/sr-log_trimmed_2.fastq"
 path_output="data/sr-log/metaspades/"
-path_log="data/sr-log/log/"
+path_log="data/sr-log/logs/"
 dataset="sr-log"
 task="metaspades"
 
