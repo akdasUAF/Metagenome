@@ -1,9 +1,9 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_miniasm="code/assembly/miniasm/run_miniasm.sh"
-reads_in="data/raw/lr-bd/SRR22366767/SRR22366767.fastq"
-mag_output="data/lr-bd/miniasm/"
-dataset="lr-bd"
+reads_in="data/lr-log/raw/Zymo-GridION-LOG-BB-SN.fq"
+mag_output="data/lr-log/miniasm/"
+dataset="lr-log"
 task="miniasm"
 
 mkdir -p $(dirname "$mag_output")
