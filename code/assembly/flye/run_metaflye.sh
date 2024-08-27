@@ -9,6 +9,10 @@ path_raw=$1
 path_MAG=$2
 path_log_file=$3
 
+echo "path_raw: $path_raw"
+echo "path_MAG: $path_MAG"
+echo "path_log_file: $path_log_file"
+
 bash_to_run="code/assembly/flye/metaflye.sh ${path_raw} ${path_output}"
 
 echo "${bash_to_run}"

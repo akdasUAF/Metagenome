@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <raw_path> <MAG_path>"
+  echo "Usage: $0 <raw_path> <path_output>"
   exit 1
 fi
 
