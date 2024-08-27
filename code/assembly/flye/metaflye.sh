@@ -2,6 +2,8 @@
 
 if [ $# -ne 2 ]; then
   echo "Usage: $0 <raw_path> <path_output>"
+  echo $#
+  echo $1
   exit 1
 fi
 
