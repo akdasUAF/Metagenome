@@ -3,21 +3,19 @@
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
-### SBATCH --mem=214G
+###SBATCH --mem=214G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_raven_lr-pasture_t1standard"
-#SBATCH --output=data/lr-pasture/logs/log_slurm_raven_lr-marine_sediment_%j.log
-#SBATCH --error=data/lr-pasture/logs/log_slurm_raven_lr-marine_sediment_err_%j.log
+#SBATCH --job-name="panmeta_asm_flye_lr-pasture_bio"
+#SBATCH --output=data/lr-pasture/logs/log_slurm_flye_lr-pasture_%j.log
+#SBATCH --error=data/lr-pasture/logs/log_slurm_flye_lr-pasture_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
 module purge
 module load slurm
 
-ulimit -l unlimited
-
 eval "$(conda shell.bash hook)"
-bash code/assembly/raven/scripts/run_raven_lr-pasture.sh
+bash code/assembly/flye/scripts/flye_lr-pasture.sh
