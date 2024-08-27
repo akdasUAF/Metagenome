@@ -21,6 +21,6 @@ echo $PWD
 echo "Starting Abyss..."
 
 
-conda run -n asm_abyss code/assembly/abyss/abyss.sh | tee $path_log
+conda run -n asm_abyss $bash_to_run | tee $path_log
 
 
