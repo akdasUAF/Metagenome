@@ -1,11 +1,11 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_unicycler="code/assembly/unicycler/run_unicycler.sh"
-forward_in="data/sr-ms/trimmed/sr-ms_trimmed_1.fastq"
-reverse_in="data/sr-ms/trimmed/sr-ms_trimmed_2.fastq"
-path_log="data/sr-ms/log/"
-path_output="data/sr-ms/unicycler/"
-dataset="sr-ms"
+forward_in="data/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq"
+reverse_in="data/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq"
+path_log="data/sr-bmock/log/"
+path_output="data/sr-bmock/unicycler/"
+dataset="sr-bmock"
 task="unicycler"
 
 

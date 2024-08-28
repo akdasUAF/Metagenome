@@ -8,14 +8,16 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_flye_lr-ecoli_bio"
-#SBATCH --output=data/analysis/flye/lr-ecoli/log_slurm_flye_lr-ecoli_%j.log
-#SBATCH --error=data/analysis/flye/lr-ecoli/log_slurm_flye_lr-ecoli_err_%j.log
+#SBATCH --job-name="panmeta_asm_unicycler_sr-log_t1standard"
+#SBATCH --output=data/sr-log/logs/slurm_unicycler_sr-log_%j.log
+#SBATCH --error=data/sr-log/logs/slurm_sr-log_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
 module purge
 module load slurm
 
+ulimit -l unlimited
+
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/flye/run_scripts/run_flye_lr-ecoli.sh" 2>&1 | tee -a data/analysis/flye/log_assemble_flye_lr-ecoli_slurm.log || echo 'Assembly failed : flye lr-ecoli'
+bash code/assembly/unicycler/scripts/unicycler_sr-log.sh

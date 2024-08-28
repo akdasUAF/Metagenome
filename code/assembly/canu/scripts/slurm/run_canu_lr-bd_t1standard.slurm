@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_flye_lr-synth_bio"
-#SBATCH --output=data/analysis/flye/lr-synth/log_slurm_flye_lr-synth_%j.log
-#SBATCH --error=data/analysis/flye/lr-synth/log_slurm_flye_lr-synth_err_%j.log
+#SBATCH --job-name="panmeta_asm_canu_lr-bd_t1standard"
+#SBATCH --output=data/lr-bd/logs/log_slurm_canu_lr-gut_%j.log
+#SBATCH --error=data/lr-bd/logs/log_slurm_canu_lr-gut_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -18,4 +18,4 @@ module purge
 module load slurm
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/flye/run_scripts/run_flye_lr-synth.sh" 2>&1 | tee -a data/analysis/flye/log_assemble_flye_lr-synth_slurm.log || echo 'Assembly failed : flye lr-synth'
+bash code/assembly/canu/scripts/canu_lr-bd.sh

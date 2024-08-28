@@ -16,4 +16,4 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 command="$path_metaspades $path_forward $path_reverse $path_output $log_file"
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d $dataset -t $task
+bash $benchmark_script "$command" $dataset $task

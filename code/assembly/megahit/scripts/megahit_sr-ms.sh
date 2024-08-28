@@ -16,14 +16,8 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 command="$path_megahit $forward_reads $reverse_reads $path_output $log_file"
 
 # Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d "$dataset" -t "$task"
+bash $benchmark_script "$command" "$dataset" "$task"
 
-
-# Construct the command to be executed
-command="$path_megahit $raw_dir $MAG_output $log_file"
-
-# Execute the benchmark script with the constructed command
-"$benchmark_script" "$command" -d "$dataset" -t "$task"
 
 
 

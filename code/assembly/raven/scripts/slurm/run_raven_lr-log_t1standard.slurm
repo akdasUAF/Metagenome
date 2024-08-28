@@ -3,14 +3,14 @@
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
-##SBATCH --mem=214G
+### SBATCH --mem=214G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-ecoli_t1standard"
-#SBATCH --output=data/analysis/canu/lr-ecoli/log_slurm_canu_lr-ecoli_%j.log
-#SBATCH --error=data/analysis/canu/lr-ecoli/log_slurm_canu_lr-ecoli_err_%j.log
+#SBATCH --job-name="panmeta_asm_raven_lr-log_t1standard"
+#SBATCH --output=data/lr-log/logs/log_slurm_raven_lr-marine_sediment_%j.log
+#SBATCH --error=data/lr-log/logs/log_slurm_raven_lr-marine_sediment_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/canu/run_scripts/run_canu_lr-ecoli.sh" 2>&1 | tee -a data/analysis/canu/log_assemble_canu_lr-ecoli_slurm.log || echo 'Assembly failed : canu lr-ecoli'
+bash code/assembly/raven/scripts/run_raven_lr-log.sh

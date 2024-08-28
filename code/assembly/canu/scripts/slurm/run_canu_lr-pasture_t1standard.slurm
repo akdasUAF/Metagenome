@@ -8,16 +8,14 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-gut_t1standard"
-#SBATCH --output=data/analysis/canu/lr-gut/log_slurm_canu_lr-gut_%j.log
-#SBATCH --error=data/analysis/canu/lr-gut/log_slurm_canu_lr-gut_err_%j.log
+#SBATCH --job-name="panmeta_asm_canu_lr-pasture_bio"
+#SBATCH --output=data/lr-pasture/logs/log_slurm_canu_lr-pasture_%j.log
+#SBATCH --error=data/lr-pasture/logs/log_slurm_canu_lr-pasture_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
 module purge
 module load slurm
 
-ulimit -l unlimited
-
 eval "$(conda shell.bash hook)"
-/usr/bin/time -v bash -c "source code/assembly/canu/run_scripts/run_canu_lr-gut.sh" 2>&1 | tee -a data/analysis/canu/log_assemble_canu_lr-gut_slurm.log || echo 'Assembly failed : canu lr-gut'
+bash code/assembly/canu/scripts/canu_lr-pasture.sh
