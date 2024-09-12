@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_canu_lr-bd_t1standard"
-#SBATCH --output=data/lr-bd/logs/log_slurm_canu_lr-gut_%j.log
-#SBATCH --error=data/lr-bd/logs/log_slurm_canu_lr-gut_err_%j.log
+#SBATCH --output=data/lr-bd/logs/log_slurm_canu_lr-bd_%j.log
+#SBATCH --error=data/lr-bd/logs/log_slurm_canu_lr-bd_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
