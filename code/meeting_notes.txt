@@ -1,0 +1,38 @@
+
+
+Reallocation:
+
+scim -> vim for spreadsheets
+sc -> similar to scim
+cat file | ps sc 
+
+Medaka on Mac -> Rosetta
+- pip install medaka
+- Instead of Medaka- player3
+
+qx cigar
+
+raw reads -> reference -> Error rate
+cat psc | sc | scim
+
+bwamap
+minimap2
+eval "$(conda shell.bash hook)"; conda activate medaka;
+
+USED 16 threads
+
+
+MS: Running ASsembly through blst
+
+lilo	
+
+
+Devin:
+- Trimming
+
+
+
+
+
+Other:
+- OpenBSD
