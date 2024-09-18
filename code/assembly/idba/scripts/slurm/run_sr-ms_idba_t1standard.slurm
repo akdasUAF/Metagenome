@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_idba_sr-bmock_t1standard"
-#SBATCH --output=data/sr-bmock/log/idba_%j.log
-#SBATCH --error=data/sr-bmock/log/idba_err_%j.log
+#SBATCH --job-name="panmeta_asm_idba_sr-ms_t1standard"
+#SBATCH --output=data/sr-ms/log/idba_%j.log
+#SBATCH --error=data/sr-ms/log/idba_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/idba/scripts/sr-bmock_idba.bash
+bash code/assembly/idba/scripts/sr-ms_idba.bash
