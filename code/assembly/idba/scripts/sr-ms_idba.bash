@@ -1,7 +1,7 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_idba="code/assembly/idba/run_idba.sh"
-combined_in="data/process/sr-ms/trimmed/sr-ms_trimmed_combined.fastq"
+combined_in="data/sr-ms/trimmed/sr-ms_trimmed_combined.fastq"
 path_output="data/sr-ms/idba/"
 path_log="data/sr-ms/log/idba/"
 
