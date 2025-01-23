@@ -1,12 +1,12 @@
 from decompose_graph import *
+from contig_formation import *
 
 # Main workflow
 def main():
     fastq_file = "16S_WT_day3_11_SRR2628505_1.fastq"  # Replace with your FASTQ file path
     k = 21
     n_species = 2
-    paired_end_reads = [("ATGC", "TGCA"), ("GCGT", "CGTG")]
-
+    paired_end_reads = extract_paired_end_reads(fastq_file)
     reads = parse_reads(fastq_file)
 
     # Split reads into chunks for parallel processing
@@ -31,6 +31,10 @@ def main():
     clusters, ambiguous_nodes = resolve_ambiguous_nodes(clusters)
     subgraphs = extract_subgraphs(clusters, graph)
     output_subgraphs(subgraphs, "subgraphs_output.txt")
+
+    # TODO: Multiple rounds of compression
+    contigs_by_subgraph = generate_contigs(subgraphs)
+    write_contigs_to_files(contigs_by_subgraph)
 
 if __name__ == "__main__":
     main()

@@ -2,3 +2,5 @@
 venv
 Paper
 .ipynb*
+*.fastq'
+output

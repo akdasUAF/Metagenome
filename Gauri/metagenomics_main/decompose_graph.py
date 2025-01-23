@@ -22,6 +22,17 @@ def construct_de_bruijn_graph(reads, k):
             graph[kmers[i]].add(kmers[i + 1])
     return graph
 
+# TODO: reverse complement of the reverse read - different read
+def extract_paired_end_reads(fastq_file):
+    paired_reads = []
+    with open(fastq_file, "r") as f:
+        records = list(SeqIO.parse(f, "fastq"))
+        for i in range(0, len(records), 2):
+            read1 = str(records[i].seq)
+            read2 = str(records[i + 1].seq)
+            paired_reads.append((read1, read2))
+    return paired_reads
+
 # Step 3: Annotate Nodes with Coverage
 def annotate_coverage(reads, k):
     coverage_map = defaultdict(int)
@@ -32,6 +43,7 @@ def annotate_coverage(reads, k):
     return coverage_map
 
 # Step 4: Cluster Nodes by Coverage
+# n coverage bin
 def cluster_by_coverage(coverage_map, n_clusters):
     kmers = list(coverage_map.keys())
     coverage_values = np.array(list(coverage_map.values())).reshape(-1, 1)
@@ -47,15 +59,24 @@ def calculate_gc_content(kmer):
     gc_count = kmer.count('G') + kmer.count('C')
     return (gc_count / len(kmer)) * 100
 
+# TODO: cluster based on GC inside coverage clusters
 def refine_clusters_with_gc(clusters):
-    refined_clusters = defaultdict(set)
+    refined_clusters = {}
+
     for cluster_id, kmers in clusters.items():
+        high_gc_key = f"{cluster_id}_high_gc"
+        low_gc_key = f"{cluster_id}_low_gc"
+
+        refined_clusters[high_gc_key] = set()
+        refined_clusters[low_gc_key] = set()
+
         for kmer in kmers:
             gc_content = calculate_gc_content(kmer)
             if gc_content >= 50:
-                refined_clusters["high_gc"].add(kmer)
+                refined_clusters[high_gc_key].add(kmer)
             else:
-                refined_clusters["low_gc"].add(kmer)
+                refined_clusters[low_gc_key].add(kmer)
+    
     return refined_clusters
 
 # Step 6: Leverage Paired-End Reads
