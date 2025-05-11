@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --partition=t1standard
-#SBATCH --ntasks=24
+#SBATCH --ntasks=4
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
 ####SBATCH --mem=214G
