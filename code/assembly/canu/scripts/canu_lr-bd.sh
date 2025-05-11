@@ -12,7 +12,7 @@ task="canu"
 
 
 #### ~~~~~~ Canu only
-genomeSize="220000000"
+genomeSize="40m"
 name="${dataset}_task"
 
 mkdir -p $output_path
@@ -26,3 +26,5 @@ command="$path_canu $raw_reads $output_path $genomeSize $name $log_file"
 bash $benchmark_script "$command" $dataset $task
 
 
+
+#./tools/assemblers/canu-2.2/bin/canu -p canu_lr-bd -d data/lr-bd/canu/ genomeSize=220000000 -nanopore data/lr-bd/raw/lr-bd_raw.fastq
