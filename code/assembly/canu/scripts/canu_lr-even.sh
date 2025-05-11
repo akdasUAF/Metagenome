@@ -1,13 +1,13 @@
 #!/bin/env bash
-## Dataset: Long-read Synthetic
+## Dataset: Long-read Even
 ## Uses this dataset: https://www.ncbi.nlm.nih.gov/sra/PRJNA903965
 ## Assembler: Canu
 benchmark_script="code/benchmarking/benchmark.bash"
 path_canu="code/assembly/canu/run_canu.sh"
-raw_reads="data/lr-bd/raw/lr-bd_raw.fastq"
-output_path="data/lr-bd/canu/"
-log_dir="data/lr-bd/canu/"
-dataset="lr-bd"
+raw_reads="data/raw/lr-even/lr-even_raw.fastq"
+output_path="data/canu/lr-even"
+log_dir="data/canu/logs/"
+dataset="lr-even"
 task="canu"
 
 

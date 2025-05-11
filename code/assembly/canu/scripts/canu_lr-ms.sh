@@ -4,9 +4,9 @@
 ## Assembler: Canu
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/canu/run_canu.sh"
-raw_reads="data/lr-ms/raw/lr-ms_raw.fastq"
-output_path="data/lr-ms/canu/"
-log_dir="data/lr-ms/canu/"
+raw_reads="data/raw/lr-ms/lr-ms_raw.fastq"
+output_path="data/canu/lr-ms/"
+log_dir="data/canu/logs/"
 dataset="lr-ms"
 task="canu"
 

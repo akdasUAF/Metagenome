@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-bd_t1standard"
-#SBATCH --output=data/lr-bd/logs/log_slurm_canu_lr-bd_%j.log
-#SBATCH --error=data/lr-bd/logs/log_slurm_canu_lr-bd_err_%j.log
+#SBATCH --job-name="panmeta_asm_canu_lr-even_bio"
+#SBATCH --output=data/canu/logs/log_slurm_canu_lr-even_%j.log
+#SBATCH --error=data/canu/logs/log_slurm_canu_lr-even_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -18,4 +18,4 @@ module purge
 module load slurm
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/canu/scripts/canu_lr-bd.sh
+bash code/assembly/canu/scripts/canu_lr-even.sh
