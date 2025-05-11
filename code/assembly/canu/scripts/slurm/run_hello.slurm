@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=t1standard
-#SBATCH --ntasks=12
-#SBATCH --tasks-per-node=12
+#SBATCH --ntasks=1
+#SBATCH --tasks-per-node=1
 ####If running on the bio or analysis queue add:
 ##SBATCH --mem=214G
 #SBATCH --mail-user=wwinnett@alaska.edu
@@ -18,4 +18,4 @@ module purge
 module load slurm
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/canu/scripts/canu_lr-even.sh
+echo "Hello World"
