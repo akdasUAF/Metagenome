@@ -4,10 +4,10 @@
 ## Assembler: Canu
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/canu/run_canu.sh"
-raw_reads="data/lr-pasture/raw/lr-pasture_raw.fastq"
-output_path="data/lr-pasture/canu/"
-log_dir="data/lr-pasture/canu/"
-dataset="lr-pasture"
+raw_reads="data/lr-soil/raw/lr-soil_raw.fastq"
+output_path="data/lr-soil/canu/"
+log_dir="data/lr-soil/canu/"
+dataset="lr-soil"
 task="canu"
 
 
@@ -26,3 +26,4 @@ command="$path_flye $raw_reads $output_path $genomeSize $name $log_file"
 bash $benchmark_script "$command" $dataset $task
 
 
+./tools/assemblers/canu-2.2/bin/canu -p canu_lr-soil -d data/lr-soil/canu/ genomeSize=400000 -nanopore data/lr-soil/raw/lr-soil_raw.fastq

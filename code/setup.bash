@@ -18,7 +18,6 @@ mkdir -p logs/processing/
 mkdir -p logs/analysis/
 
 
-mkdir -p data/MAG/
 mkdir -p data/raw/
 mkdir -p data/process/
 mkdir -p data/analysis/

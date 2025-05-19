@@ -1,11 +1,12 @@
-#### 
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(tidyverse)
-library(broom)
-library(gridExtra)
-
+####
+{
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(tidyverse)
+  library(broom)
+  library(gridExtra)
+}
 
 bits_to_mb <- function(bits) {
   # Conversion factor: 1 MB = 8 * 2^20 bits
@@ -90,7 +91,7 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
     geom_line(linewidth = 0.75) +
     #geom_point(size = 0.05) + 
     scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
-    scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
+    scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 150000000000000, length.out = 10), labels = as.integer) + 
     theme_classic() + 
     theme(legend.position = "bottom",
           legend.key.size = unit(1.5, "cm")) + 
@@ -177,7 +178,6 @@ generate_dool_ggplot <- function(logs_to_plot, save_directory) {
 
 
 
-generate_dool_ggplot(logs_to_plot, "data/dool_logs/")
 
 
 ### Load all dool_charts
@@ -194,6 +194,24 @@ logs_to_plot <- list(
 )
 
 
+
+dool_megahit_bmock <- c("data/dool_logs/log_dool_megahit_sr-bmock_clean.csv", "MEGAHIT", "sr-bmock")
+dool_megahit_log <- c("data/dool_logs/log_dool_megahit_sr-log_clean.csv", "MEGAHIT", "sr-log")
+
+
+
+dool_megahit <- c("data/dool_logs/sr-log/log_dool_metaspades_sr-log_no-header.csv", "MEGAHIT", "sr-log")
+
+
+
+
+
+
+
+
+
+
+generate_dool_ggplot(logs_to_plot, "data/dool_logs/")
 
 
 
@@ -244,7 +262,7 @@ ggsave("exploratory/figures/dool_plots/doolplot_unicycler_sr-bmock.png", dool_un
 
 
 
-
+temp <- read.csv("data/dool_logs/sr-log/log_dool_metaspades_sr-log_no-header.csv")
 
 
 
