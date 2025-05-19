@@ -4,19 +4,19 @@
 ## Assembler: Flye 
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/flye/run_metaflye.sh"
-raw_path="data/raw/lr-bd/SRR22366767/SRR22366767.fastq"
-MAG_output="data/MAG/lr-bd/flye/"
-log_dir="data/MAG/lr-bd/"
-dataset="lr-bd"
+raw_path="data/raw/lr-even/lr-even_raw.fastq"
+output_path="data/flye/lr-even"
+log_dir="data/flye/logs/"
+dataset="lr-even"
 task="flye"
 
 
-mkdir -p $MAG_output
+mkdir -p $output_path
 mkdir -p ${log_dir}
 log_file="${log_dir}/log_asm_${task}_${dataset}.log"
 
 # Construct the command to be executed
-command="$path_flye $raw_path $MAG_output $log_file"
+command="$path_flye $raw_path $output_path $log_file"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
