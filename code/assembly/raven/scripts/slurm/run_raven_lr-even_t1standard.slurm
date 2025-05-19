@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/raven/scripts/run_raven_lr-bd.sh
+bash code/assembly/raven/scripts/run_raven_lr-even.sh
