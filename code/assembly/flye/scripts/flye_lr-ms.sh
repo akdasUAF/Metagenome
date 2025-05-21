@@ -3,9 +3,9 @@
 ## Assembler: Flye 
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/flye/run_metaflye.sh"
-raw_path="data/lr-ms/raw/lr-ms_raw.fastq"
-path_output="data/lr-ms/flye/"
-log_dir="data/lr-ms/logs/"
+raw_path="data/raw/lr-ms/lr-ms_raw.fastq"
+path_output="data/flye/lr-ms/"
+log_dir="data/flye/logs/"
 dataset="lr-ms"
 task="flye"
 
