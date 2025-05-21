@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_miniasm_lr-even_t1small"
-#SBATCH --output=data/raven/logs/log_slurm_miniasm_lr-even_%j.log
-#SBATCH --error=data/raven/logs/log_slurm_miniasm_lr-even_err_%j.log
+#SBATCH --output=data/miniasm/logs/log_slurm_miniasm_lr-even_%j.log
+#SBATCH --error=data/miniasm/logs/log_slurm_miniasm_lr-even_err_%j.log
 
 
 ## Clean out any modules, then reload slurm
