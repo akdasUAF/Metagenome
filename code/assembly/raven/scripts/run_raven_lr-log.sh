@@ -3,7 +3,7 @@ benchmark_script="code/benchmarking/benchmark.bash"
 path_raven="code/assembly/raven/run_raven.sh"
 raw_path="data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq"
 output_directory="data/raven/lr-log/assembly_raven_lr-log.fasta"
-log_dir="data/raven/log/"
+log_dir="data/raven/logs/"
 dataset="lr-log"
 task="raven"
 
