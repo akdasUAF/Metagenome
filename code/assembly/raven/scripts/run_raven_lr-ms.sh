@@ -1,9 +1,9 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_raven="code/assembly/raven/run_raven.sh"
-raw_path="data/lr-ms/raw/lr-ms_raw.fastq"
-path_output="data/lr-ms/raven/assembly_raven_lr-log.fasta"
-log_dir="data/lr-ms/logs/"
+raw_path="data/raw/lr-ms/lr-ms_raw.fastq"
+path_output="data/raven/lr-ms/assembly_raven_lr-ms.fasta"
+log_dir="data/raven/logs"
 dataset="lr-ms"
 task="raven"
 
