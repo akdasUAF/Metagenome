@@ -5,18 +5,18 @@
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/flye/run_metaflye.sh"
 raw_path="data/lr-log/raw/Zymo-GridION-LOG-BB-SN.fq"
-path_output="data/lr-log/flye/"
-log_dir="data/lr-log/logs/"
+output_path="data/flye/lr-log/"
+log_dir="data/flye/logs/"
 dataset="lr-log"
 task="flye"
 
 
-mkdir -p $path_output
+mkdir -p $output_path
 mkdir -p ${log_dir}
 log_file="${log_dir}/log_asm_${task}_${dataset}.log"
 
 # Construct the command to be executed
-command="$path_flye $raw_path $path_output $log_file"
+command="$path_flye $raw_path $output_path $log_file"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
