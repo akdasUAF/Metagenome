@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_flye_lr-even_t1standard"
-#SBATCH --output=data/lr-even/logs/log_slurm_flye_lr-even_%j.log
-#SBATCH --error=data/lr-even/logs/log_slurm_flye_lr-even_err_%j.log
+#SBATCH --output=data/flye/logs/log_slurm_flye_lr-even_%j.log
+#SBATCH --error=data/flye/logs/log_slurm_flye_lr-even_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
