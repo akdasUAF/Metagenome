@@ -4,7 +4,7 @@
 ## Assembler: Flye 
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/flye/run_metaflye.sh"
-raw_path="data/lr-log/raw/Zymo-GridION-LOG-BB-SN.fq"
+raw_path="data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq"
 output_path="data/flye/lr-log/"
 log_dir="data/flye/logs/"
 dataset="lr-log"
