@@ -71,6 +71,7 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
     rownames_to_column(var = "time") 
   
   
+  
   dool_raw_filtered <- dool_raw %>%
     select(time, used, free, cach, avai) %>%
     mutate(time = as.integer(as.character(time))) %>%
@@ -87,11 +88,17 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
   plot_title = paste(assembler, " (", dataset, "): Memory", sep="")
 
   dool_plot_memory <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
-    labs(title = plot_title, x = "Time (s)", y = "Memory (MB)", color = "Memory Allocated") +
+    labs(title = plot_title,
+         x = "Time (s)",
+         y = "Memory (MB)",
+         color = "Memory Allocated") +
     geom_line(linewidth = 0.75) +
     #geom_point(size = 0.05) + 
-    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
-    scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 150000000000000, length.out = 10), labels = as.integer) + 
+    scale_x_continuous(breaks = seq(min(dool_raw_long$time), 
+                                    max(dool_raw_long$time), 
+                                    length.out = 10), 
+                       labels = as.integer) +
+    #scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
     theme_classic() + 
     theme(legend.position = "bottom",
           legend.key.size = unit(1.5, "cm")) + 
@@ -193,25 +200,61 @@ logs_to_plot <- list(
   dool_megahit_ms
 )
 
-
-
-dool_megahit_bmock <- c("data/dool_logs/log_dool_megahit_sr-bmock_clean.csv", "MEGAHIT", "sr-bmock")
-dool_megahit_log <- c("data/dool_logs/log_dool_megahit_sr-log_clean.csv", "MEGAHIT", "sr-log")
-
-
-
-dool_megahit <- c("data/dool_logs/sr-log/log_dool_metaspades_sr-log_no-header.csv", "MEGAHIT", "sr-log")
-
-
-
-
-
-
-
-
-
-
 generate_dool_ggplot(logs_to_plot, "data/dool_logs/")
+
+
+
+
+
+
+
+
+### Load all dool_charts
+dool_log_metaspades <- c("data/dool_logs/sr-log/log_dool_metaspades_sr-log_no-header.csv", "MetaSPAdes", "sr-log")
+dool_log_megahit<- c("data/dool_logs/sr-log/log_dool_megahit_sr-log_no-header.csv", "MEGAHIT", "sr-log")
+
+
+logs_to_plot <- list(
+  dool_log_metaspades,
+  dool_log_megahit
+)
+
+generate_dool_ggplot(logs_to_plot, "exploratory/sr-log/")
+
+
+
+### Load all dool_charts
+dool_raven_lr_log <- c("data/dool_logs/sr-log/log_dool_metaspades_sr-log_no-header.csv", "MetaSPAdes", "sr-log")
+dool_raven_lr_log<- c("data/dool_logs/sr-log/log_dool_megahit_sr-log_no-header.csv", "MEGAHIT", "sr-log")
+
+
+logs_to_plot <- list(
+  dool_log_metaspades,
+  dool_log_megahit
+)
+
+generate_dool_ggplot(logs_to_plot, "exploratory/sr-log/")
+
+
+
+
+### Load all dool_charts
+dool_even_metaspades <- c("data/dool_logs/sr-even/log_dool_metaspades_sr-even_no-header.csv", "MetaSPAdes", "sr-even")
+dool_even_megahit<- c("data/dool_logs/sr-even/log_dool_megahit_sr-even_no-headers.csv", "MEGAHIT", "sr-even")
+
+
+logs_to_plot <- list(
+  dool_even_metaspades,
+  dool_even_megahit
+)
+
+generate_dool_ggplot(logs_to_plot, "exploratory/sr-even/")
+
+
+
+
+
+
 
 
 
@@ -231,6 +274,19 @@ dool_unicycler_bmock_memory <- make_dool_plot_memory("data/dool_logs/dool_sr-bmo
 dool_unicycler_bmock_memory
 
 ggsave("exploratory/figures/dool_plots/doolplot_unicycler_sr-bmock.png", dool_unicycler_bmock_memory, width = 10, height = 5, units = "in", dpi = 300)
+
+
+
+
+
+
+
+
+generate_dool_ggplot()
+
+
+
+
 
 
 
@@ -341,7 +397,7 @@ ggsave("exploratory/figures/dool_plots/sr-bmock_memory_combined.png", sbmock_mem
 
 
 ###### lr-bd Long read Buttler Drown
-dool_bd_raven_memory <- make_dool_plot_memory("data/dool_logs/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
+dool_bd_raven_memory <- make_dool_plot_memory("data/dool_logs/lr-even/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
 dool_bd_raven_cpu <- make_dool_plot_cpu("data/dool_logs/dool_asm_lr-bd_raven_no-header.csv", "Raven", "lr-bd")
 
 
@@ -352,5 +408,4 @@ bd_memory <- grid.arrange(dool_bd_raven_memory, dool_bd_miniasm_memory, ncol = 2
 bd_cpu <- grid.arrange(dool_bd_raven_cpu, dool_bd_miniasm_cpu, ncol = 2)
 ggsave("exploratory/figures/dool_plots/lr-bd_memory_combined.png", bd_memory)
 ggsave("exploratory/figures/dool_plots/lr-bd_cpu_combined.png", bd_cpu)
-
 
