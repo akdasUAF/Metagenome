@@ -8,7 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_flye_lr-even_t1standard"
+#SBATCH --job-name="panmeta_asm_flye_lr-even_t1small"
 #SBATCH --output=data/flye/logs/log_slurm_flye_lr-even_%j.log
 #SBATCH --error=data/flye/logs/log_slurm_flye_lr-even_err_%j.log
 
