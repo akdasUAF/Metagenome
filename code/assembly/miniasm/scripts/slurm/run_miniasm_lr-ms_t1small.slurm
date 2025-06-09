@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_miniasm_lr-ms_t1standard"
-#SBATCH --output=data/lr-ms/logs/lr-ms_%j.log
-#SBATCH --error=data/lr-ms/logs/lr-ms_err_%j.log
+#SBATCH --job-name="panmeta_asm_miniasm_lr-ms_t1small"
+#SBATCH --output=data/miniasm/logs/log_slurm_miniasm_lr-ms_%j.log
+#SBATCH --error=data/miniasm/logs/log_slurm_miniasm_lr-ms_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
