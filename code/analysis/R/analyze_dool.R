@@ -253,6 +253,22 @@ generate_dool_ggplot(logs_to_plot, "exploratory/sr-even/")
 
 
 
+### Load all dool_charts
+dool_raven_even <- c("data/dool_logs/raven/log_dool_raven_lr-even.csv", "Raven", "lr-even")
+dool_raven_log <- c("data/dool_logs/raven/log_dool_raven_lr-log.csv", "Raven", "lr-log")
+dool_raven_ms <- c("data/dool_logs/raven/log_dool_raven_lr-ms.csv", "Raven", "lr-ms")
+
+
+logs_to_plot <- list(
+  dool_raven_even,
+  dool_raven_log,
+  dool_raven_ms
+)
+
+generate_dool_ggplot(logs_to_plot, "exploratory/raven/")
+
+
+
 
 
 
