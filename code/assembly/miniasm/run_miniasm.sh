@@ -9,6 +9,8 @@ reads_in=$1
 path_output=$2
 dataset=$3
 
+mkdir -p $(dirname "$path_output")
+
 bash_to_run="code/assembly/miniasm/miniasm.sh ${reads_in} ${path_output} ${dataset}"
 
 echo "Starting MiniASM..."
