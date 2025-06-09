@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=t1standard
+#SBATCH --partition=t1small
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:

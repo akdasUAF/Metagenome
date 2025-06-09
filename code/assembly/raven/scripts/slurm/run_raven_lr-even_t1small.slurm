@@ -8,7 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_raven_lr-bd_t1small"
+#SBATCH --job-name="panmeta_asm_raven_lr-even_t1small"
 #SBATCH --output=data/raven/logs/log_slurm_raven_lr-even_%j.log
 #SBATCH --error=data/raven/logs/log_slurm_raven_lr-even_err_%j.log
 
