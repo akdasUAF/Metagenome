@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=t1standard
+#SBATCH --partition=t1small
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
@@ -9,7 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_metaspades_sr-ms_t1standard"
-#SBATCH --output=data/sr-ms/logs/log_slurm_metaspades_sr-crust_t1standard.log
+#SBATCH --output=data/metaspades/logs/log_slurm_metaspades_sr-ms_%j.log
+#SBATCH --error=data/metaspades/logs/log_slurm_metaspades_sr-ms_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
