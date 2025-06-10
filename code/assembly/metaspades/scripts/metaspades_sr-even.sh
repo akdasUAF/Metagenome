@@ -1,11 +1,11 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
-path_forward="data/sr-bmock/trimmed/sr-bmock_trimmed_1.fastq"
-path_reverse="data/sr-bmock/trimmed/sr-bmock_trimmed_2.fastq"
-path_output="data/sr-bmock/metaspades/"
-path_log="data/sr-bmock/logs/"
-dataset="sr-bmock"
+path_forward="data/raw/sr-even/sr-even_1_trimmed.fastq"
+path_reverse="data/raw/sr-even/sr-even_2_trimmed.fastq"
+path_output="data/metaspades/sr-even/"
+path_log="data/metaspades/logs/"
+dataset="sr-even"
 task="metaspades"
 
 rm -rf $(dirname "$path_output")
