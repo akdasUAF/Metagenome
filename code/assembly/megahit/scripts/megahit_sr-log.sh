@@ -1,9 +1,9 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-raw_reads_dir="data/raw/sr-ms/"
-path_output="data/megahit/sr-ms/"
-path_log="data/megahit/logs/"
+raw_reads_dir="data/raw/sr-log/"
+path_output="data/megahit/sr-log/"
+path_log="data/megahit/logs/sr-log/"
 dataset="sr-log"
 task="megahit"
 

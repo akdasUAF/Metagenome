@@ -1,15 +1,16 @@
 #!/bin/bash
-## Assembler: megahit
+## Assembler: MetaSPAdes
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <path_forward> <path_reverse> <path_output> <analysis_directory>"
-  exit 1
-fi
+# Find the output path (it should be the last argument)
+path_output="${@: -1}"
+num_args=$(($# - 1))
 
-path_forward=$1
-path_reverse=$2
-path_output=$3
+metaspades_input_args="${@:1:$num_args}"
 
-rm -rf $path_output
+# Remove the output directory if it exists (good practice for clean runs)
+rm -rf "$path_output"
 
-python3 tools/assemblers/SPAdes-4.0.0-Linux/bin/metaspades.py -1 $path_forward -2 $path_reverse -o $path_output -t 24
+eval "python3 tools/assemblers/SPAdes-4.0.0-Linux/bin/metaspades.py --meta \
+  $metaspades_input_args \
+  -o \"$path_output\" \
+  -t 24" 2>&1

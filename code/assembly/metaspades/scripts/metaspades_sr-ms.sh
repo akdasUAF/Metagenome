@@ -1,19 +1,24 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
-path_forward="data/raw/sr-ms/sr-ms_trimmed_1.fastq"
-path_reverse="data/raw/sr-ms/sr-ms_trimmed_2.fastq"
+input_fastq_dir="data/raw/sr-ms/"
 path_output="data/metaspades/sr-ms/"
-path_log="data/metaspades/logs/"
+path_log="data/metaspades/logs/sr-ms/"
 dataset="sr-ms"
 task="metaspades"
 
-rm -rf $(dirname "$path_output")
-mkdir -p ${path_log}
-log_file="${path_log}/log_asm_${task}_${dataset}.log"
+# Ensure the log directory exists
+mkdir -p "${path_log}"
 
-# Construct the command to be executed
-command="$path_metaspades $path_forward $path_reverse $path_output $log_file"
+# This line should clear the *specific assembly output directory* before running
+rm -rf "$path_output" # This is fine if path_output is the specific directory
+
+# Construct the command string to be executed by benchmark.bash
+command="$path_metaspades \"$input_fastq_dir\" \"$path_output\" \"$path_log\""
+
+echo "Command to pass to benchmark.bash: ${command}"
+echo "Dataset: ${dataset}"
+echo "Task: ${task}"
 
 # Execute the benchmark script with the constructed command
-bash $benchmark_script "$command" $dataset $task
+bash "$benchmark_script" "$command" "$dataset" "$task"
