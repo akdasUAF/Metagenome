@@ -13,6 +13,8 @@ path_output=$3
 name_assembly=$4
 kmer=$5
 bloom=$6
+abyss_pe_in="${forward_reads} ${reverse_reads}"
+
 
 echo "    "
 echo "forward_in: $forward_reads"
@@ -22,8 +24,8 @@ echo "name_assembly: $name_assembly"
 echo "kmer: $kmer"
 echo "bloom: $bloom"
 echo "    "
+echo "full reads in: $abyss_pe_in"
 
-abyss_pe_in="${forward_reads} ${reverse_reads}"
 
 abyss-pe k=$kmer name=$name_assembly B=$bloom j=24 \
 	in=$abyss_pe_in \
