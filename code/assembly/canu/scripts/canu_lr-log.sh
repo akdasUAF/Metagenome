@@ -4,9 +4,9 @@
 ## Assembler: Canu
 benchmark_script="code/benchmarking/benchmark.bash"
 path_flye="code/assembly/canu/run_canu.sh"
-raw_reads="data/lr-log/raw/lr-log_raw.fastq"
-output_path="data/lr-log/canu/"
-log_dir="data/lr-log/canu/"
+raw_reads="data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq"
+output_path="data/canu/lr-log"
+log_dir="data/canu/logs/"
 dataset="lr-log"
 task="canu"
 
