@@ -14,6 +14,10 @@ kmer=$5
 bloom=$6
 path_log=$7
 
+
+mkdir -p "${path_output}"
+mkdir -p "$(dirname "${path_log}")"
+
 bash_to_run="code/assembly/abyss/abyss.sh ${forward_reads} ${reverse_reads} ${path_output} ${name_assembly} ${kmer} ${bloom}"
 
 echo "${bash_to_run}"

@@ -13,8 +13,6 @@ kmer="117"
 bloom="10G"
 name_assembly="${task}_${dataset}"
 
-
-mkdir -p ${path_log}
 log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 
