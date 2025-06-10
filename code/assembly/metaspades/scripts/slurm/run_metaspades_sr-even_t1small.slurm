@@ -8,8 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_metaspades_sr-bmock_t1standard"
-#SBATCH --output=data/sr-bmock/logs/log_slurm_metaspades_sr-crust_t1standard.log
+#SBATCH --job-name="panmeta_asm_metaspades_sr-even_t1standard"
+#SBATCH --output=data/metaspades/logs/log_slurm_metaspades_sr-even_%j.log
+#SBATCH --error=data/metaspades/logs/log_slurm_metaspades_sr-even_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +21,4 @@ module load Python/3.11.3
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/metaspades/scripts/metaspades_sr-bmock.sh
+bash code/assembly/metaspades/scripts/metaspades_sr-even.sh
