@@ -10,4 +10,4 @@ output_directory=$2
 genomeSize=$3
 name=$4
 
-./tools/assemblers/canu-2.2/bin/canu -p $name -d $output_directory genomeSize=$genomeSize -nanopore $raw_reads useGrid=false
+./tools/assemblers/canu-2.2/bin/canu -p $name -d $output_directory genomeSize=$genomeSize -nanopore $raw_reads useGrid=false stopOnLowCoverage=6
