@@ -14,7 +14,7 @@ mkdir -p ${path_log}
 log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 # Construct the command to be executed
-command="$path_idba $combined_out $path_output $path_log"
+command="$path_idba $path_raw $path_output $path_log"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
