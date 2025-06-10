@@ -1,21 +1,22 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-forward_reads="data/sr-log/trimmed/sr-log_trimmed_1.fastq"
-reverse_reads="data/sr-log/trimmed/sr-log_trimmed_2.fastq"
+raw_reads_dir="data/raw/sr-log/"
 path_output="data/sr-log/megahit/"
-path_log="data/sr-log/log/megahit/"
+path_log="data/sr-log/log/"
+
 dataset="sr-log"
 task="megahit"
 
-
-mkdir -p ${path_log}
-log_file="${path_log}/log_asm_${task}_${dataset}.log"
+mkdir -p "${path_log}" # Make sure this log directory exists
 
 
-# Construct the command to be executed
-command="$path_megahit $forward_reads $reverse_reads $path_output $log_file"
+command="$path_megahit \"$raw_reads_dir\" \"$path_output\" \"$path_log\""
+
+
+echo "Command to pass to benchmark.bash: ${command}"
+echo "Dataset: ${dataset}"
+echo "Task: ${task}"
 
 # Execute the benchmark script with the constructed command
-bash $benchmark_script "$command" "$dataset" "$task"
-
+bash "$benchmark_script" "$command" "$dataset" "$task"
