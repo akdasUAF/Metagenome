@@ -23,15 +23,15 @@ reverse=reverse/
 
 
 ## current working directory to prefetch location
-${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
+${root_dir}/tools/retrieval/sratoolkit.3.2.1-ubuntu64/bin/vdb-config --prefetch-to-cwd
 
 ## Loops through each 
 while IFS= read -r line; do
 
   ## Fetches each line
-  ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/prefetch $line
+  ${root_dir}/tools/retrieval/sratoolkit.3.2.1-ubuntu64/bin/prefetch $line
   cd ${line}/
-  ${root_dir}/tools/retrieval/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump *.fastq
+  ${root_dir}/tools/retrieval/sratoolkit.3.2.1-ubuntu64/bin/fasterq-dump *.sra
 
 
 done < "$root_dir"/"$filename"
