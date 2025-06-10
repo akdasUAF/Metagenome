@@ -1,10 +1,9 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-forward_reads="data/sr-ms/trimmed/sr-ms_trimmed_1.fastq"
-reverse_reads="data/sr-ms/trimmed/sr-ms_trimmed_2.fastq"
-path_output="data/sr-ms/megahit/"
-path_log="data/sr-ms/log/megahit/"
+raw_reads_dir="data/raw/sr-ms/"
+path_output="data/megahit/sr-ms/"
+path_log="data/megahit/"
 dataset="sr-ms"
 task="megahit"
 

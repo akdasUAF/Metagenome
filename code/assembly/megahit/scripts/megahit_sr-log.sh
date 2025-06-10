@@ -1,16 +1,13 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_megahit="code/assembly/megahit/run_megahit.sh"
-raw_reads_dir="data/raw/sr-log/"
-path_output="data/sr-log/megahit/"
-path_log="data/sr-log/log/"
-
+raw_reads_dir="data/raw/sr-ms/"
+path_output="data/megahit/sr-ms/"
+path_log="data/megahit/logs/"
 dataset="sr-log"
 task="megahit"
 
-mkdir -p "${path_log}" # Make sure this log directory exists
-
-
+mkdir -p "${path_log}"
 command="$path_megahit \"$raw_reads_dir\" \"$path_output\" \"$path_log\""
 
 

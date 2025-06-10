@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=t1standard
+#SBATCH --partition=t1small
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
@@ -8,8 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_megahit_sr-ms_t1standard"
-#SBATCH --output=data/analysis/megahit/sr-ms/log_slurm_megahit_sr-ms_t1standard.log
+#SBATCH --job-name="panmeta_asm_megahit_sr-log_t1standard"
+#SBATCH --output=data/megahit/logs/log_slurm_megahit_sr-log_%j.log
+#SBATCH --error=data/megahit/logs/log_slurm_megahit_sr-log_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -19,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/megahit/scripts/megahit_sr-ms.sh | tee -a data/analysis/megahit/sr-ms/log_assemble_megahit_sr-ms_slurm.log || echo 'Assembly failed : megahit sr-ms'
+bash code/assembly/megahit/scripts/megahit_sr-log.sh
