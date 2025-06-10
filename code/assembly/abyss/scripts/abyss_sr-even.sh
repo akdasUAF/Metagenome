@@ -2,7 +2,7 @@
 benchmark_script="code/benchmarking/benchmark.bash"
 path_abyss="code/assembly/abyss/run_abyss.sh"
 forward_reads="data/raw/sr-even/sr-even_1_trimmed.fastq"
-reverse_reads="data/raw/sr-even/sr-even_12_trimmed.fastq"
+reverse_reads="data/raw/sr-even/sr-even_2_trimmed.fastq"
 path_output="data/sr-even/abyss/"
 path_log="data/logs/abyss/"
 dataset="sr-even"
