@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=t1standard
+#SBATCH --partition=t1small
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_canu_lr-gut_t1standard"
-#SBATCH --output=data/lr-log/logs/log_slurm_canu_lr-gut_%j.log
-#SBATCH --error=data/lr-log/logs/log_slurm_canu_lr-gut_err_%j.log
+#SBATCH --job-name="panmeta_asm_canu_lr-log_t1standard"
+#SBATCH --output=data/canu/logs/log_slurm_canu_lr-log_%j.log
+#SBATCH --error=data/canu/logs/log_slurm_canu_lr-log_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
