@@ -1,11 +1,11 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_abyss="code/assembly/abyss/run_abyss.sh"
-path_forward="sr-bmock/trimmed/sr-bmock_trimmed_1.fastq"
-path_reverse="sr-bmock/trimmed/sr-bmock_trimmed_2.fastq"
-path_output="data/sr-bmock/abyss/"
-path_log="data/sr-bmock/logs"
-dataset="sr-bmock"
+forward_reads="data/raw/sr-even/sr-even_1_trimmed.fastq"
+reverse_reads="data/raw/sr-even/sr-even_12_trimmed.fastq"
+path_output="data/sr-even/abyss/"
+path_log="data/logs/abyss/"
+dataset="sr-even"
 task="abyss"
 
 ######~~~~~~~~~~~~ Abyss Only
@@ -20,7 +20,7 @@ log_file="${path_log}/log_asm_${task}_${dataset}.log"
 
 
 # Construct the command to be executed
-command="${path_abyss} ${path_forward} ${path_reverse} ${path_output} ${name_assembly} ${kmer} ${bloom} ${log_file}"
+command="${path_abyss} ${forward_reads} ${reverse_reads} ${path_output} ${name_assembly} ${kmer} ${bloom} ${log_file}"
 
 # Execute the benchmark script with the constructed command
 bash $benchmark_script "$command" $dataset $task
