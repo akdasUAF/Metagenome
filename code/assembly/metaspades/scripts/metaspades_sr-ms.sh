@@ -11,7 +11,7 @@ task="metaspades"
 mkdir -p "${path_log}"
 
 # This line should clear the *specific assembly output directory* before running
-rm -rf "$path_output" # This is fine if path_output is the specific directory
+rm -rf "$path_output" 
 
 # Construct the command string to be executed by benchmark.bash
 command="$path_metaspades \"$input_fastq_dir\" \"$path_output\" \"$path_log\""

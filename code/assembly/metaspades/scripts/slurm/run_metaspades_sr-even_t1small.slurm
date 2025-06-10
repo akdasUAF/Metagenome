@@ -16,6 +16,7 @@
 # Since conda will be used, no other modules will be loaded
 module purge
 module load slurm
+module load GCCcore/12.3.0
 module load Python/3.11.3
 
 ulimit -l unlimited
