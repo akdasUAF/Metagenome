@@ -12,7 +12,7 @@ task="canu"
 
 
 #### ~~~~~~ Canu only
-genomeSize="50m"
+genomeSize="40m"
 name="${dataset}_task"
 
 mkdir -p $output_path
