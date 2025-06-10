@@ -28,6 +28,6 @@ echo "full reads in: $abyss_pe_in"
 
 
 abyss-pe k=$kmer name=$name_assembly B=$bloom j=24 \
-	in=$abyss_pe_in \
+	in="$abyss_pe_in" \
 	out=$path_output
 
