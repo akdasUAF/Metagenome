@@ -15,6 +15,4 @@ echo "${bash_to_run}"
 echo $PWD
 echo "Starting IDBA..."
 
-conda run -n asm_idba $bash_to_run | tee $path_log
-
-
+conda run -n asm_idba $bash_to_run | tee "${path_log}/idba_ud_console_output.log"

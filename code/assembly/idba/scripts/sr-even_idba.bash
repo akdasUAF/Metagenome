@@ -1,7 +1,7 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_idba="code/assembly/idba/run_idba.sh"
-path_raw="data/raw/sr-even/sr-even_raw_combined.fasta"
+path_raw="data/raw/sr-even/sr-even_raw_combined_paired.fasta"
 path_output="data/idba/sr-even/"
 path_log="data/idba/logs/"
 
