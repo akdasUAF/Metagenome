@@ -1,0 +1,20 @@
+#!/bin/env bash
+benchmark_script="code/benchmarking/benchmark.bash"
+path_idba="code/assembly/idba/run_idba.sh"
+path_raw="data/raw/sr-even/sr-even_raw_combined.fastq"
+path_output="data/idba/sr-even/"
+path_log="data/idba/logs/"
+
+## Benchmarking
+dataset="sr-even"
+task="idba"
+
+mkdir -p ${path_output}
+mkdir -p ${path_log}
+log_file="${path_log}/log_asm_${task}_${dataset}.log"
+
+# Construct the command to be executed
+command="$path_idba $combined_out $path_output $path_log"
+
+# Execute the benchmark script with the constructed command
+bash $benchmark_script "$command" $dataset $task

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 3 ]; then
-  echo "Usage: $0 <path_combinedy> <path_output> <path_log>"
+  echo "Usage: $0 <path_combined> <path_output> <path_log>"
   exit 1
 fi
 
