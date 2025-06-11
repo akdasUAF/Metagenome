@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=t1standard
+#SBATCH --partition=t1small
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #If running on the bio or analysis queue add:
@@ -9,8 +9,8 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
 #SBATCH --job-name="panmeta_asm_unicycler_sr-ms_t1standard"
-#SBATCH --output=data/sr-ms/logs/slurm_unicycler_sr-ms_%j.log
-#SBATCH --error=data/sr-ms/logs/slurm_sr-ms_err_%j.log
+#SBATCH --output=data/unicycler/logs/log_slurm_unicycler_sr-ms_%j.log
+#SBATCH --error=data/unicycler/logs/log_slurm_unicycler_sr-ms_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded

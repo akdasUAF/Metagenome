@@ -1,24 +1,22 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_unicycler="code/assembly/unicycler/run_unicycler.sh"
-forward_in="data/sr-ms/trimmed/sr-ms_trimmed_1.fastq"
-reverse_in="data/sr-ms/trimmed/sr-ms_trimmed_2.fastq"
-path_log="data/sr-ms/log/"
-path_output="data/sr-ms/unicycler/"
+input_fastq_dir="data/raw/sr-ms/"
+path_output="data/unicycler/sr-ms/"
+path_log="data/unicycler/logs/sr-ms/"
 dataset="sr-ms"
 task="unicycler"
 
+rm -rf "$path_output"
+mkdir -p "${path_log}"
 
-mkdir -p ${path_log}
-log_file="${path_log}/log_asm_${task}_${dataset}.log"
+# Construct the command string to be executed by benchmark.bash
+# Now, run_unicycler.sh expects the input directory, output directory, and log directory
+command="$path_unicycler \"$input_fastq_dir\" \"$path_output\" \"$path_log\""
 
-# Construct the command to be executed
-command="$path_unicycler $forward_in $reverse_in $path_output $log_file"
+echo "Command to pass to benchmark.bash: ${command}"
+echo "Dataset: ${dataset}"
+echo "Task: ${task}"
 
 # Execute the benchmark script with the constructed command
-bash $benchmark_script "$command" $dataset $task
-
-
-
-
-
+bash "$benchmark_script" "$command" "$dataset" "$task"
