@@ -1,19 +1,24 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
-path_forward="data/raw/sr-even/sr-even_1_trimmed.fastq"
-path_reverse="data/raw/sr-even/sr-even_2_trimmed.fastq"
+input_fastq_dir="data/raw/sr-even/"
 path_output="data/metaspades/sr-even/"
-path_log="data/metaspades/logs/"
+path_log="data/metaspades/logs/sr-even/"
 dataset="sr-even"
 task="metaspades"
 
-rm -rf $(dirname "$path_output")
-mkdir -p ${path_log}
-log_file="${path_log}/log_asm_${task}_${dataset}.log"
+rm -rf "$path_output" 
+mkdir -p "${path_log}"
 
-# Construct the command to be executed
-command="$path_metaspades $path_forward $path_reverse $path_output $log_file"
+# Construct the command string to be executed by benchmark.bash
+command="$path_metaspades \"$input_fastq_dir\" \"$path_output\" \"$path_log\""
+
+echo "Command to pass to benchmark.bash: ${command}"
+echo "Dataset: ${dataset}"
+echo "Task: ${task}"
 
 # Execute the benchmark script with the constructed command
-bash $benchmark_script "$command" $dataset $task
+bash "$benchmark_script" "$command" "$dataset" "$task"
+
+
+

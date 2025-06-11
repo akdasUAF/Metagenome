@@ -8,7 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_metaspades_sr-log_t1standard"
+#SBATCH --job-name="panmeta_asm_metaspades_sr-log_t1small"
 #SBATCH --output=data/metaspades/logs/log_slurm_metaspades_sr-log_%j.log
 #SBATCH --error=data/metaspades/logs/log_slurm_metaspades_sr-log_err_%j.log
 

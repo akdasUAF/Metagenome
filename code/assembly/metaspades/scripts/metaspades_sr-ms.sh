@@ -7,11 +7,8 @@ path_log="data/metaspades/logs/sr-ms/"
 dataset="sr-ms"
 task="metaspades"
 
-# Ensure the log directory exists
-mkdir -p "${path_log}"
-
-# This line should clear the *specific assembly output directory* before running
 rm -rf "$path_output" 
+mkdir -p "${path_log}"
 
 # Construct the command string to be executed by benchmark.bash
 command="$path_metaspades \"$input_fastq_dir\" \"$path_output\" \"$path_log\""
