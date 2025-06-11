@@ -10,7 +10,6 @@ task="megahit"
 mkdir -p "${path_log}"
 command="$path_megahit \"$raw_reads_dir\" \"$path_output\" \"$path_log\""
 
-
 echo "Command to pass to benchmark.bash: ${command}"
 echo "Dataset: ${dataset}"
 echo "Task: ${task}"

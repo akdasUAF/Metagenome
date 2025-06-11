@@ -1,12 +1,9 @@
-####
-{
-  library(ggplot2)
-  library(dplyr)
-  library(tidyr)
-  library(tidyverse)
-  library(broom)
-  library(gridExtra)
-}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(broom)
+library(gridExtra)
 
 bits_to_mb <- function(bits) {
   # Conversion factor: 1 MB = 8 * 2^20 bits
@@ -20,11 +17,27 @@ bits_to_kb <- function(bits) {
   return(kb)
 }
 
-
 trim_dool <- function(dool_in) {
+  # Calculate the number of rows to trim from the end
+  # Ensure we don't try to trim more rows than exist in the data
+  num_rows <- nrow(dool_in)
+  start_row <- min(11, num_rows) # Start at 11th row or the last if data is too short
+  end_row <- max(1, num_rows - 10) # End 10 rows from the end, or at the first if data is too short
+  
+  # If data is too short to trim, return the original data or handle as an error
+  if (num_rows < 21) { # 10 from start + 10 from end + 1 in middle
+    warning("Dataset is too short (less than 21 rows) for 10-second trimming. Returning full dataset.")
+    return(dool_in)
+  }
   
   dool_out <- dool_in %>%
-    slice(11:nrow(dool_in) - 10)
+    slice(start_row:end_row)
+  
+  # Reset time/row names after slicing if they were sequential
+  # If 'time' column is already numeric and represents seconds, no need to reset rownames
+  # Assuming 'time' column is already correct after initial read.csv + rownames_to_column
+  # If it still represents row numbers, you might need to re-index it from 1 to new_nrow
+  # For now, assuming slice maintains relative time or you adjust time column later
   return(dool_out)
 }
 
@@ -32,16 +45,24 @@ trim_dool <- function(dool_in) {
 make_dool_plot_cpu <- function(dool_log_file, assembler="", dataset="") {
   
   dool_raw <- read.csv(dool_log_file)
-
+  
   dool_raw <- dool_raw %>%
     rownames_to_column(var = "time")
   
   dool_raw <- dool_raw %>%
     mutate(time = as.integer(as.character(time)))
   
+  # Apply trimming
+  dool_raw <- trim_dool(dool_raw)
+  
+  # Adjust time column to start from 0 after trimming
+  if (nrow(dool_raw) > 0) {
+    dool_raw$time <- dool_raw$time - min(dool_raw$time)
+  }
+  
   dool_raw_filtered <- dool_raw %>%
-    select(time, usr, idl)  # Adjust columns as needed
-
+    select(time, usr, idl) # Adjust columns as needed
+  
   # Reshape the data to long format
   dool_raw_long <- dool_raw_filtered %>%
     pivot_longer(cols = -time, names_to = "variable", values_to = "value")
@@ -51,11 +72,11 @@ make_dool_plot_cpu <- function(dool_log_file, assembler="", dataset="") {
   dool_plot_cpu <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
     labs(title = plot_title, x = "Time (s)", y = "Percentage", color = "CPU Processes") +
     geom_line(linewidth = 0.75) +
-    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 10), labels = as.integer) +
-    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, length.out = 5), labels = as.integer) + 
-    theme_classic() + 
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, length.out = 5), labels = as.integer) +
+    theme_classic() +
     theme(legend.position = "bottom",
-          legend.key.size = unit(1.5, "cm")) + 
+          legend.key.size = unit(1.5, "cm")) +
     scale_color_manual(values = c("usr" = "chocolate3","idl" = "darkseagreen3"),
                        labels = c("Idle CPU", "User CPU"))
   
@@ -64,20 +85,27 @@ make_dool_plot_cpu <- function(dool_log_file, assembler="", dataset="") {
 
 make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
   
-  # dool_raw <- read.csv(dool_log_file)
   dool_raw <- read.csv(dool_log_file)
   
   dool_raw <- dool_raw %>%
-    rownames_to_column(var = "time") 
+    rownames_to_column(var = "time")
   
+  dool_raw <- dool_raw %>%
+    mutate(time = as.integer(as.character(time)))
   
+  # Apply trimming
+  dool_raw <- trim_dool(dool_raw)
+  
+  # Adjust time column to start from 0 after trimming
+  if (nrow(dool_raw) > 0) {
+    dool_raw$time <- dool_raw$time - min(dool_raw$time)
+  }
   
   dool_raw_filtered <- dool_raw %>%
     select(time, used, free, cach, avai) %>%
-    mutate(time = as.integer(as.character(time))) %>%
-    mutate(used = as.numeric(bits_to_mb(used))) %>% 
-    mutate(free = as.numeric(bits_to_mb(free))) %>% 
-    mutate(cach = as.numeric(bits_to_mb(cach))) %>% 
+    mutate(used = as.numeric(bits_to_mb(used))) %>%
+    mutate(free = as.numeric(bits_to_mb(free))) %>%
+    mutate(cach = as.numeric(bits_to_mb(cach))) %>%
     mutate(avai = as.numeric(bits_to_mb(avai)))
   
   # Reshape the data to long format
@@ -86,22 +114,17 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
   
   
   plot_title = paste(assembler, " (", dataset, "): Memory", sep="")
-
+  
   dool_plot_memory <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
     labs(title = plot_title,
          x = "Time (s)",
          y = "Memory (MB)",
          color = "Memory Allocated") +
     geom_line(linewidth = 0.75) +
-    #geom_point(size = 0.05) + 
-    scale_x_continuous(breaks = seq(min(dool_raw_long$time), 
-                                    max(dool_raw_long$time), 
-                                    length.out = 10), 
-                       labels = as.integer) +
-    #scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
-    theme_classic() + 
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    theme_classic() +
     theme(legend.position = "bottom",
-          legend.key.size = unit(1.5, "cm")) + 
+          legend.key.size = unit(1.5, "cm")) +
     scale_color_manual(values = c("used" = "#48448EFF", "free" = "#8CCC58FF", "cach" = "#FC4D97FF","avai" = "#B82578FF"),
                        labels = c("Available Memory", "Cached Memory", "Free Memory", "Used Memory"))
   
@@ -110,46 +133,105 @@ make_dool_plot_memory <- function(dool_log_file, assembler="", dataset="") {
 
 make_dool_plot_virtmemory <- function(dool_log_file, assembler="", dataset="") {
   
-  # dool_raw <- read.csv(dool_log_file)
   dool_raw <- read.csv(dool_log_file)
   
-  dool_raw <- trim_dool(dool_raw) %>%
-    rownames_to_column(var = "time") 
+  dool_raw <- dool_raw %>%
+    rownames_to_column(var = "time")
   
+  dool_raw <- dool_raw %>%
+    mutate(time = as.integer(as.character(time)))
+  
+  # Apply trimming
+  dool_raw <- trim_dool(dool_raw)
+  
+  # Adjust time column to start from 0 after trimming
+  if (nrow(dool_raw) > 0) {
+    dool_raw$time <- dool_raw$time - min(dool_raw$time)
+  }
   
   dool_raw_filtered <- dool_raw %>%
     select(time, majpf, minpf, alloc, free.1) %>%
-    mutate(time = as.numeric(time)) %>%
-    mutate(majpf = as.numeric(bits_to_kb(majpf))) %>% 
-    mutate(minpf = as.numeric(bits_to_kb(minpf))) %>% 
-    mutate(alloc = as.numeric(bits_to_kb(alloc))) %>% 
+    mutate(majpf = as.numeric(bits_to_kb(majpf))) %>%
+    mutate(minpf = as.numeric(bits_to_kb(minpf))) %>%
+    mutate(alloc = as.numeric(bits_to_kb(alloc))) %>%
     mutate(vfree = as.numeric(bits_to_kb(free.1))) %>%
-    select(-free.1, -vfree)
-  
+    select(-free.1, -vfree) # Keep alloc, majpf, minpf, remove old free.1 and new vfree if not needed
   
   # Reshape the data to long format
   dool_raw_long <- dool_raw_filtered %>%
     pivot_longer(cols = -time, names_to = "variable", values_to = "value")
   
-    
+  
   plot_title = paste(assembler, " assembly (", dataset, "): Virtual Memory", sep="")
   
   dool_plot_virtmemory <- ggplot(dool_raw_long, aes(x = time, y = value, color = variable)) +
-    labs(title = plot_title, x = "Time (s)", y = "Memory (MB)", color = "Memory Allocated") +
-    geom_line(size = 0.75) +
-    #geom_point(size = 0.05) + 
-    scale_x_continuous(breaks = seq(min(dool_raw_long$time), max(dool_raw_long$time), length.out = 5), labels = as.integer) +
-    # scale_y_continuous(limits = c(0, 15000), breaks = seq(0, 15000, length.out = 10), labels = as.integer) + 
-    theme_classic() + 
+    labs(title = plot_title, x = "Time (s)", y = "Memory (KB)", color = "Memory Allocated") + # Changed to KB from MB for virtmem
+    geom_line(linewidth = 0.75) +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    theme_classic() +
     theme(legend.position = "bottom",
-          legend.key.size = unit(1.5, "cm")) + 
+          legend.key.size = unit(1.5, "cm")) +
     scale_color_manual(values = c("majpf" = "#48448EFF", "minpf" = "#8CCC58FF", "alloc" = "#FC4D97FF"),
-                       labels = c("Virtual Majpf", "Virtual Minpf", "Virtual Allocated"))
+                       labels = c("Major Page Faults", "Minor Page Faults", "Virtual Allocated"))
   
   return (dool_plot_virtmemory)
 }
 
 
+make_dool_plot_cpu_mem_percentage <- function(dool_log_file, assembler="", dataset="") {
+  
+  dool_raw <- read.csv(dool_log_file)
+  
+  dool_raw <- dool_raw %>%
+    rownames_to_column(var = "time")
+  
+  dool_raw <- dool_raw %>%
+    mutate(time = as.integer(as.character(time)))
+  
+  # Apply trimming
+  dool_raw <- trim_dool(dool_raw)
+  
+  # Adjust time column to start from 0 after trimming
+  if (nrow(dool_raw) > 0) {
+    dool_raw$time <- dool_raw$time - min(dool_raw$time)
+  }
+  
+  # Calculate CPU percentage used (assuming 'usr' is user CPU and 'sys' is system CPU)
+  # d_cpu - CPU_usage_percentage (usr + sys)
+  # d_mem - Memory_usage_percentage (used / total * 100)
+  # NOTE: 'total' column is crucial here for memory percentage.
+  # If 'total' is not in your dool log, you might need to hardcode it or calculate it.
+  # I'm assuming 'total' refers to the total system memory reported by dool.
+  
+  # For CPU, 'usr' represents user CPU usage. We will combine this with 'sys' (system CPU) if available.
+  # If only 'usr' and 'idl' (idle) are present, then (100 - idl) is the total CPU usage.
+  dool_processed <- dool_raw %>%
+    mutate(CPU_percent_used = 100 - idl) %>% # Total CPU usage is 100% minus idle
+    mutate(Memory_percent_used = as.numeric(bits_to_mb(used)) / as.numeric(bits_to_mb(total)) * 100) %>% # Convert bits to MB, then %
+    select(time, CPU_percent_used, Memory_percent_used)
+  
+  # Reshape for ggplot
+  dool_long <- dool_processed %>%
+    pivot_longer(cols = -time, names_to = "Metric", values_to = "Percentage")
+  
+  plot_title = paste(assembler, " (", dataset, "): CPU & Memory %", sep="")
+  
+  dool_plot_combined <- ggplot(dool_long, aes(x = time, y = Percentage, color = Metric)) +
+    labs(title = plot_title,
+         x = "Time (s)",
+         y = "Percentage (%)",
+         color = "Resource") +
+    geom_line(linewidth = 0.75) +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 20), labels = as.integer) +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          legend.key.size = unit(1.5, "cm")) +
+    scale_color_manual(values = c("CPU_percent_used" = "darkred", "Memory_percent_used" = "darkblue"),
+                       labels = c("CPU Usage", "Memory Usage"))
+  
+  return(dool_plot_combined)
+}
 
 ### Function to generate a four by four graph
 generate_dool_ggplot <- function(logs_to_plot, save_directory) {
@@ -157,6 +239,7 @@ generate_dool_ggplot <- function(logs_to_plot, save_directory) {
   plot_list_memory <- list()
   plot_list_cpu <- list()
   plot_list_virt <- list()
+  plot_list_combined <- list() # New list for the combined plot
   
   i <- 1
   
@@ -164,24 +247,25 @@ generate_dool_ggplot <- function(logs_to_plot, save_directory) {
     plot_list_memory[[i]] <- make_dool_plot_memory(logg[[1]], logg[[2]], logg[[3]])
     plot_list_cpu[[i]] <- make_dool_plot_cpu(logg[[1]], logg[[2]], logg[[3]])
     plot_list_virt[[i]] <- make_dool_plot_virtmemory(logg[[1]], logg[[2]], logg[[3]])
+    plot_list_combined[[i]] <- make_dool_plot_cpu_mem_percentage(logg[[1]], logg[[2]], logg[[3]]) # Call the new function
     i <- i + 1
   }
   
+  # Use `length(plot_list_X)` for more flexible column arrangement
+  full_memory <- grid.arrange(grobs = plot_list_memory, ncol = ceiling(length(plot_list_memory) / 2)) # Adjust ncol as needed, e.g., 2, 3, or use ceiling for flexible grid
+  full_cpu <- grid.arrange(grobs = plot_list_cpu, ncol = ceiling(length(plot_list_cpu) / 2))
+  full_virt <- grid.arrange(grobs = plot_list_virt, ncol = ceiling(length(plot_list_virt) / 2))
+  full_combined <- grid.arrange(grobs = plot_list_combined, ncol = ceiling(length(plot_list_combined) / 2)) # New combined plot grid
   
-  full_memory <- grid.arrange(grobs = plot_list_memory, ncol = length(plot_list_memory) / 2)
-  full_cpu <- grid.arrange(grobs = plot_list_cpu, ncol = length(plot_list_cpu) / 2)
-  full_virt <- grid.arrange(grobs = plot_list_virt, ncol = length(plot_list_virt) / 2)
+  ggsave(paste(save_directory, "dool_memory.png", sep = ""), full_memory, width = 12, height = 8) # Added width/height for better saving
+  ggsave(paste(save_directory, "dool_cpu.png", sep = ""), full_cpu, width = 12, height = 8)
+  ggsave(paste(save_directory, "dool_virt.png", sep = ""), full_virt, width = 12, height = 8)
+  ggsave(paste(save_directory, "dool_cpu_mem_percentage.png", sep = ""), full_combined, width = 12, height = 8) # Save the new combined plot
   
-  
-  
-  ggsave(paste(save_directory, "dool_memory.png", sep = ""), full_memory)
-  ggsave(paste(save_directory, "dool_cpu.png", sep = ""), full_cpu)
-  ggsave(paste(save_directory, "dool_virt.png", sep = ""), full_virt)
-  
-  return (full_memory, full_cpu)
+  # You can't return multiple objects like (full_memory, full_cpu) directly in R.
+  # You'd return a list of plots if you want to use them outside the function.
+  return (list(full_memory = full_memory, full_cpu = full_cpu, full_virt = full_virt, full_combined = full_combined))
 }
-
-
 
 
 

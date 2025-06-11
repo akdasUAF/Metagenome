@@ -19,6 +19,3 @@ echo "Task: ${task}"
 
 # Execute the benchmark script with the constructed command
 bash "$benchmark_script" "$command" "$dataset" "$task"
-
-
-
