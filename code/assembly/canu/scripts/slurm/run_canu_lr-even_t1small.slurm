@@ -8,6 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
+#SBATCH --time=9-00:00:00
 #SBATCH --job-name="panmeta_asm_canu_lr-even_t1small"
 #SBATCH --output=data/canu/logs/log_slurm_canu_lr-even_%j.log
 #SBATCH --error=data/canu/logs/log_slurm_canu_lr-even_err_%j.log
