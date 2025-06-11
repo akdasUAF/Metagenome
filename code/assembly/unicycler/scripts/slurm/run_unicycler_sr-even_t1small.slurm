@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_unicycler_sr-bmock_t1standard"
-#SBATCH --output=data/sr-bmock/logs/slurm_unicycler_sr-bmock_%j.log
-#SBATCH --error=data/sr-bmock/logs/slurm_sr-bmock_err_%j.log
+#SBATCH --job-name="panmeta_asm_unicycler_sr-even_t1standard"
+#SBATCH --output=data/unicycler/logs/log_slurm_unicycler_sr-even_%j.log
+#SBATCH --error=data/unicycler/logs/log_slurm_unicycler_sr-even_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/unicycler/scripts/unicycler_sr-bmock.sh
+bash code/assembly/unicycler/scripts/unicycler_sr-even.sh
