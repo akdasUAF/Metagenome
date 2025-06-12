@@ -22,7 +22,7 @@ ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
 
-cd data/raw/cami-high/
+cd data/raw/cami_high/
 # tar -xvf cami-high_raw.tar
 
 cd CAMI-high/
