@@ -25,7 +25,7 @@ eval "$(conda shell.bash hook)"
 cd data/raw/cami-low/
 tar -xvf cami-low_raw.tar
 
-cd CAMI-LOW/
+cd CAMI_LOW/
 
 conda activate pro_fastp
 
@@ -38,7 +38,6 @@ fastp \
   -z 4 \
   -w 8
 
-mv *.fastp* ../
+mv *fastp* ../
 cd ..
-mv RM1_S001_insert_5000_fastp.fq.gz cami-low_trimmed_1.fastq.gz
-mv RM1_S002_insert_5000_fastp.fq.gz cami-low_trimmed_2.fastq.gz
+mv RL_S001_insert_270_fastp.fq.gz cami-low_trimmed.fastq.gz

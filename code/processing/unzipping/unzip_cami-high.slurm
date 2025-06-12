@@ -38,6 +38,6 @@ fastp \
   -z 4 \
   -w 8
 
-mv *.fastp* ../
+mv *fastp* ../
 cd ..
 mv RH_S004_insert_270_fastp.fq.gz cami-high_trimmed.fastq.gz

@@ -1,23 +1,25 @@
 #!/bin/bash
 ## Assembler: megahit
 
-# The last argument is always path_output.
-# The arguments before that are the MEGAHIT specific read arguments (-1 <reads1>, -2 <reads2> or -r <reads>)
+# The last argument is the path_output
+path_output="${!#}"
 
-# Get the last argument as path_output
-path_output="${!#}" # This gets the value of the last argument
+# All arguments except the last one are the read arguments for megahit
+megahit_read_args=("${@:1:$#-1}")
 
-# Remove the last argument from the arguments list to get only read arguments
-read_args=("${@:1:$#-1}") # Get all arguments from 1 to the second to last
-
-if [ ${#read_args[@]} -eq 0 ]; then
-  echo "Usage: $0 <read_arguments> <path_output>"
-  echo "  <read_arguments> can be: -1 <fwd_reads> -2 <rev_reads> OR -r <single_reads>"
+if [ ${#megahit_read_args[@]} -eq 0 ]; then
+  echo "Usage: $0 <read_arguments_for_megahit> <path_output>"
+  echo "  <read_arguments_for_megahit> can be: -1 <fwd_reads> -2 <rev_reads> OR -r <single_reads>"
   exit 1
 fi
 
+# *** ADD THIS LINE FOR DEBUGGING ***
+echo "DEBUG: MEGAHIT command will be:"
+echo "megahit -t 24 \"${megahit_read_args[@]}\" -o \"$path_output\" --min-contig-len 1000"
+echo "*********************************"
+
 # Construct the MEGAHIT command
 megahit -t 24 \
-  "${read_args[@]}" \ # This will expand to -1 "..." -2 "..." or -r "..."
+  "${megahit_read_args[@]}" \
   -o "$path_output" \
   --min-contig-len 1000 2>&1
