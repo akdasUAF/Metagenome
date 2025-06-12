@@ -9,5 +9,13 @@ fi
 path_combined=$1
 path_output=$2
 
-./tools/assemblers/idba/bin/idba_ud -r $path_combined -o $path_output --num_threads 24
+./tools/assemblers/idba/bin/idba_ud \
+    --read "$path_combined" \
+    --out "$path_output" \
+    --mink 20 \
+    --maxk 100 \
+    --step 10 \
+    --min_count 2 \
+    --num_threads 24
+
 
