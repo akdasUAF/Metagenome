@@ -1,0 +1,2 @@
+mkdir -p data/raw/cami-medium/
+wget -O data/raw/cami-medium/cami-medium_raw.tar --show-progress --continue https://s3.ap-northeast-1.wasabisys.com/gigadb-datasets/live/pub/10.5524/100001_101000/100344/ChallengeDatasets.dir/CAMI_medium.tar

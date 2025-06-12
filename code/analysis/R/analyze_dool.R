@@ -178,7 +178,22 @@ make_dool_plot_virtmemory <- function(dool_log_file, assembler="", dataset="") {
 }
 
 
-make_dool_plot_cpu_mem_percentage <- function(dool_log_file, assembler="", dataset="") {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+make_dool_plot_cpu_mem_percentage <- function(dool_log_file, assembler="", dataset="") { # Removed total_system_ram_mb argument
   
   dool_raw <- read.csv(dool_log_file)
   
@@ -196,19 +211,24 @@ make_dool_plot_cpu_mem_percentage <- function(dool_log_file, assembler="", datas
     dool_raw$time <- dool_raw$time - min(dool_raw$time)
   }
   
-  # Calculate CPU percentage used (assuming 'usr' is user CPU and 'sys' is system CPU)
-  # d_cpu - CPU_usage_percentage (usr + sys)
-  # d_mem - Memory_usage_percentage (used / total * 100)
-  # NOTE: 'total' column is crucial here for memory percentage.
-  # If 'total' is not in your dool log, you might need to hardcode it or calculate it.
-  # I'm assuming 'total' refers to the total system memory reported by dool.
-  
-  # For CPU, 'usr' represents user CPU usage. We will combine this with 'sys' (system CPU) if available.
-  # If only 'usr' and 'idl' (idle) are present, then (100 - idl) is the total CPU usage.
+  # --- MODIFICATION START ---
+  # Calculate 'total' memory from 'used', 'free', and 'cach'
+  # Assuming used, free, and cach are in bits as per your bits_to_mb function usage
   dool_processed <- dool_raw %>%
     mutate(CPU_percent_used = 100 - idl) %>% # Total CPU usage is 100% minus idle
-    mutate(Memory_percent_used = as.numeric(bits_to_mb(used)) / as.numeric(bits_to_mb(total)) * 100) %>% # Convert bits to MB, then %
+    mutate(
+      # Calculate total memory at each timestamp (in bits)
+      calculated_total_memory_bits = used + free + cach,
+      # Convert used memory to MB
+      used_mb = as.numeric(bits_to_mb(used)),
+      # Convert calculated total memory to MB
+      calculated_total_memory_mb = as.numeric(bits_to_mb(calculated_total_memory_bits)),
+      # Calculate Memory_percent_used based on calculated total
+      Memory_percent_used = (used_mb / calculated_total_memory_mb) * 100
+    ) %>%
     select(time, CPU_percent_used, Memory_percent_used)
+  # --- MODIFICATION END ---
+  
   
   # Reshape for ggplot
   dool_long <- dool_processed %>%
@@ -233,13 +253,21 @@ make_dool_plot_cpu_mem_percentage <- function(dool_log_file, assembler="", datas
   return(dool_plot_combined)
 }
 
+
+
+
+
+
+
+
+
 ### Function to generate a four by four graph
-generate_dool_ggplot <- function(logs_to_plot, save_directory) {
+generate_dool_ggplot <- function(logs_to_plot, save_directory) { # Removed total_system_ram_mb here
   
   plot_list_memory <- list()
   plot_list_cpu <- list()
   plot_list_virt <- list()
-  plot_list_combined <- list() # New list for the combined plot
+  plot_list_combined <- list()
   
   i <- 1
   
@@ -247,25 +275,30 @@ generate_dool_ggplot <- function(logs_to_plot, save_directory) {
     plot_list_memory[[i]] <- make_dool_plot_memory(logg[[1]], logg[[2]], logg[[3]])
     plot_list_cpu[[i]] <- make_dool_plot_cpu(logg[[1]], logg[[2]], logg[[3]])
     plot_list_virt[[i]] <- make_dool_plot_virtmemory(logg[[1]], logg[[2]], logg[[3]])
-    plot_list_combined[[i]] <- make_dool_plot_cpu_mem_percentage(logg[[1]], logg[[2]], logg[[3]]) # Call the new function
+    # Call the new function WITHOUT total_system_ram_mb
+    plot_list_combined[[i]] <- make_dool_plot_cpu_mem_percentage(logg[[1]], logg[[2]], logg[[3]])
     i <- i + 1
   }
   
-  # Use `length(plot_list_X)` for more flexible column arrangement
-  full_memory <- grid.arrange(grobs = plot_list_memory, ncol = ceiling(length(plot_list_memory) / 2)) # Adjust ncol as needed, e.g., 2, 3, or use ceiling for flexible grid
+  full_memory <- grid.arrange(grobs = plot_list_memory, ncol = ceiling(length(plot_list_memory) / 2))
   full_cpu <- grid.arrange(grobs = plot_list_cpu, ncol = ceiling(length(plot_list_cpu) / 2))
   full_virt <- grid.arrange(grobs = plot_list_virt, ncol = ceiling(length(plot_list_virt) / 2))
-  full_combined <- grid.arrange(grobs = plot_list_combined, ncol = ceiling(length(plot_list_combined) / 2)) # New combined plot grid
+  full_combined <- grid.arrange(grobs = plot_list_combined, ncol = ceiling(length(plot_list_combined) / 2))
   
-  ggsave(paste(save_directory, "dool_memory.png", sep = ""), full_memory, width = 12, height = 8) # Added width/height for better saving
+  ggsave(paste(save_directory, "dool_memory.png", sep = ""), full_memory, width = 12, height = 8)
   ggsave(paste(save_directory, "dool_cpu.png", sep = ""), full_cpu, width = 12, height = 8)
   ggsave(paste(save_directory, "dool_virt.png", sep = ""), full_virt, width = 12, height = 8)
-  ggsave(paste(save_directory, "dool_cpu_mem_percentage.png", sep = ""), full_combined, width = 12, height = 8) # Save the new combined plot
+  ggsave(paste(save_directory, "dool_cpu_mem_percentage.png", sep = ""), full_combined, width = 12, height = 8)
   
-  # You can't return multiple objects like (full_memory, full_cpu) directly in R.
-  # You'd return a list of plots if you want to use them outside the function.
   return (list(full_memory = full_memory, full_cpu = full_cpu, full_virt = full_virt, full_combined = full_combined))
 }
+
+
+
+
+
+
+
 
 
 
