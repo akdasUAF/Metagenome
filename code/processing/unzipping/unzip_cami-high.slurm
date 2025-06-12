@@ -24,3 +24,20 @@ eval "$(conda shell.bash hook)"
 
 cd data/raw/cami-high/
 tar -xvf cami-high_raw.tar
+
+cd CAMI-HIGH/
+
+conda activate pro_fastp
+
+fastp \
+  -i RH_S004__insert_270.fq.gz \
+  -o RH_S004_insert_270_fastp.fq.gz \
+  --failed_out RH_insert_270_failed.fq.gz \
+  -j RH_insert_270.json \
+  -h RH_insert_270.html \
+  -z 4 \
+  -w 8
+
+mv *.fastp* ../
+cd ..
+mv RH_S004_insert_270_fastp.fq.gz cami-high_trimmed.fastq.gz
