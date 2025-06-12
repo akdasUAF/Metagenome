@@ -24,3 +24,25 @@ eval "$(conda shell.bash hook)"
 
 cd data/raw/cami-medium/
 tar -xvf cami-medium_raw.tar
+
+cd CAMI-MEDIUM/
+
+conda activate pro_fastp
+
+fastp \
+  -i RM1_S001__insert_5000.fq.gz \
+  -I RM1_S002__insert_5000.fq.gz \
+  -o RM1_S001_insert_5000_fastp.fq.gz \
+  -O RM1_S002_insert_5000_fastp.fq.gz \
+  --unpaired1 RM1_S001_insert_5000_unpaired.fq.gz \
+  --unpaired2 RM1_S002_insert_5000_unpaired.fq.gz \
+  --failed_out RM1_insert_5000_failed.fq.gz \
+  -j RM1_insert_5000.json \
+  -h RM1_insert_5000.html \
+  -z 4 \
+  -w 8
+
+mv *.fastp* ../
+cd ..
+mv RM1_S001_insert_5000_fastp.fq.gz cami-medium_trimmed_1.fastq.gz
+mv RM1_S002_insert_5000_fastp.fq.gz cami-medium_trimmed_2.fastq.gz
