@@ -25,7 +25,7 @@ eval "$(conda shell.bash hook)"
 cd data/raw/cami-high/
 # tar -xvf cami-high_raw.tar
 
-cd CAMI-HIGH/
+cd CAMI-high/
 
 conda activate pro_fastp
 
