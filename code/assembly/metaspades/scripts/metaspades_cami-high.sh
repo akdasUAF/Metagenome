@@ -1,14 +1,14 @@
-#!/bin/bash
+#!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
-path_megahit="code/assembly/megahit/run_megahit.sh"
+path_metaspades="code/assembly/metaspades/run_metaspades.sh"
 raw_reads_dir="data/raw/cami-high/"
-path_output="data/megahit/cami-high/"
-path_log="data/megahit/logs/cami-high/"
+path_output="data/metaspades/cami-high/"
+path_log="data/metaspades/logs/"
 dataset="cami-high"
-task="megahit"
+task="metaspades"
 
 mkdir -p "${path_log}"
-command="$path_megahit \"$raw_reads_dir\" \"$path_output\" \"$path_log\""
+command="$path_metaspades \"$raw_reads_dir\" \"$path_output\" \"$path_log\""
 
 echo "Command to pass to benchmark.bash: ${command}"
 echo "Dataset: ${dataset}"
