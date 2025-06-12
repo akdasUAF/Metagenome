@@ -2,7 +2,7 @@
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
 raw_reads_dir="data/raw/cami-medium/"
-path_output="data/metaspades/sr-log/"
+path_output="data/metaspades/cami-medium/"
 path_log="data/metaspades/logs/"
 dataset="cami-medium"
 task="metaspades"
