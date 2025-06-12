@@ -22,10 +22,10 @@ ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
 
-cd data/raw/cami_high/
+cd data/raw/cami-high/
 # tar -xvf cami-high_raw.tar
 
-cd CAMI-high/
+cd CAMI_high/
 
 conda activate pro_fastp
 
