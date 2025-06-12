@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_asm_megahit_sr-even_t1standard"
-#SBATCH --output=data/megahit/logs/log_slurm_megahit_sr-even_%j.log
-#SBATCH --error=data/megahit/logs/log_slurm_megahit_sr-even_err_%j.log
+#SBATCH --job-name="panmeta_asm_megahit_cami-medium_t1standard"
+#SBATCH --output=data/megahit/logs/log_slurm_megahit_cami-medium_%j.log
+#SBATCH --error=data/megahit/logs/log_slurm_megahit_cami-medium_err_%j.log
 
 ## Clean out any modules, then reload slurm
 # Since conda will be used, no other modules will be loaded
@@ -20,4 +20,4 @@ module load slurm
 ulimit -l unlimited
 
 eval "$(conda shell.bash hook)"
-bash code/assembly/megahit/scripts/megahit_sr-even.sh
+bash code/assembly/megahit/scripts/megahit_cami-medium.sh
