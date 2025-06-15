@@ -27,7 +27,7 @@ def extract_paired_end_reads(fastq_file):
     paired_reads = []
     with open(fastq_file, "r") as f:
         records = list(SeqIO.parse(f, "fastq"))
-        for i in range(0, len(records), 2):
+        for i in range(0, len(records) - 1, 2):  # Ensure we don’t go out of range
             read1 = str(records[i].seq)
             read2 = str(records[i + 1].seq)
             paired_reads.append((read1, read2))
@@ -80,11 +80,20 @@ def refine_clusters_with_gc(clusters):
     return refined_clusters
 
 # Step 6: Leverage Paired-End Reads
-def adjust_clusters_with_paired_end(clusters, paired_end_reads):
-    for source, target in paired_end_reads:
+def adjust_clusters_with_paired_end(clusters, paired_end_reads, relax=False):
+    for read1, read2 in paired_end_reads:
         for cluster_id, kmers in clusters.items():
-            if source in kmers:
-                clusters[cluster_id].add(target)
+            match = None
+            if read1 in kmers:
+                match = read2
+            elif relax:
+                # Relaxed condition: check prefix/suffix matches
+                for kmer in kmers:
+                    if read1[:10] in kmer or read1[-10:] in kmer:
+                        match = read2
+                        break
+            if match:
+                clusters[cluster_id].add(match)
                 break
     return clusters
 
@@ -113,3 +122,40 @@ def output_subgraphs(subgraphs, output_file):
             f.write(f"Sub-Graph {cluster_id}:\n")
             for node, neighbors in edges.items():
                 f.write(f"{node} -> {', '.join(neighbors)}\n")
+
+
+def error_substitution(reads, k, threshold=1.0):
+    corrected_reads = []
+    global_kmer_coverage = annotate_coverage(reads, k)
+    global_coverage_values = list(global_kmer_coverage.values())
+    global_median = np.median(global_coverage_values)
+
+    for read in reads:
+        subregions = [read[i:i+k] for i in range(0, len(read) - k + 1, k)]
+        coverage_list = [np.mean([global_kmer_coverage.get(kmer, 0) for kmer in generate_kmers(sub, k)]) for sub in subregions]
+        mean_ = np.mean(coverage_list)
+        median_ = np.median(coverage_list)
+        std_ = np.std(coverage_list) if np.std(coverage_list) != 0 else 1
+        skew = (mean_ - median_) / std_
+
+        new_read = ""
+        for i, sub in enumerate(subregions):
+            local_kmer_cov = [global_kmer_coverage.get(kmer, 0) for kmer in generate_kmers(sub, k)]
+            local_median = np.median(local_kmer_cov)
+            if skew < threshold:  # True region
+                new_read += sub
+            else:
+                # If the subregion is likely erroneous
+                high_threshold = global_median * 1.5
+                low_threshold = global_median * 0.5
+                corrected_sub = ""
+                for kmer in generate_kmers(sub, k):
+                    cov = global_kmer_coverage.get(kmer, 0)
+                    if (local_median >= global_median and cov >= high_threshold) or (cov >= low_threshold):
+                        corrected_sub += kmer[0]
+                    else:
+                        corrected_sub += "N"
+                new_read += corrected_sub
+        corrected_reads.append(new_read)
+
+    return corrected_reads

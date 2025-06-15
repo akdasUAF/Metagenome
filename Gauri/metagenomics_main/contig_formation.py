@@ -96,22 +96,21 @@ def build_contigs_parallel(graph):
     return contigs
 
 # Main Workflow for Contig Generation
-def generate_contigs(subgraphs):
+def generate_contigs(subgraphs, cleanup_rounds=2):
     all_contigs = {}
     for cluster_id, graph in subgraphs.items():
         print(f"Processing Sub-Graph: {cluster_id}")
-        
-        # Step 1: Remove tips
-        cleaned_graph = remove_tips(graph)
-        
-        # Step 2: Remove bubbles
-        cleaned_graph = remove_bubbles(cleaned_graph)
-        
-        # Step 3: Build contigs
-        contigs = build_contigs_parallel(cleaned_graph)
+
+        # Multiple rounds of tip and bubble removal
+        for _ in range(cleanup_rounds):
+            graph = remove_tips(graph)
+            graph = remove_bubbles(graph)
+
+        contigs = build_contigs_parallel(graph)
         all_contigs[cluster_id] = contigs
-    
+
     return all_contigs
+
 
 def write_contigs_to_files(contigs_by_subgraph, output_dir="output"):
     os.makedirs(output_dir, exist_ok=True)

@@ -3,4 +3,5 @@ venv
 Paper
 .ipynb*
 *.fastq'
-output
+output*
+assembly_stats*
