@@ -1,7 +1,7 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_unicycler="code/assembly/unicycler/run_unicycler.sh"
-input_fastq_dir="data/raw/sr-even/" # This directory should contain your _1.fastq and _2.fastq files
+input_fastq_dir="data/raw/sr-even/"
 path_output="data/unicycler/sr-even/"
 path_log="data/unicycler/logs/sr-even/"
 dataset="sr-even"
@@ -11,7 +11,6 @@ rm -rf "$path_output"
 mkdir -p "${path_log}"
 
 # Construct the command string to be executed by benchmark.bash
-# Now, run_unicycler.sh expects the input directory, output directory, and log directory
 command="$path_unicycler \"$input_fastq_dir\" \"$path_output\" \"$path_log\""
 
 echo "Command to pass to benchmark.bash: ${command}"
