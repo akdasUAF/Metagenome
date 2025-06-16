@@ -33,7 +33,7 @@ for dataset in "${!datasets[@]}"; do
         # Check if the source file actually exists before creating the link
         if [ -f "$SOURCE_FILE" ]; then
             # Create the symbolic link
-            ln -s "$SOURCE_FILE" "$DEST_LINK"
+            ln -s -f "$SOURCE_FILE" "$DEST_LINK"
             echo "Created link: $DEST_LINK -> $SOURCE_FILE"
         else
             echo "WARNING: Source file not found, skipping link: $SOURCE_FILE"
