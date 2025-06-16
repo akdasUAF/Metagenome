@@ -21,7 +21,7 @@ for dataset in "${!datasets[@]}"; do
     # Loop through each assembler associated with the current dataset
     for assembler in ${datasets[$dataset]}; do
         # Construct the source path
-        SOURCE_FILE="${BASE_LOG_DIR}/${dataset}/${assembler}/log_dool_${dataset}_${assembler}.log"
+        SOURCE_FILE="${BASE_LOG_DIR}/${dataset}/${assembler}/log_dool_${assembler}_${dataset}.log"
 
         # Construct the destination directory (create if it doesn't exist)
         DEST_DIR="${BASE_RESULT_DIR}/${assembler}/${dataset}"
