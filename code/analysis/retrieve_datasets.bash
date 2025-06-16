@@ -12,9 +12,9 @@ datasets["lr-ms"]="raven flye canu miniasm"
 datasets["sr-even"]="megahit metaspades unicycler"
 datasets["sr-log"]="megahit metaspades unicycler"
 datasets["sr-ms"]="megahit metaspades"
-datasets["sr-cami_high"]="megahit"
-datasets["sr-cami_medium"]="megahit metaspades"
-datasets["sr-cami_low"]="megahit"
+datasets["cami_high"]="megahit"
+datasets["cami_medium"]="megahit metaspades"
+datasets["cami_low"]="megahit"
 
 # Loop through each dataset
 for dataset in "${!datasets[@]}"; do
