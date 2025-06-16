@@ -1,14 +1,14 @@
 #!/bin/env bash
 benchmark_script="code/benchmarking/benchmark.bash"
 path_metaspades="code/assembly/metaspades/run_metaspades.sh"
-path_forward="data/sr-crust/trimmed/sr-crust_trimmed_1.fastq"
-path_reverse="data/sr-crust/trimmed/sr-crust_trimmed_2.fastq"
-path_output="data/sr-crust/metaspades/"
-path_log="data/sr-crust/log/"
-dataset="sr-crust"
+path_forward="data/raw/sr-even/sr-even_1_trimmed.fastq"
+path_reverse="data/raw/sr-even/sr-log_2_trimmed.fastq"
+path_output="data/metaspades/sr-log/"
+path_log="data/metaspades/logs/"
+dataset="sr-log"
 task="metaspades"
 
-mkdir -p ${path_output}
+rm -rf $(dirname "$path_output")
 mkdir -p ${path_log}
 log_file="${path_log}/log_asm_${task}_${dataset}.log"
 

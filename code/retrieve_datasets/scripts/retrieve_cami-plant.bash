@@ -92,23 +92,22 @@ for archive_file in rhimgCAMI2_sample_*.tar.gz; do
 done
 
 
-mkdir -p cleaned/sorted/ # Ensure the destination directory exists
+mkdir -p cleaned/sorted/
 
 find archives/ -name "*.fq.gz" -print0 | \
 while IFS= read -r -d $'\0' source_file; do
     path_suffix="${source_file#*sample_}"
     sample_num="${path_suffix%%/*}" 
 
-    # Let's refine the sample_num extraction to be more general if the structure is not always `.../sample_XYZ/reads/`
     if [[ "$source_file" =~ (sample_[0-9]+) ]]; then
         sample_tag="${BASH_REMATCH[1]}" # e.g., "sample_001"
         sample_num="${sample_tag#sample_}" # Extracts "001"
     else
         echo "Warning: Could not extract sample number from path: $source_file. Skipping."
-        continue # Skip to next file if sample number cannot be found
+        continue 
     fi
 
-    # Get the original filename (e.g., "anonymous_reads.fq.gz")
+    # Get the original filename
     original_filename=$(basename "$source_file")
 
     # Construct the new destination filename
@@ -139,16 +138,15 @@ while IFS= read -r -d $'\0' source_file; do
     path_suffix="${source_file#*sample_}"
     sample_num="${path_suffix%%/*}" 
 
-    # Let's refine the sample_num extraction to be more general if the structure is not always `.../sample_XYZ/reads/`
     if [[ "$source_file" =~ (sample_[0-9]+) ]]; then
-        sample_tag="${BASH_REMATCH[1]}" # e.g., "sample_001"
+        sample_tag="${BASH_REMATCH[1]}" # "sample_001"
         sample_num="${sample_tag#sample_}" # Extracts "001"
     else
         echo "Warning: Could not extract sample number from path: $source_file. Skipping."
-        continue # Skip to next file if sample number cannot be found
+        continue
     fi
 
-    # Get the original filename (e.g., "anonymous_reads.fq.gz")
+    # Get the original filename
     original_filename=$(basename "$source_file")
 
     # Construct the new destination filename
@@ -166,7 +164,7 @@ cd data/raw/cami-plant/lr-pacbio/
 mkdir -p cleaned/sorted/
 mkdir -p archives/
 
-# Extracting each archive to cleaned foldedr
+# Extracting each archive to cleaned foldede
 for archive_file in rhimgCAMI2_sample_*.tar.gz; do
     echo "Extracting: $archive_file to archives/"
     tar -xzf "$archive_file" -C archives/
@@ -178,7 +176,6 @@ while IFS= read -r -d $'\0' source_file; do
     path_suffix="${source_file#*sample_}"
     sample_num="${path_suffix%%/*}" 
 
-    # Let's refine the sample_num extraction to be more general if the structure is not always `.../sample_XYZ/reads/`
     if [[ "$source_file" =~ (sample_[0-9]+) ]]; then
         sample_tag="${BASH_REMATCH[1]}" # e.g., "sample_001"
         sample_num="${sample_tag#sample_}" # Extracts "001"
@@ -187,7 +184,7 @@ while IFS= read -r -d $'\0' source_file; do
         continue # Skip to next file if sample number cannot be found
     fi
 
-    # Get the original filename (e.g., "anonymous_reads.fq.gz")
+    # Get the original filename
     original_filename=$(basename "$source_file")
 
     # Construct the new destination filename
