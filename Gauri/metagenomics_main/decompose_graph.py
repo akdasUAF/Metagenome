@@ -5,6 +5,12 @@ import numpy as np
 from sklearn.cluster import KMeans
 import dask
 from dask import delayed, compute
+from scipy.spatial.distance import mahalanobis
+from sklearn.preprocessing import normalize
+from sklearn.mixture import GaussianMixture
+import pandas as pd
+from itertools import product
+from scipy.stats import multivariate_normal
 
 # Step 1: Parse Reads
 def parse_reads(fastq_file):
@@ -58,6 +64,102 @@ def cluster_by_coverage(coverage_map, n_clusters):
 def calculate_gc_content(kmer):
     gc_count = kmer.count('G') + kmer.count('C')
     return (gc_count / len(kmer)) * 100
+
+
+def get_canonical_4mers():
+    bases = ['A', 'C', 'G', 'T']
+    all_4mers = [''.join(p) for p in product(bases, repeat=4)]
+    canonicals = set()
+    for mer in all_4mers:
+        rev_comp = mer[::-1].translate(str.maketrans("ACGT", "TGCA"))
+        canonicals.add(min(mer, rev_comp))
+    return sorted(list(canonicals))
+
+CANONICAL_4MERS = get_canonical_4mers()
+
+# Compute 4-mer frequency for a k-mer
+def compute_tnf_vector(kmer):
+    counts = defaultdict(int)
+    for i in range(len(kmer) - 3):
+        mer = kmer[i:i+4]
+        rev_comp = mer[::-1].translate(str.maketrans("ACGT", "TGCA"))
+        canonical = min(mer, rev_comp)
+        counts[canonical] += 1
+    total = sum(counts.values()) or 1
+    return [counts[canon] / total for canon in CANONICAL_4MERS]
+
+def compute_tnf_vectors(kmers):
+    return np.array([compute_tnf_vector(kmer) for kmer in kmers])
+
+def cluster_by_tnf(kmers, n_clusters, method="euclidean"):
+    tnf_matrix = compute_tnf_vectors(kmers)
+
+    if method == "mahalanobis":
+        VI = np.linalg.inv(np.cov(tnf_matrix.T))
+        dist_matrix = np.array([
+            [mahalanobis(a, b, VI) for b in tnf_matrix]
+            for a in tnf_matrix
+        ])
+        # Apply clustering (e.g., GMM on distance matrix)
+        gmm = GaussianMixture(n_components=n_clusters, covariance_type='full', random_state=0)
+        labels = gmm.fit_predict(dist_matrix)
+    else:
+        # Default to Euclidean clustering
+        kmeans = KMeans(n_clusters=n_clusters, random_state=0)
+        labels = kmeans.fit_predict(tnf_matrix)
+
+    clusters = defaultdict(set)
+    for kmer, label in zip(kmers, labels):
+        clusters[label].add(kmer)
+    return clusters
+
+
+def extract_features_for_em(kmers, coverage_map):
+    feature_matrix = []
+    for kmer in kmers:
+        tnf_vec = compute_tnf_vector(kmer)
+        coverage = np.log1p(coverage_map.get(kmer, 1)) / 10  # log-scale normalize
+        feature_matrix.append(tnf_vec + [coverage])
+    return np.array(feature_matrix)
+
+def em_binning(kmers, coverage_map, n_bins=2, max_iter=10, eps=1e-3):
+    X = extract_features_for_em(kmers, coverage_map)
+
+    # Step 1: Initialization via KMeans
+    kmeans = KMeans(n_clusters=n_bins, random_state=0).fit(X)
+    labels = kmeans.labels_
+    mus = [X[labels == i].mean(axis=0) for i in range(n_bins)]
+    covs = [np.cov(X[labels == i].T) + np.eye(X.shape[1]) * 1e-6 for i in range(n_bins)]
+    pis = [np.mean(labels == i) for i in range(n_bins)]
+
+    for iteration in range(max_iter):
+        # E-step
+        probs = np.zeros((X.shape[0], n_bins))
+        for i in range(n_bins):
+            rv = multivariate_normal(mean=mus[i], cov=covs[i], allow_singular=True)
+            probs[:, i] = pis[i] * rv.pdf(X)
+
+        probs = probs / probs.sum(axis=1, keepdims=True)  # normalize
+
+        # M-step
+        N_k = probs.sum(axis=0)
+        for i in range(n_bins):
+            mus[i] = np.sum(probs[:, i].reshape(-1, 1) * X, axis=0) / N_k[i]
+            covs[i] = np.cov(X.T, aweights=probs[:, i]) + np.eye(X.shape[1]) * 1e-6
+            pis[i] = N_k[i] / X.shape[0]
+
+        # Optional convergence check (based on mu delta)
+        if iteration > 0 and np.max(np.abs(prev_mus - np.array(mus))) < eps:
+            break
+        prev_mus = np.array(mus)
+
+    # Final hard assignment
+    bin_assignments = np.argmax(probs, axis=1)
+    clusters = defaultdict(set)
+    for kmer, bin_id in zip(kmers, bin_assignments):
+        clusters[bin_id].add(kmer)
+
+    return clusters
 
 # TODO: cluster based on GC inside coverage clusters
 def refine_clusters_with_gc(clusters):

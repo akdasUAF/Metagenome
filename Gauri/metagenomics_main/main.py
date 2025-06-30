@@ -350,7 +350,8 @@ def main_with_stats_and_timing():
 
     # Parameters
     fastq_file = "/home/gauri/Metagenomics/Resources/16S_WT_day3_11_SRR2628505_1.fastq"
-    k_values = [11]
+    k_values = [19, 29, 39, 49, 59, 69, 79, 89, 99] 
+    # k_values = [99] 
     n_species = 2
     num_rounds = 1
     graph_cleanup_rounds = 1
@@ -392,8 +393,10 @@ def main_with_stats_and_timing():
             # Annotate coverage and cluster
             timer.start_step(f"k={k} R{round_num + 1}: Coverage + Clustering")
             coverage_map = annotate_coverage(reads, k)
-            clusters = cluster_by_coverage(coverage_map, n_species)
-            clusters = refine_clusters_with_gc(clusters)
+            kmers = list(coverage_map.keys())
+            # clusters = cluster_by_tnf(kmers, n_species, method="euclidean")  # much faster  # or "mahalanobis"
+            clusters = em_binning(kmers, coverage_map, n_bins=n_species)
+
             scaffolding_mode = round_num > 0
             clusters = adjust_clusters_with_paired_end(clusters, paired_end_reads, relax=scaffolding_mode)
             clusters, _ = resolve_ambiguous_nodes(clusters)
