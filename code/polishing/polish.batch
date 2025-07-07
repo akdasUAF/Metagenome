@@ -33,8 +33,6 @@ declare -r ASSEMBLER_ID="$2"         # e.g., flye
 declare -r RAW_READS_FULLPATH="$3"   # e.g., data/raw/lr-even/lr-even_raw.fastq
 declare -r DRAFT_ASSEMBLY_FULLPATH="$4" # e.g., data/flye/lr-even/assembly.fasta
 
-# No additional path construction needed here, as arguments 3 and 4 are already full paths.
-
 # Verify input files exist before proceeding
 if [ ! -f "${RAW_READS_FULLPATH}" ]; then
     echo "ERROR: Raw reads file not found: ${RAW_READS_FULLPATH}" | tee /dev/stderr
@@ -45,7 +43,7 @@ if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
     exit 1
 fi
 
-# Conda Environment Names (These were from the previous working version)
+# Conda Environment Names
 declare -r MINIMAP2_ENV_NAME="align_minimap2"
 declare -r RACON_ENV_NAME="racon"
 declare -r MEDAKA_ENV_NAME="medaka"
@@ -61,7 +59,10 @@ declare -r POLISHED_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/polished"
 declare -r MEDAKA_OUTPUT_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/medaka"
 
 # Intermediate files
-declare -r RACON_OVERLAP="${POLISHED_DIR}/overlap_${ASSEMBLER_ID}_${DATASET_ID}.sam"
+# Minimap2 will output raw SAM here
+declare -r MINIMAP2_RAW_SAM="${POLISHED_DIR}/overlap_${ASSEMBLER_ID}_${DATASET_ID}.sam"
+# Filtered BAM will be used as input for Racon
+declare -r RACON_INPUT_BAM="${POLISHED_DIR}/overlap_${ASSEMBLER_ID}_${DATASET_ID}.filtered.bam"
 declare -r RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${DATASET_ID}_assembly_racon.fasta"
 
 # Detailed command log file (separate from SLURM's job logs)
@@ -88,8 +89,8 @@ echo "" | tee -a "${path_log}"
 MINIMAP2_BIN="/home/wwinnett/miniconda3/envs/align_minimap2/bin/minimap2"
 RACON_BIN="/home/wwinnett/miniconda3/envs/racon/bin/racon"
 MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus"
-# If you add Quast later, find its path similarly:
-# QUAST_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/quast.py" # Example if Quast is in medaka env
+# You might need to add Samtools path here if it's not in the specified envs or your PATH
+# SAMTOOLS_BIN="/path/to/samtools"
 
 # Create a directory for output
 mkdir -p "${POLISHED_DIR}" || { echo "ERROR: Could not create output directory ${POLISHED_DIR}"; exit 1; }
@@ -98,22 +99,28 @@ mkdir -p "${POLISHED_DIR}" || { echo "ERROR: Could not create output directory $
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
 
-echo "Running Minimap2..." | tee -a "${path_log}"
+echo "Running Minimap2 to generate raw SAM alignments..." | tee -a "${path_log}"
 
 conda run -n "${MINIMAP2_ENV_NAME}" minimap2 \
     -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
-    > "${RACON_OVERLAP}" 2>> "${path_log}"
-if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed." | tee -a "${path_log}"; exit 1; fi
+    > "${MINIMAP2_RAW_SAM}" 2>> "${path_log}" # Output to the raw SAM file
+if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM." | tee -a "${path_log}"; exit 1; fi
 
-### Racon into same folder
-echo "Running Racon..." | tee -a "${path_log}"
+echo "Filtering SAM file and converting to BAM (removing unmapped reads)..." | tee -a "${path_log}"
+# Samtools view -F 4 (exclude unmapped reads) -bS (output BAM, input SAM)
+# Ensure samtools is installed in MINIMAP2_ENV_NAME (or a suitable environment)
+conda run -n "${MINIMAP2_ENV_NAME}" samtools view -F 4 -bS "${MINIMAP2_RAW_SAM}" \
+    -o "${RACON_INPUT_BAM}" 2>> "${path_log}"
+if [ $? -ne 0 ]; then echo "ERROR: Samtools filtering failed." | tee -a "${path_log}"; exit 1; fi
+
+echo "Running Racon with filtered BAM input..." | tee -a "${path_log}"
 conda run -n "${RACON_ENV_NAME}" racon \
     -t 24 \
     "${RAW_READS_FULLPATH}" \
-    "${RACON_OVERLAP}" \
+    "${RACON_INPUT_BAM}" \ # Use the filtered BAM file as input for Racon
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Racon failed." | tee -a "${path_log}"; exit 1; fi
