@@ -86,7 +86,7 @@ mkdir -p cleaned/sorted/
 mkdir -p archives/
 
 # Extracting each archive to cleaned folder
-for archive_file in rhimgCAMI2_sample_*.tar.gz; do
+for archive_file in *.tar.gz; do
     echo "Extracting: $archive_file to archives/"
     tar -xzf "$archive_file" -C archives/
 done
@@ -104,7 +104,7 @@ while IFS= read -r -d $'\0' source_file; do
         sample_num="${sample_tag#sample_}" # Extracts "001"
     else
         echo "Warning: Could not extract sample number from path: $source_file. Skipping."
-        continue 
+        continue
     fi
 
     # Get the original filename
