@@ -19,17 +19,6 @@ module load slurm
 
 ulimit -l unlimited
 
-CONDA_ACTIVATE_SCRIPT="/home/wwinnett/miniconda3/etc/profile.d/conda.sh"
-
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before sourcing conda.sh: $PATH" | tee -a "${path_log}"
-if [ -f "${CONDA_ACTIVATE_SCRIPT}" ]; then
-    . "${CONDA_ACTIVATE_SCRIPT}"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after sourcing conda.sh: $PATH" | tee -a "${path_log}"
-else
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Conda activate script not found at ${CONDA_ACTIVATE_SCRIPT}" | tee -a "${path_log}"
-    exit 1
-fi
-
 # Define variables for dataset and assembler
 dataset="lr-even"
 assembler="flye"
@@ -45,12 +34,32 @@ RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${dataset}_assembly_racon.fasta"
 # Define the path for the detailed command log file
 LOG_DIR="data/${assembler}/logs/polished" # Define log directory
 mkdir -p "${LOG_DIR}" # Ensure log directory exists
-path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
 
-# Clear the log file at the start of the script
+# Clear the log file at the start of the script (MOVED THIS LINE)
 > "${path_log}"
 
 echo "Script started at $(date)" | tee -a "${path_log}" # Log script start time
+
+# --- DIAGNOSTIC: Check PATH before any Conda actions ---
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before sourcing conda.sh: $PATH" | tee -a "${path_log}"
+
+# --- IMPORTANT CHANGE HERE: Source conda.sh directly with 'source' keyword ---
+CONDA_ACTIVATE_SCRIPT="/home/wwinnett/miniconda3/etc/profile.d/conda.sh" # MAKE SURE THIS IS YOUR EXACT PATH!
+if [ -f "${CONDA_ACTIVATE_SCRIPT}" ]; then
+    source "${CONDA_ACTIVATE_SCRIPT}" # Use 'source' keyword
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after sourcing conda.sh: $PATH" | tee -a "${path_log}"
+else
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Conda activate script not found at ${CONDA_ACTIVATE_SCRIPT}" | tee -a "${path_log}"
+    exit 1
+fi
+
+# --- IMPORTANT CHANGE: Activate base and deactivate to initialize Conda fully ---
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Attempting to activate/deactivate base to init Conda functions..." | tee -a "${path_log}"
+conda activate base # This should change the PATH
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after activating base: $PATH" | tee -a "${path_log}"
+conda deactivate # This should revert/clean the PATH
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after deactivating base: $PATH" | tee -a "${path_log}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Conda should now be fully initialized." | tee -a "${path_log}"
 
 
 # Create a directory for output
