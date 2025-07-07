@@ -1,103 +1,200 @@
 #!/bin/bash
-#SBATCH --partition=t1small
-#SBATCH --ntasks=24
-#SBATCH --tasks-per-node=24
-#If running on the bio or analysis queue add:
-####SBATCH --mem=214G
-#SBATCH --mail-user=wwinnett@alaska.edu
-#SBATCH --mail-type=BEGIN
-#SBATCH --mail-type=END
-#SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_align_raven_lr-even"
-#SBATCH --output=data/raven/logs/polished/log_slurm_raven_lr-even_%j.log
-#SBATCH --error=data/raven/logs/polished/log_slurm_raven_lr-even_%j_err.log
+#
+# SBATCH --job-name="panmeta_align_polished_assembly"
+# SBATCH --partition=t1small       # Specify the partition (queue) you want to use
+# SBATCH --ntasks=24               # Number of CPU cores for the entire job
+# SBATCH --tasks-per-node=24       # Number of tasks (cores) per node
+# #SBATCH --mem=214G                # Optional: Uncomment and set memory if needed (e.g., for bio/analysis queue)
+# SBATCH --mail-user=your.email@example.com # Replace with your email address for notifications
+# SBATCH --mail-type=BEGIN         # Email you when the job begins
+# SBATCH --mail-type=END           # Email you when the job ends
+# SBATCH --mail-type=FAIL          # Email you if the job fails
+# SBATCH --output=logs/slurm_job_%j.log   # Standard output log file (will be created automatically)
+# SBATCH --error=logs/slurm_job_err_%j.log # Standard error log file (will be created automatically)
 
-## Clean out any modules, then reload slurm
+## --- SECTION 0: SHELL DEBUGGING & ERROR HANDLING ---
+# Enable strict shell settings for robust script execution and debugging.
+# 'set -e' : Exit immediately if a command exits with a non-zero status.
+# 'set -u' : Treat unset variables as an error.
+# 'set -x' : Print commands and their arguments as they are executed (VERY VERBOSE, for debugging Conda).
+# 'set -o pipefail' : The return value of a pipeline is the value of the last (rightmost) command to exit with a non-zero status, or zero if all commands in the pipeline exit successfully.
+set -euxo pipefail
+
+## --- SECTION 1: SLURM & SYSTEM SETUP ---
+# Clean out any modules to ensure a clean environment, then reload essential modules.
 module purge
-module load slurm
+module load slurm # Load essential SLURM modules for job management
 
-ulimit -l unlimited
+ulimit -l unlimited # Set stack size to unlimited, often good practice for bioinformatics jobs
 
-# Define variables for dataset and assembler
-dataset="lr-even"
-assembler="raven"
-RAW_READS="data/raw/${dataset}/${dataset}_raw.fastq"
+## --- SECTION 2: USER CONFIGURATION ---
+# IMPORTANT: Adjust these variables for your specific run.
 
-# Define paths using the variables for better maintainability
-DRAFT_ASSEMBLY="data/${assembler}/${dataset}/assembly.fasta"
-POLISHED_DIR="data/${assembler}/${dataset}/polished"
-MEDAKA_OUTPUT_DIR="data/${assembler}/${dataset}/medaka" # Medaka has its own output dir
-RACON_OVERLAP="${POLISHED_DIR}/overlap_${assembler}_${dataset}.paf"
-RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${dataset}_assembly_racon.fasta"
+# 1. Dataset & Assembler Identifiers
+# These are used for naming output directories and files.
+declare -r DATASET_ID="lr-even"        # Identifier for your dataset (e.g., lr-even, lr-log)
+declare -r ASSEMBLER_ID="flye"          # Identifier for the assembler used (e.g., flye, canu)
+
+# 2. Input File Paths
+# Specify the full path to your raw reads and initial draft assembly.
+declare -r RAW_READS_PATH="data/raw/${DATASET_ID}/${DATASET_ID}_raw.fastq" # Path to your raw reads FASTQ
+declare -r DRAFT_ASSEMBLY_PATH="data/${ASSEMBLER_ID}/${DATASET_ID}/assembly.fasta" # Path to your draft assembly FASTA
+
+# 3. Conda Environment Paths (Names of your Conda environments)
+# Ensure these environments exist and contain the necessary tools.
+declare -r MINIMAP2_ENV="align_minimap2"
+declare -r RACON_ENV="racon"
+declare -r MEDAKA_ENV="medaka"
+declare -r QUAST_ENV="quast" # If you create a separate environment for Quast
+
+
+## --- SECTION 3: CONDITIONAL CONDDA INITIALIZATION & DIAGNOSTICS ---
+# This section attempts to properly initialize Conda.
+# It's crucial for `conda activate` to work.
+
+# Define the path to your conda.sh script (adjust if your miniconda installation path differs)
+# You found this earlier: /home/wwinnett/miniconda3/etc/profile.d/conda.sh
+declare -r CONDA_INIT_SCRIPT="/home/wwinnett/miniconda3/etc/profile.d/conda.sh"
+
+echo "Script started at $(date)" | tee -a "${COMMAND_LOG_FILE}"
 
 # Define the path for the detailed command log file
-LOG_DIR="data/${assembler}/logs/polished"
-mkdir -p "${LOG_DIR}"
-path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
+declare -r COMMAND_LOG_DIR="data/${ASSEMBLER_ID}/logs/polished"
+mkdir -p "${COMMAND_LOG_DIR}"
+declare -r COMMAND_LOG_FILE="${COMMAND_LOG_DIR}/script_commands_${ASSEMBLER_ID}_${DATASET_ID}.log"
 
-# Clear the log file at the start of the script
-> "${path_log}"
+# Clear the command log file at the start of the script execution (move this after path_log defined)
+> "${COMMAND_LOG_FILE}"
 
-echo "Script started at $(date)" | tee -a "${path_log}"
-
-
-# --- HARDCODED TOOL PATHS (NOW WITH YOUR EXACT PATHS) ---
-MINIMAP2_BIN="/home/wwinnett/miniconda3/envs/align_minimap2/bin/minimap2"
-RACON_BIN="/home/wwinnett/miniconda3/envs/racon/bin/racon"
-MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus"
-# If you add Quast later, find its path similarly:
-# QUAST_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/quast.py" # Example if Quast is in medaka env
-
-# Create a directory for output
-mkdir -p "${POLISHED_DIR}" | tee -a "${path_log}"
+echo "Script started at $(date)" | tee -a "${COMMAND_LOG_FILE}"
+echo "Configuration:" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Dataset ID: ${DATASET_ID}" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Assembler ID: ${ASSEMBLER_ID}" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Raw Reads Path: ${RAW_READS_PATH}" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Draft Assembly Path: ${DRAFT_ASSEMBLY_PATH}" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Minimap2 Env: ${MINIMAP2_ENV}" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Racon Env: ${RACON_ENV}" | tee -a "${COMMAND_LOG_FILE}"
+echo "  Medaka Env: ${MEDAKA_ENV}" | tee -a "${COMMAND_LOG_FILE}"
+echo "" | tee -a "${COMMAND_LOG_FILE}"
 
 
-###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
+echo "--- Conda Initialization Diagnostics ---" | tee -a "${COMMAND_LOG_FILE}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before Conda init: $PATH" | tee -a "${COMMAND_LOG_FILE}"
 
-echo "Running Minimap2..." | tee -a "${path_log}"
-"${MINIMAP2_BIN}" \
+if [ -f "${CONDA_INIT_SCRIPT}" ]; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Sourcing Conda init script: ${CONDA_INIT_SCRIPT}" | tee -a "${COMMAND_LOG_FILE}"
+    source "${CONDA_INIT_SCRIPT}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after sourcing Conda init: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+
+    # OPTIONAL: "Kickstart" Conda by activating and deactivating base.
+    # This sometimes helps if shell functions aren't fully recognized immediately.
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Attempting to activate/deactivate base to kickstart Conda..." | tee -a "${COMMAND_LOG_FILE}"
+    conda activate base
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after activating base: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+    conda deactivate
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after deactivating base: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Conda should now be fully initialized." | tee -a "${COMMAND_LOG_FILE}"
+else
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Conda init script not found at ${CONDA_INIT_SCRIPT}. Conda activation will fail." | tee -a "${COMMAND_LOG_FILE}"
+    exit 1
+fi
+echo "--- End Conda Initialization Diagnostics ---" | tee -a "${COMMAND_LOG_FILE}"
+echo "" | tee -a "${COMMAND_LOG_FILE}"
+
+
+## --- SECTION 4: DERIVED PATHS & DIRECTORY SETUP ---
+
+# Base output directory for polished assemblies
+declare -r POLISHED_BASE_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/polished"
+
+# Medaka-specific output directory
+declare -r MEDAKA_OUTPUT_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/medaka"
+
+# Intermediate files
+declare -r RACON_OVERLAP_FILE="${POLISHED_BASE_DIR}/overlap_${ASSEMBLER_ID}_${DATASET_ID}.paf"
+declare -r RACON_POLISHED_ASSEMBLY_FILE="${POLISHED_BASE_DIR}/${DATASET_ID}_assembly_racon.fasta"
+
+# Create necessary output directories
+mkdir -p "${POLISHED_BASE_DIR}" || { echo "ERROR: Could not create output directory ${POLISHED_BASE_DIR}"; exit 1; }
+mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; }
+
+
+## --- SECTION 5: MAIN PIPELINE EXECUTION ---
+
+### --- Stage: Racon Polishing (Minimap2 + Racon) ---
+echo "########## Running Racon Stage (Minimap2 + Racon) ##########" | tee -a "${COMMAND_LOG_FILE}"
+
+echo "Activating ${MINIMAP2_ENV} environment..." | tee -a "${COMMAND_LOG_FILE}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before ${MINIMAP2_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+conda activate "${MINIMAP2_ENV}" | tee -a "${COMMAND_LOG_FILE}" # This should modify PATH
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after ${MINIMAP2_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+
+echo "Running Minimap2 to generate overlaps..." | tee -a "${COMMAND_LOG_FILE}"
+# Redirect stdout (PAF output) to RACON_OVERLAP_FILE
+# Redirect stderr (diagnostic messages) to COMMAND_LOG_FILE
+minimap2 \
     -ax map-ont \
     -t 24 \
-    "${DRAFT_ASSEMBLY}" \
-    "${RAW_READS}" \
-    > "${RACON_OVERLAP}" 2>&1 | tee -a "${path_log}"
+    "${DRAFT_ASSEMBLY_PATH}" \
+    "${RAW_READS_PATH}" \
+    > "${RACON_OVERLAP_FILE}" 2>> "${COMMAND_LOG_FILE}"
+if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed." | tee -a "${COMMAND_LOG_FILE}"; exit 1; fi
 
+echo "Activating ${RACON_ENV} environment..." | tee -a "${COMMAND_LOG_FILE}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before ${RACON_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+conda activate "${RACON_ENV}" | tee -a "${COMMAND_LOG_FILE}" # This should modify PATH
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after ${RACON_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
 
-### Racon into same folder
-echo "Running Racon..." | tee -a "${path_log}"
-"${RACON_BIN}" \
+echo "Running Racon for initial polishing..." | tee -a "${COMMAND_LOG_FILE}"
+racon \
     -t 24 \
-    "${RAW_READS}" \
-    "${RACON_OVERLAP}" \
-    "${DRAFT_ASSEMBLY}" \
-    > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}"
+    "${RAW_READS_PATH}" \
+    "${RACON_OVERLAP_FILE}" \
+    "${DRAFT_ASSEMBLY_PATH}" \
+    > "${RACON_POLISHED_ASSEMBLY_FILE}" 2>&1 | tee -a "${COMMAND_LOG_FILE}"
+if [ $? -ne 0 ]; then echo "ERROR: Racon failed." | tee -a "${COMMAND_LOG_FILE}"; exit 1; fi
 
 
-###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-echo "########## Running Medaka Stage ##########" | tee -a "${path_log}"
+### --- Stage: Medaka Polishing ---
+echo "########## Running Medaka Stage ##########" | tee -a "${COMMAND_LOG_FILE}"
 
-mkdir -p "${MEDAKA_OUTPUT_DIR}" | tee -a "${path_log}"
+echo "Activating ${MEDAKA_ENV} environment..." | tee -a "${COMMAND_LOG_FILE}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before ${MEDAKA_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+conda activate "${MEDAKA_ENV}" | tee -a "${COMMAND_LOG_FILE}" # This should modify PATH
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after ${MEDAKA_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
 
-echo "Running Medaka consensus..." | tee -a "${path_log}"
-"${MEDAKA_CONSENSUS_BIN}" \
-    -i "${RAW_READS}" \
-    -d "${RACON_POLISHED_ASSEMBLY}" \
+echo "Running Medaka consensus polishing..." | tee -a "${COMMAND_LOG_FILE}"
+# Medaka uses the super accuracy model r941_min_sup_g507
+medaka_consensus \
+    -i "${RAW_READS_PATH}" \
+    -d "${RACON_POLISHED_ASSEMBLY_FILE}" \
     -o "${MEDAKA_OUTPUT_DIR}" \
     -m r941_min_sup_g507 \
-    -t 24 2>&1 | tee -a "${path_log}"
+    -t 24 2>&1 | tee -a "${COMMAND_LOG_FILE}"
+if [ $? -ne 0 ]; then echo "ERROR: Medaka failed." | tee -a "${COMMAND_LOG_FILE}"; exit 1; fi
 
 
-###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
+### --- Stage: Quast Quality Control (Placeholder) ---
+echo "########## Running Quast Stage ##########" | tee -a "${COMMAND_LOG_FILE}"
 
-# Placeholder for Quast command (uncomment and adjust when ready)
-# QUAST_OUTPUT_DIR="data/${assembler}/${dataset}/quast_results"
-# mkdir -p "$(dirname "${QUAST_OUTPUT_DIR}")" | tee -a "${path_log}"
-# echo "Running Quast..." | tee -a "${path_log}"
-# "${QUAST_BIN}" \
+# Uncomment and configure this section when you are ready to add Quast.
+# Make sure QUAST_ENV is defined in Section 2.
+#
+# echo "Activating ${QUAST_ENV} environment..." | tee -a "${COMMAND_LOG_FILE}"
+# echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before ${QUAST_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+# conda activate "${QUAST_ENV}" | tee -a "${COMMAND_LOG_FILE}"
+# echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after ${QUAST_ENV} activation: $PATH" | tee -a "${COMMAND_LOG_FILE}"
+#
+# declare -r QUAST_OUTPUT_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/quast_results"
+# mkdir -p "${QUAST_OUTPUT_DIR}" || { echo "ERROR: Could not create Quast output directory ${QUAST_OUTPUT_DIR}"; exit 1; }
+# echo "Running Quast..." | tee -a "${COMMAND_LOG_FILE}"
+# quast.py \
 #     "${MEDAKA_OUTPUT_DIR}/consensus.fasta" \
 #     -o "${QUAST_OUTPUT_DIR}" \
-#     -t 24 2>&1 | tee -a "${path_log}"
+#     -t 24 2>&1 | tee -a "${COMMAND_LOG_FILE}"
+# if [ $? -ne 0 ]; then echo "ERROR: Quast failed." | tee -a "${COMMAND_LOG_FILE}"; exit 1; fi
 
-echo "Script finished at $(date)" | tee -a "${path_log}"
+echo "Script finished at $(date)" | tee -a "${COMMAND_LOG_FILE}"
+
+# OPTIONAL: Deactivate the last active environment
+conda deactivate

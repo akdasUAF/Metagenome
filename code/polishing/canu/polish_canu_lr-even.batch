@@ -25,7 +25,7 @@ RAW_READS="data/raw/${dataset}/${dataset}_raw.fastq"
 
 
 # Define paths using the variables for better maintainability
-DRAFT_ASSEMBLY="data/${assembler}/${dataset}/${dataset}_task.contigs.fasta "
+DRAFT_ASSEMBLY="data/${assembler}/${dataset}/${dataset}_task.contigs.fasta"
 POLISHED_DIR="data/${assembler}/${dataset}/polished"
 MEDAKA_OUTPUT_DIR="data/${assembler}/${dataset}/medaka" # Medaka has its own output dir
 RACON_OVERLAP="${POLISHED_DIR}/overlap_${assembler}_${dataset}.paf"
