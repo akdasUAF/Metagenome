@@ -18,14 +18,30 @@ module load slurm
 
 ulimit -l unlimited
 
+# --- GLOBAL SHELL OPTIONS FOR ROBUSTNESS ---
+set -e         # Exit immediately if a command exits with a non-zero status.
+set -u         # Treat unset variables as an error when substituting.
+set -o pipefail # The return value of a pipeline is the status of the last command to exit with a non-zero status.
+# set -x       # Uncomment for debugging: print commands and their arguments as they are executed.
+
+# --- TRAP FOR GRACEFUL EXIT ---
+# This function runs when the script exits, regardless of how it exits (success or error).
+function cleanup_and_exit {
+    local exit_code=$? # Capture the exit code of the last command before the trap
+    echo "Script finished at $(date) with exit code ${exit_code}" | tee -a "${path_log}"
+    # You can add cleanup commands here, e.g., rm -rf /tmp/my_temp_dir
+    exit "${exit_code}" # Explicitly exit with the captured code
+}
+trap cleanup_and_exit EXIT # Register the cleanup function to be called on EXIT
+
+
 # --- SECTION 1: USER CONFIGURATION & ARGUMENT PARSING ---
 
 # Parse Command-Line Arguments
 # Now, $3 and $4 are expected to be the full relative paths to the files
 if [ "$#" -ne 4 ]; then
     echo "Usage: sbatch $0 <dataset_id> <assembler_id> <raw_reads_fullpath> <draft_assembly_fullpath>" | tee /dev/stderr
-    echo "Example: sbatch $0 lr-even flye data/raw/lr-even/lr-even_raw.fastq data/flye/lr-even/assembly.fasta" | tee /dev/stderr
-    exit 1
+    exit 1 # Script will exit here with code 1 if arguments are incorrect
 fi
 
 declare -r DATASET_ID="$1"          # e.g., lr-even
@@ -38,11 +54,11 @@ declare -r DRAFT_ASSEMBLY_FULLPATH="$4" # e.g., data/flye/lr-even/assembly.fasta
 # Verify input files exist before proceeding
 if [ ! -f "${RAW_READS_FULLPATH}" ]; then
     echo "ERROR: Raw reads file not found: ${RAW_READS_FULLPATH}" | tee /dev/stderr
-    exit 1
+    exit 1 # Script will exit here with code 1 if file not found
 fi
 if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
     echo "ERROR: Draft assembly file not found: ${DRAFT_ASSEMBLY_FULLPATH}" | tee /dev/stderr
-    exit 1
+    exit 1 # Script will exit here with code 1 if file not found
 fi
 
 # Conda Environment Names (These were from the previous working version)
@@ -66,7 +82,7 @@ declare -r RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${DATASET_ID}_assembly_racon
 
 # Detailed command log file (separate from SLURM's job logs)
 declare -r LOG_DIR="data/${ASSEMBLER_ID}/logs/polished"
-mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
+mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}" | tee /dev/stderr; exit 1; }
 declare -r path_log="${LOG_DIR}/script_commands_${ASSEMBLER_ID}_${DATASET_ID}.log"
 
 # Clear the log file at the start of the script
@@ -92,7 +108,7 @@ MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus
 # QUAST_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/quast.py" # Example if Quast is in medaka env
 
 # Create a directory for output
-mkdir -p "${POLISHED_DIR}" || { echo "ERROR: Could not create output directory ${POLISHED_DIR}"; exit 1; }
+mkdir -p "${POLISHED_DIR}" || { echo "ERROR: Could not create output directory ${POLISHED_DIR}" | tee /dev/stderr; exit 1; }
 
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
@@ -104,7 +120,8 @@ echo "Running Minimap2..." | tee -a "${path_log}"
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
-    > "${RACON_OVERLAP}" 2>> "${path_log}" # Changed to 2>> for stderr to log file
+    > "${RACON_OVERLAP}" 2>> "${path_log}"
+# Explicit check here is still good for specific error message, even with set -e
 if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed." | tee -a "${path_log}"; exit 1; fi
 
 ### Racon into same folder
@@ -121,7 +138,8 @@ if [ $? -ne 0 ]; then echo "ERROR: Racon failed." | tee -a "${path_log}"; exit 1
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Medaka Stage ##########" | tee -a "${path_log}"
 
-mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; } | tee -a "${path_log}"
+# Corrected mkdir -p error handling
+mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}" | tee /dev/stderr; exit 1; }
 
 echo "Running Medaka consensus..." | tee -a "${path_log}"
 "${MEDAKA_CONSENSUS_BIN}" \
@@ -138,7 +156,7 @@ echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
 
 # Placeholder for Quast command (uncomment and adjust when ready)
 # declare -r QUAST_OUTPUT_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/quast_results"
-# mkdir -p "${QUAST_OUTPUT_DIR}" || { echo "ERROR: Could not create Quast output directory ${QUAST_OUTPUT_DIR}"; exit 1; }
+# mkdir -p "${QUAST_OUTPUT_DIR}" || { echo "ERROR: Could not create Quast output directory ${QUAST_OUTPUT_DIR}" | tee /dev/stderr; exit 1; }
 # echo "Running Quast..." | tee -a "${path_log}"
 # "${QUAST_BIN}" \
 #     "${MEDAKA_OUTPUT_DIR}/consensus.fasta" \
@@ -146,4 +164,4 @@ echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
 #     -t 24 2>&1 | tee -a "${path_log}"
 # if [ $? -ne 0 ]; then echo "ERROR: Quast failed." | tee -a "${path_log}"; exit 1; fi
 
-echo "Script finished at $(date)" | tee -a "${path_log}"
+# The 'trap' function handles the final "Script finished" message.
