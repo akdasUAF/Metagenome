@@ -19,6 +19,17 @@ module load slurm
 
 ulimit -l unlimited
 
+CONDA_ACTIVATE_SCRIPT="/home/wwinnett/miniconda3/etc/profile.d/conda.sh"
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before sourcing conda.sh: $PATH" | tee -a "${path_log}"
+if [ -f "${CONDA_ACTIVATE_SCRIPT}" ]; then
+    . "${CONDA_ACTIVATE_SCRIPT}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after sourcing conda.sh: $PATH" | tee -a "${path_log}"
+else
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Conda activate script not found at ${CONDA_ACTIVATE_SCRIPT}" | tee -a "${path_log}"
+    exit 1
+fi
+
 # Define variables for dataset and assembler
 dataset="lr-even"
 assembler="flye"
@@ -32,7 +43,6 @@ RACON_OVERLAP="${POLISHED_DIR}/overlap_${assembler}_${dataset}.paf"
 RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${dataset}_assembly_racon.fasta"
 
 # Define the path for the detailed command log file
-# It's good to make this distinct from the SLURM output logs to capture granular command output.
 LOG_DIR="data/${assembler}/logs/polished" # Define log directory
 mkdir -p "${LOG_DIR}" # Ensure log directory exists
 path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
@@ -41,11 +51,6 @@ path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
 > "${path_log}"
 
 echo "Script started at $(date)" | tee -a "${path_log}" # Log script start time
-
-# --- DIAGNOSTIC: Check PATH before any Conda actions ---
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before Conda hook: $PATH" | tee -a "${path_log}"
-eval "$(conda shell.bash hook)"
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after Conda hook: $PATH" | tee -a "${path_log}"
 
 
 # Create a directory for output
@@ -62,13 +67,12 @@ conda activate align_minimap2 | tee -a "${path_log}"
 echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after align_minimap2 activation: $PATH" | tee -a "${path_log}"
 
 echo "Running Minimap2..." | tee -a "${path_log}"
-# Create map alignment for racon
 minimap2 \
     -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY}" \
     "${RAW_READS}" \
-    > "${RACON_OVERLAP}" 2>&1 | tee -a "${path_log}" # Redirect stderr to stdout before piping to tee
+    > "${RACON_OVERLAP}" 2>&1 | tee -a "${path_log}"
 
 
 ### Racon into same folder
@@ -83,7 +87,7 @@ racon \
     "${RAW_READS}" \
     "${RACON_OVERLAP}" \
     "${DRAFT_ASSEMBLY}" \
-    > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}" # Redirect stderr to stdout before piping to tee
+    > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}"
 
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
@@ -97,7 +101,6 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after medaka activation: $PATH" 
 mkdir -p "${MEDAKA_OUTPUT_DIR}" | tee -a "${path_log}"
 
 echo "Running Medaka consensus..." | tee -a "${path_log}"
-# Consensus model with the super accuracy model r941_min_sup_g507
 medaka_consensus \
     -i "${RAW_READS}" \
     -d "${RACON_POLISHED_ASSEMBLY}" \
@@ -110,7 +113,7 @@ medaka_consensus \
 echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
 # Setup environment
 echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before quast activation: $PATH" | tee -a "${path_log}"
-conda activate medaka | tee -a "${path_log}" # Assuming Quast is in medaka env, or change to quast env
+conda activate medaka | tee -a "${path_log}"
 echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after quast activation: $PATH" | tee -a "${path_log}"
 
 # Placeholder for Quast command (you can uncomment and adjust when you add the full command)
