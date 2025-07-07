@@ -18,7 +18,6 @@ module purge
 module load slurm
 
 ulimit -l unlimited
-eval "$(conda shell.bash hook)"
 
 # Define variables for dataset and assembler
 dataset="lr-even"
@@ -43,6 +42,11 @@ path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
 
 echo "Script started at $(date)" | tee -a "${path_log}" # Log script start time
 
+# --- DIAGNOSTIC: Check PATH before any Conda actions ---
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before Conda hook: $PATH" | tee -a "${path_log}"
+eval "$(conda shell.bash hook)"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after Conda hook: $PATH" | tee -a "${path_log}"
+
 
 # Create a directory for output
 mkdir -p "${POLISHED_DIR}" | tee -a "${path_log}"
@@ -53,7 +57,9 @@ echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
 
 ###  Run Minimap First to generate an alignment
 # Setup environment
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before align_minimap2 activation: $PATH" | tee -a "${path_log}"
 conda activate align_minimap2 | tee -a "${path_log}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after align_minimap2 activation: $PATH" | tee -a "${path_log}"
 
 echo "Running Minimap2..." | tee -a "${path_log}"
 # Create map alignment for racon
@@ -67,7 +73,9 @@ minimap2 \
 
 ### Racon into same folder
 # Setup environment
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before racon activation: $PATH" | tee -a "${path_log}"
 conda activate racon | tee -a "${path_log}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after racon activation: $PATH" | tee -a "${path_log}"
 
 echo "Running Racon..." | tee -a "${path_log}"
 racon \
@@ -82,7 +90,10 @@ racon \
 echo "########## Running Medaka Stage ##########" | tee -a "${path_log}"
 
 # Setup environment
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before medaka activation: $PATH" | tee -a "${path_log}"
 conda activate medaka | tee -a "${path_log}"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after medaka activation: $PATH" | tee -a "${path_log}"
+
 mkdir -p "${MEDAKA_OUTPUT_DIR}" | tee -a "${path_log}"
 
 echo "Running Medaka consensus..." | tee -a "${path_log}"
@@ -92,13 +103,15 @@ medaka_consensus \
     -d "${RACON_POLISHED_ASSEMBLY}" \
     -o "${MEDAKA_OUTPUT_DIR}" \
     -m r941_min_sup_g507 \
-    -t 24 2>&1 | tee -a "${path_log}" # Redirect stderr to stdout before piping to tee
+    -t 24 2>&1 | tee -a "${path_log}"
 
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
 # Setup environment
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before quast activation: $PATH" | tee -a "${path_log}"
 conda activate medaka | tee -a "${path_log}" # Assuming Quast is in medaka env, or change to quast env
+echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after quast activation: $PATH" | tee -a "${path_log}"
 
 # Placeholder for Quast command (you can uncomment and adjust when you add the full command)
 # QUAST_OUTPUT_DIR="data/${assembler}/${dataset}/quast_results"
@@ -113,21 +126,13 @@ echo "Script finished at $(date)" | tee -a "${path_log}"
 
 #### Ignore this this is for later. But keep it
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-########## Run Quast
+########## Run Busco
 # Setup environment
-# conda activate 
-
-
-
-
-# ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-# ########## Run Busco
-# # Setup environment
 # conda activate ana_busco
 
 # busco --auto-lineage-prok \
-# 	-c 24 \
-# 	-i $RAW_READS \
-# 	-o $path_output \
-# 	-m genome \
-# 	| tee $path_log
+#   -c 24 \
+#   -i $RAW_READS \
+#   -o $path_output \
+#   -m genome \
+#   | tee $path_log
