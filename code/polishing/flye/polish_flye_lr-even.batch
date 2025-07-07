@@ -13,7 +13,6 @@
 #SBATCH --error=data/flye/logs/polished/log_slurm_flye_lr-even_%j_err.log
 
 ## Clean out any modules, then reload slurm
-# Since conda will be used, no other modules will be loaded
 module purge
 module load slurm
 
@@ -32,35 +31,22 @@ RACON_OVERLAP="${POLISHED_DIR}/overlap_${assembler}_${dataset}.paf"
 RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${dataset}_assembly_racon.fasta"
 
 # Define the path for the detailed command log file
-LOG_DIR="data/${assembler}/logs/polished" # Define log directory
-mkdir -p "${LOG_DIR}" # Ensure log directory exists
+LOG_DIR="data/${assembler}/logs/polished"
+mkdir -p "${LOG_DIR}"
+path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
 
-# Clear the log file at the start of the script (MOVED THIS LINE)
+# Clear the log file at the start of the script
 > "${path_log}"
 
-echo "Script started at $(date)" | tee -a "${path_log}" # Log script start time
+echo "Script started at $(date)" | tee -a "${path_log}"
 
-# --- DIAGNOSTIC: Check PATH before any Conda actions ---
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before sourcing conda.sh: $PATH" | tee -a "${path_log}"
 
-# --- IMPORTANT CHANGE HERE: Source conda.sh directly with 'source' keyword ---
-CONDA_ACTIVATE_SCRIPT="/home/wwinnett/miniconda3/etc/profile.d/conda.sh" # MAKE SURE THIS IS YOUR EXACT PATH!
-if [ -f "${CONDA_ACTIVATE_SCRIPT}" ]; then
-    source "${CONDA_ACTIVATE_SCRIPT}" # Use 'source' keyword
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after sourcing conda.sh: $PATH" | tee -a "${path_log}"
-else
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] Conda activate script not found at ${CONDA_ACTIVATE_SCRIPT}" | tee -a "${path_log}"
-    exit 1
-fi
-
-# --- IMPORTANT CHANGE: Activate base and deactivate to initialize Conda fully ---
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Attempting to activate/deactivate base to init Conda functions..." | tee -a "${path_log}"
-conda activate base # This should change the PATH
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after activating base: $PATH" | tee -a "${path_log}"
-conda deactivate # This should revert/clean the PATH
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after deactivating base: $PATH" | tee -a "${path_log}"
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] Conda should now be fully initialized." | tee -a "${path_log}"
-
+# --- HARDCODED TOOL PATHS (NOW WITH YOUR EXACT PATHS) ---
+MINIMAP2_BIN="/home/wwinnett/miniconda3/envs/align_minimap2/bin/minimap2"
+RACON_BIN="/home/wwinnett/miniconda3/envs/racon/bin/racon"
+MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus"
+# If you add Quast later, find its path similarly:
+# QUAST_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/quast.py" # Example if Quast is in medaka env
 
 # Create a directory for output
 mkdir -p "${POLISHED_DIR}" | tee -a "${path_log}"
@@ -69,14 +55,8 @@ mkdir -p "${POLISHED_DIR}" | tee -a "${path_log}"
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
 
-###  Run Minimap First to generate an alignment
-# Setup environment
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before align_minimap2 activation: $PATH" | tee -a "${path_log}"
-conda activate align_minimap2 | tee -a "${path_log}"
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after align_minimap2 activation: $PATH" | tee -a "${path_log}"
-
 echo "Running Minimap2..." | tee -a "${path_log}"
-minimap2 \
+"${MINIMAP2_BIN}" \
     -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY}" \
@@ -85,13 +65,8 @@ minimap2 \
 
 
 ### Racon into same folder
-# Setup environment
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before racon activation: $PATH" | tee -a "${path_log}"
-conda activate racon | tee -a "${path_log}"
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after racon activation: $PATH" | tee -a "${path_log}"
-
 echo "Running Racon..." | tee -a "${path_log}"
-racon \
+"${RACON_BIN}" \
     -t 24 \
     "${RAW_READS}" \
     "${RACON_OVERLAP}" \
@@ -102,15 +77,10 @@ racon \
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Medaka Stage ##########" | tee -a "${path_log}"
 
-# Setup environment
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before medaka activation: $PATH" | tee -a "${path_log}"
-conda activate medaka | tee -a "${path_log}"
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after medaka activation: $PATH" | tee -a "${path_log}"
-
 mkdir -p "${MEDAKA_OUTPUT_DIR}" | tee -a "${path_log}"
 
 echo "Running Medaka consensus..." | tee -a "${path_log}"
-medaka_consensus \
+"${MEDAKA_CONSENSUS_BIN}" \
     -i "${RAW_READS}" \
     -d "${RACON_POLISHED_ASSEMBLY}" \
     -o "${MEDAKA_OUTPUT_DIR}" \
@@ -120,31 +90,14 @@ medaka_consensus \
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
-# Setup environment
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH before quast activation: $PATH" | tee -a "${path_log}"
-conda activate medaka | tee -a "${path_log}"
-echo "$(date '+%Y-%m-%d %H:%M:%S') [DEBUG] PATH after quast activation: $PATH" | tee -a "${path_log}"
 
-# Placeholder for Quast command (you can uncomment and adjust when you add the full command)
+# Placeholder for Quast command (uncomment and adjust when ready)
 # QUAST_OUTPUT_DIR="data/${assembler}/${dataset}/quast_results"
-# mkdir -p "$(dirname "${QUAST_OUTPUT_DIR}")" | tee -a "${path_log}" # Ensure parent dir for quast exists
+# mkdir -p "$(dirname "${QUAST_OUTPUT_DIR}")" | tee -a "${path_log}"
 # echo "Running Quast..." | tee -a "${path_log}"
-# quast.py \
+# "${QUAST_BIN}" \
 #     "${MEDAKA_OUTPUT_DIR}/consensus.fasta" \
 #     -o "${QUAST_OUTPUT_DIR}" \
 #     -t 24 2>&1 | tee -a "${path_log}"
 
 echo "Script finished at $(date)" | tee -a "${path_log}"
-
-#### Ignore this this is for later. But keep it
-###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-########## Run Busco
-# Setup environment
-# conda activate ana_busco
-
-# busco --auto-lineage-prok \
-#   -c 24 \
-#   -i $RAW_READS \
-#   -o $path_output \
-#   -m genome \
-#   | tee $path_log
