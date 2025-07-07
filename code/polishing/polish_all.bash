@@ -40,12 +40,14 @@ sbatch code/polishing/polish.batch "lr-ms" "flye" "data/raw/lr-ms/lr-ms_raw.fast
 
 
 ######## CANU
+sbatch code/polishing/polish.batch "lr-even" "canu" "data/raw/lr-even/lr-even_raw.fastq" "data/canu/lr-even/lr-even_task.contigs.fasta"
 sbatch code/polishing/polish.batch "lr-log" "canu" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/canu/lr-log/lr-log_task.contigs.fasta"
 sbatch code/polishing/polish.batch "lr-ms" "canu" "data/raw/lr-ms/lr-ms_raw.fastq" "data/canu/lr-ms/lr-ms_task.contigs.fasta"
 
 
 
 ######## RAVEN
+sbatch code/polishing/polish.batch "lr-even" "raven" "data/raw/lr-even/lr-even_raw.fastq" "data/raven/lr-even/assembly_raven_lr-even.fasta"
 sbatch code/polishing/polish.batch "lr-log" "raven" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/raven/lr-log/assembly_raven_lr-log.fasta"
 sbatch code/polishing/polish.batch "lr-ms" "raven" "data/raw/lr-ms/lr-ms_raw.fastq" "data/raven/lr-ms/assembly_raven_lr-ms.fasta"
 
