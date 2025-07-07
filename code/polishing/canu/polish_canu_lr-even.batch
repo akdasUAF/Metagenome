@@ -58,10 +58,6 @@ conda activate align_minimap2 | tee -a "${path_log}"
 
 echo "Running Minimap2..." | tee -a "${path_log}"
 # Create map alignment for racon
-# Note: tee here will capture the *stdout* of minimap2.
-# Minimap2 typically prints progress to stderr, and the PAF to stdout.
-# If you want stderr too, you'd use '2>&1 | tee -a "$path_log"'.
-# For now, it will capture only the PAF if minimap2 prints non-PAF info to stdout.
 minimap2 \
     -ax map-ont \
     -t 24 \

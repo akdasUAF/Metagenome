@@ -53,7 +53,7 @@ echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
 
 ###  Run Minimap First to generate an alignment
 # Setup environment
-eval "$(conda shell.bash hook)" | tee -a "${path_log}"
+
 conda activate align_minimap2 | tee -a "${path_log}"
 
 echo "Running Minimap2..." | tee -a "${path_log}"
@@ -68,7 +68,7 @@ minimap2 \
 
 ### Racon into same folder
 # Setup environment
-eval "$(conda shell.bash hook)" | tee -a "${path_log}"
+
 conda activate racon | tee -a "${path_log}"
 
 echo "Running Racon..." | tee -a "${path_log}"
@@ -84,7 +84,7 @@ racon \
 echo "########## Running Medaka Stage ##########" | tee -a "${path_log}"
 
 # Setup environment
-eval "$(conda shell.bash hook)" | tee -a "${path_log}"
+
 conda activate medaka | tee -a "${path_log}"
 mkdir -p "${MEDAKA_OUTPUT_DIR}" | tee -a "${path_log}"
 
@@ -101,7 +101,7 @@ medaka_consensus \
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
 # Setup environment
-eval "$(conda shell.bash hook)" | tee -a "${path_log}"
+
 conda activate medaka | tee -a "${path_log}" # Assuming Quast is in medaka env, or change to quast env
 
 # Placeholder for Quast command
