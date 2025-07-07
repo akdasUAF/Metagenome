@@ -101,7 +101,7 @@ echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
 echo "Running Minimap2..." | tee -a "${path_log}"
 
 conda run -n "${MINIMAP2_ENV_NAME}" minimap2 \
-    -ax map-ont \
+    -x map-ont \
     -c \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
