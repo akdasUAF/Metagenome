@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=24
+#SBATCH --tasks-per-node=24
+#If running on the bio or analysis queue add:
+####SBATCH --mem=214G
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+#SBATCH --job-name="panmeta_align_flye_lr-log"
+#SBATCH --output=data/flye/logs/polished/log_slurm_flye_lr-log_%j.log
+#SBATCH --error=data/flye/logs/polished/log_slurm_flye_lr-log_%j_err.log
+
+## Clean out any modules, then reload slurm
+# Since conda will be used, no other modules will be loaded
+module purge
+module load slurm
+
+ulimit -l unlimited
+
+eval "$(conda shell.bash hook)"
+
+conda activate asm_miniasm
+mkdir -p data/flye/lr-log/polished/
+
+minimap2 -ax map-ont -t 24 data/flye/lr-log/assembly.fasta data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq > data/flye/lr-log/polished/overlap_flye_lr-log.paf
