@@ -22,7 +22,6 @@ ulimit -l unlimited
 eval "$(conda shell.bash hook)"
 
 conda activate asm_miniasm
-mkdir -p data/flye/lr-log/polished/
-
+mkdir -p data/flye/lr-even/polished/
 
 minimap2 -ax map-ont -t 24 data/flye/lr-even/assembly.fasta data/raw/lr-even/lr-even_raw.fastq > data/flye/lr-even/polished/overlap_flye_lr-even.paf

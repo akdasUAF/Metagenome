@@ -24,4 +24,4 @@ eval "$(conda shell.bash hook)"
 conda activate asm_miniasm
 mkdir -p data/raven/lr-log/polished/
 
-minimap2 -ax map-ont -t 24 data/raven/lr-log/assembly_raven_lr-log.fasta Zymo-GridION-LOG-BB-SN.fq > data/raven/lr-log/polished/overlap_raven_lr-log.paf
+minimap2 -ax map-ont -t 24 data/raven/lr-log/assembly_raven_lr-log.fasta data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq > data/raven/lr-log/polished/overlap_raven_lr-log.paf
