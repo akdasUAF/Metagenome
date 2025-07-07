@@ -8,24 +8,23 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_align_flye_lr-ms"
-#SBATCH --output=data/flye/logs/polished/log_slurm_flye_lr-ms_%j.log
-#SBATCH --error=data/flye/logs/polished/log_slurm_flye_lr-ms_%j_err.log
+#SBATCH --job-name="panmeta_align_raven_lr-ms"
+#SBATCH --output=data/raven/logs/polished/log_slurm_raven_lr-ms_%j.log
+#SBATCH --error=data/raven/logs/polished/log_slurm_raven_lr-ms_%j_err.log
 
 ## Clean out any modules, then reload slurm
-# Since conda will be used, no other modules will be loaded
 module purge
 module load slurm
 
 ulimit -l unlimited
-eval "$(conda shell.bash hook)"
 
 # Define variables for dataset and assembler
 dataset="lr-ms"
-assembler="flye"
+assembler="raven"
+RAW_READS="data/raw/${dataset}/${dataset}_raw.fastq"
+
 
 # Define paths using the variables for better maintainability
-RAW_READS="data/raw/${dataset}/${dataset}_raw.fastq"
 DRAFT_ASSEMBLY="data/${assembler}/${dataset}/assembly.fasta"
 POLISHED_DIR="data/${assembler}/${dataset}/polished"
 MEDAKA_OUTPUT_DIR="data/${assembler}/${dataset}/medaka" # Medaka has its own output dir
@@ -33,16 +32,22 @@ RACON_OVERLAP="${POLISHED_DIR}/overlap_${assembler}_${dataset}.paf"
 RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${dataset}_assembly_racon.fasta"
 
 # Define the path for the detailed command log file
-# It's good to make this distinct from the SLURM output logs to capture granular command output.
-LOG_DIR="data/${assembler}/logs/polished" # Define log directory
-mkdir -p "${LOG_DIR}" # Ensure log directory exists
+LOG_DIR="data/${assembler}/logs/polished"
+mkdir -p "${LOG_DIR}"
 path_log="${LOG_DIR}/script_commands_${assembler}_${dataset}.log"
 
 # Clear the log file at the start of the script
 > "${path_log}"
 
-echo "Script started at $(date)" | tee -a "${path_log}" # Log script start time
+echo "Script started at $(date)" | tee -a "${path_log}"
 
+
+# --- HARDCODED TOOL PATHS (NOW WITH YOUR EXACT PATHS) ---
+MINIMAP2_BIN="/home/wwinnett/miniconda3/envs/align_minimap2/bin/minimap2"
+RACON_BIN="/home/wwinnett/miniconda3/envs/racon/bin/racon"
+MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus"
+# If you add Quast later, find its path similarly:
+# QUAST_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/quast.py" # Example if Quast is in medaka env
 
 # Create a directory for output
 mkdir -p "${POLISHED_DIR}" | tee -a "${path_log}"
@@ -51,89 +56,49 @@ mkdir -p "${POLISHED_DIR}" | tee -a "${path_log}"
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
 
-###  Run Minimap First to generate an alignment
-# Setup environment
- 
-conda activate align_minimap2 | tee -a "${path_log}"
-
 echo "Running Minimap2..." | tee -a "${path_log}"
-# Create map alignment for racon
-minimap2 \
+"${MINIMAP2_BIN}" \
     -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY}" \
     "${RAW_READS}" \
-    > "${RACON_OVERLAP}" 2>&1 | tee -a "${path_log}" # Redirect stderr to stdout before piping to tee
+    > "${RACON_OVERLAP}" 2>&1 | tee -a "${path_log}"
 
 
 ### Racon into same folder
-# Setup environment
- 
-conda activate racon | tee -a "${path_log}"
-
 echo "Running Racon..." | tee -a "${path_log}"
-racon \
+"${RACON_BIN}" \
     -t 24 \
     "${RAW_READS}" \
     "${RACON_OVERLAP}" \
     "${DRAFT_ASSEMBLY}" \
-    > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}" # Redirect stderr to stdout before piping to tee
+    > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}"
 
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Medaka Stage ##########" | tee -a "${path_log}"
 
-# Setup environment
- 
-conda activate medaka | tee -a "${path_log}"
 mkdir -p "${MEDAKA_OUTPUT_DIR}" | tee -a "${path_log}"
 
 echo "Running Medaka consensus..." | tee -a "${path_log}"
-# Consensus model with the super accuracy model r941_min_sup_g507
-medaka_consensus \
+"${MEDAKA_CONSENSUS_BIN}" \
     -i "${RAW_READS}" \
     -d "${RACON_POLISHED_ASSEMBLY}" \
     -o "${MEDAKA_OUTPUT_DIR}" \
     -m r941_min_sup_g507 \
-    -t 24 2>&1 | tee -a "${path_log}" # Redirect stderr to stdout before piping to tee
+    -t 24 2>&1 | tee -a "${path_log}"
 
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
 echo "########## Running Quast Stage ##########" | tee -a "${path_log}"
-# Setup environment
- 
-conda activate medaka | tee -a "${path_log}" # Assuming Quast is in medaka env, or change to quast env
 
-# Placeholder for Quast command (you can uncomment and adjust when you add the full command)
+# Placeholder for Quast command (uncomment and adjust when ready)
 # QUAST_OUTPUT_DIR="data/${assembler}/${dataset}/quast_results"
-# mkdir -p "$(dirname "${QUAST_OUTPUT_DIR}")" | tee -a "${path_log}" # Ensure parent dir for quast exists
+# mkdir -p "$(dirname "${QUAST_OUTPUT_DIR}")" | tee -a "${path_log}"
 # echo "Running Quast..." | tee -a "${path_log}"
-# quast.py \
+# "${QUAST_BIN}" \
 #     "${MEDAKA_OUTPUT_DIR}/consensus.fasta" \
 #     -o "${QUAST_OUTPUT_DIR}" \
 #     -t 24 2>&1 | tee -a "${path_log}"
 
 echo "Script finished at $(date)" | tee -a "${path_log}"
-
-#### Ignore this this is for later. But keep it
-###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-########## Run Quast
-# Setup environment
-# eval "$(conda shell.bash hook)"
-# conda activate 
-
-
-
-
-# ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-# ########## Run Busco
-# # Setup environment
-# eval "$(conda shell.bash hook)"
-# conda activate ana_busco
-
-# busco --auto-lineage-prok \
-# 	-c 24 \
-# 	-i $RAW_READS \
-# 	-o $path_output \
-# 	-m genome \
-# 	| tee $path_log

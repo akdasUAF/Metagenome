@@ -8,9 +8,9 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
-#SBATCH --job-name="panmeta_align_flye_lr-even"
-#SBATCH --output=data/flye/logs/polished/log_slurm_flye_lr-even_%j.log
-#SBATCH --error=data/flye/logs/polished/log_slurm_flye_lr-even_%j_err.log
+#SBATCH --job-name="panmeta_align_raven_lr-even"
+#SBATCH --output=data/raven/logs/polished/log_slurm_raven_lr-even_%j.log
+#SBATCH --error=data/raven/logs/polished/log_slurm_raven_lr-even_%j_err.log
 
 ## Clean out any modules, then reload slurm
 module purge
@@ -20,10 +20,10 @@ ulimit -l unlimited
 
 # Define variables for dataset and assembler
 dataset="lr-even"
-assembler="flye"
+assembler="raven"
+RAW_READS="data/raw/${dataset}/${dataset}_raw.fastq"
 
 # Define paths using the variables for better maintainability
-RAW_READS="data/raw/${dataset}/${dataset}_raw.fastq"
 DRAFT_ASSEMBLY="data/${assembler}/${dataset}/assembly.fasta"
 POLISHED_DIR="data/${assembler}/${dataset}/polished"
 MEDAKA_OUTPUT_DIR="data/${assembler}/${dataset}/medaka" # Medaka has its own output dir
