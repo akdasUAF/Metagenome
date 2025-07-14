@@ -135,6 +135,8 @@ echo "Deactivating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log
 conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MINIMAP2_ENV_NAME}."; } | tee -a "${path_log}"
 
 
+
+
 # --- SECTION 4: MEDAKA POLISHING ---
 echo "########## Running Medaka Polishing Stage ##########" | tee -a "${path_log}"
 
@@ -147,13 +149,7 @@ conda activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda e
 
 declare -r MEDAKA_MODEL="r941_min_sup_g507"
 
-# CHANGE THIS BLOCK CAREFULLY:
-medaka inference \
-    --reads "${ALIGNED_SORTED_BAM}" \
-    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
-    --out_dir "${MEDAKA_OUTPUT_DIR}" \
-    --model "${MEDAKA_MODEL}" \
-    --threads 24 2>&1 | tee -a "${path_log}"
+medaka inference --reads "${ALIGNED_SORTED_BAM}" --draft "${DRAFT_ASSEMBLY_FULLPATH}" --out_dir "${MEDAKA_OUTPUT_DIR}" --model "${MEDAKA_MODEL}" --threads 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Medaka failed. Exit status: $?." | tee -a "${path_log}"
