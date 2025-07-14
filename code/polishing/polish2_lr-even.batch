@@ -61,9 +61,8 @@ declare -r MEDAKA_OUTPUT_DIR="${POLISHED_BASE_DIR}/medaka_polished"
 declare -r ALIGNMENT_DIR="${POLISHED_BASE_DIR}/alignment"
 mkdir -p "${ALIGNMENT_DIR}" || { echo "ERROR: Could not create alignment directory ${ALIGNMENT_DIR}"; exit 1; }
 
-# NOTE: We are no longer creating MINIMAP2_RAW_SAM as a separate file.
-# The SAM output will be piped directly.
-# declare -r MINIMAP2_RAW_SAM="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sam"
+# Re-introducing explicit SAM file for robust piping
+declare -r MINIMAP2_RAW_SAM_FILE="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sam"
 
 declare -r ALIGNED_SORTED_BAM="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sorted.bam"
 declare -r ALIGNED_SORTED_BAM_IDX="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sorted.bam.bai"
@@ -90,37 +89,54 @@ echo "" | tee -a "${path_log}"
 # --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS ---
 echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########" | tee -a "${path_log}"
 
-echo "Running Minimap2: Aligning reads to draft assembly and piping to Samtools..." | tee -a "${path_log}"
-# The critical change is to pipe minimap2's STDOUT directly to samtools view's STDIN.
-# Minimap2's STDERR (progress messages) are still captured by tee.
-conda run -n "${MINIMAP2_ENV_NAME}" minimap2 -ax map-ont \
+# Activate the minimap2 environment once for the alignment steps
+echo "Activating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
+# Important: 'source activate' is for older conda; 'conda activate' needs 'source' in non-interactive shell
+source activate "${MINIMAP2_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MINIMAP2_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
+
+echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
+# Minimap2 outputs SAM to stdout. We redirect stdout to the explicit SAM file.
+# Stderr (progress) is also logged to the main script log.
+minimap2 -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
-    2> >(tee -a "${path_log}" >&2) | \ # Redirect stderr to tee, then back to stderr, while stdout goes to pipe
-conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 - | \ # Read SAM from stdin (-)
-conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+    > "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | tee -a "${path_log}"
 
-# Check the exit status of the entire pipeline
-if [ $? -ne 0 ]; then echo "ERROR: Alignment pipeline (Minimap2 & Samtools) failed." | tee -a "${path_log}"; exit 1; fi
+if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM file." | tee -a "${path_log}"; exit 1; fi
 
+echo "Filtering and sorting SAM to BAM using Samtools..." | tee -a "${path_log}"
+# Samtools view reads from the explicit SAM file, pipes to Samtools sort,
+# which then writes to the final sorted BAM file.
+samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" | \
+samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+
+if [ $? -ne 0 ]; then echo "ERROR: Samtools conversion/sorting failed." | tee -a "${path_log}"; exit 1; fi
 
 echo "Indexing sorted BAM file..." | tee -a "${path_log}"
-# samtools index: create BAM index (.bai)
-conda run -n "${MINIMAP2_ENV_NAME}" samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+# Samtools index works on the final BAM file.
+samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Samtools indexing failed." | tee -a "${path_log}"; exit 1; fi
+
+# Deactivate the minimap2 environment
+echo "Deactivating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
+conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MINIMAP2_ENV_NAME}."; } | tee -a "${path_log}"
 
 
 # --- SECTION 4: MEDAKA POLISHING ---
 echo "########## Running Medaka Polishing Stage ##########" | tee -a "${path_log}"
 
-mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; } | tee -a "${path_log}";
+mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; } | tee -a "${path_log}"
 
 echo "Running Medaka inference (polishing)..." | tee -a "${path_log}"
 
-conda run -n "${MEDAKA_ENV_NAME}" medaka \
+# Activate the medaka environment for medaka command
+echo "Activating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
+source activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MEDAKA_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
+
+medaka \
     inference \
-    --reads "${ALIGNED_SORTED_BAM}" \ # This is now correctly pointing to the BAM file
+    --reads "${ALIGNED_SORTED_BAM}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
     --model r941_min_high_g360 \
@@ -130,6 +146,10 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Medaka failed." | tee -a "${path_log}"
     exit 1
 fi
+
+# Deactivate the medaka environment
+echo "Deactivating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
+conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MEDAKA_ENV_NAME}."; } | tee -a "${path_log}"
 
 echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUTPUT_DIR}/consensus.fasta" | tee -a "${path_log}"
 

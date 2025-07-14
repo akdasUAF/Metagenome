@@ -57,7 +57,7 @@ sbatch code/polishing/polish2_lr-even.batch "lr-ms" "flye" "data/raw/lr-ms/lr-ms
 sbatch code/polishing/polish2_lr-even.batch "lr-even" "canu" "data/raw/lr-even/lr-even_raw.fastq" "data/canu/lr-even/lr-even_task.contigs.fasta"
 # 430244
 sbatch code/polishing/polish2_lr-even.batch "lr-log" "canu" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/canu/lr-log/lr-log_task.contigs.fasta"
-# 430245
+# 430251
 sbatch code/polishing/polish2_lr-even.batch "lr-ms" "canu" "data/raw/lr-ms/lr-ms_raw.fastq" "data/canu/lr-ms/lr-ms_task.contigs.fasta"
 
 
