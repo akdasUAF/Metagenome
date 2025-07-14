@@ -17,10 +17,9 @@ module load slurm
 
 ulimit -l unlimited
 
-# --- START CONDA INITIALIZATION ---
-# This block explicitly sources the conda.sh script, which is crucial for
-# 'conda activate' to work reliably in non-interactive batch environments.
-# Ensure the path to your miniconda3 is correct.
+# --- START CONDA INITIALIZATION (Still good practice to source conda.sh once) ---
+# This block explicitly sources the conda.sh script, which is useful for
+# ensuring 'conda' command is available in the shell, even if 'conda run' is used.
 CONDA_BASE=$(conda info --base)
 if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
     . "${CONDA_BASE}/etc/profile.d/conda.sh"
@@ -102,62 +101,59 @@ echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
 echo "" | tee -a "${path_log}"
 
 
-# --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS ---
+# --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS (USING CONDA RUN) ---
 echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########" | tee -a "${path_log}"
 
-echo "Activating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
-conda activate "${MINIMAP2_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MINIMAP2_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
-
-set -o pipefail # Added for robust pipeline error checking
-
 echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
-minimap2 -ax map-ont \
+set -o pipefail # Added for robust pipeline error checking
+conda run -n "${MINIMAP2_ENV_NAME}" minimap2 -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
-    > "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}"
+    > "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}" # SAM output to file, stderr to log
 
 if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM file. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 echo "Filtering and sorting SAM to BAM using Samtools..." | tee -a "${path_log}"
-samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | \
-samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+# Samtools commands also use conda run
+conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | \
+conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then echo "ERROR: Samtools conversion/sorting failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 echo "Indexing sorted BAM file..." | tee -a "${path_log}"
-samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+# Samtools index also uses conda run
+conda run -n "${MINIMAP2_ENV_NAME}" samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Samtools indexing failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 set +o pipefail # Reset pipefail option
 
-echo "Deactivating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
-conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MINIMAP2_ENV_NAME}."; } | tee -a "${path_log}"
+# Removed explicit deactivate as conda run handles environment context for each command
 
 
-
-
-# --- SECTION 4: MEDAKA POLISHING ---
+# --- SECTION 4: MEDAKA POLISHING (USING CONDA RUN) ---
 echo "########## Running Medaka Polishing Stage ##########" | tee -a "${path_log}"
 
 mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; } | tee -a "${path_log}"
 
 echo "Running Medaka inference (polishing)..." | tee -a "${path_log}"
 
-echo "Activating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
-conda activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MEDAKA_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
+declare -r MEDAKA_MODEL="r941_min_sup_g507" # Confirmed this model is available for Medaka 2.1.0
 
-declare -r MEDAKA_MODEL="r941_min_sup_g507"
-
-medaka inference --reads "${ALIGNED_SORTED_BAM}" --draft "${DRAFT_ASSEMBLY_FULLPATH}" --out_dir "${MEDAKA_OUTPUT_DIR}" --model "${MEDAKA_MODEL}" --threads 24 2>&1 | tee -a "${path_log}"
+# Medaka command uses conda run
+conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
+    --reads "${ALIGNED_SORTED_BAM}" \
+    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
+    --out_dir "${MEDAKA_OUTPUT_DIR}" \
+    --model "${MEDAKA_MODEL}" \
+    --threads 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Medaka failed. Exit status: $?." | tee -a "${path_log}"
     exit 1
 fi
 
-echo "Deactivating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
-conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MEDAKA_ENV_NAME}."; } | tee -a "${path_log}"
+# Removed explicit deactivate as conda run handles environment context for each command
 
 echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUTPUT_DIR}/consensus.fasta" | tee -a "${path_log}"
 
