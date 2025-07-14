@@ -145,20 +145,10 @@ echo "Running Medaka inference (polishing)..." | tee -a "${path_log}"
 echo "Activating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
 conda activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MEDAKA_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
 
-# MEDAKA 2.1.0 MODEL SELECTION
-# For Medaka 2.x, the `--model` flag typically takes a "model family" name,
-# rather than specific model files like 'r941_min_high_g360' or 'r941_e81_sup'.
-# Medaka 2.x often infers the exact model from the BAM header or uses a more generic name.
-# Given R9.4.1 chemistry and "super-accuracy" preference,
-# common model family names are 'r941_hac' (high-accuracy) or 'r941_sup' (super-accuracy).
-# Since 'r941_e81_sup' was not recognized, let's try the more generic 'r941_sup'
-# based on your previous 'r941_min_sup_g507' usage, assuming this implies 'super' accuracy.
-# If 'r941_sup' still doesn't work, 'r941_hac' is another common fallback for R9.4.1.
-# The definitive way is to consult Medaka 2.1.0 documentation or experiment.
-declare -r MEDAKA_MODEL="r941_min_sup_g507" # <--- CHANGED MODEL NAME HERE
+declare -r MEDAKA_MODEL="r941_min_sup_g507"
 
-medaka \
-    inference \
+# CHANGE THIS BLOCK CAREFULLY:
+medaka inference \ # <--- Put "inference" on the same line as "medaka", with a single space.
     --reads "${ALIGNED_SORTED_BAM}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
