@@ -150,7 +150,7 @@ source activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda 
 
 medaka \
     inference \
-    --reads "${ALIGNED_SORTED_BAM}" \ # <--- This is the key
+    --reads "${ALIGNED_SORTED_BAM}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
     --model r941_min_high_g360 \
