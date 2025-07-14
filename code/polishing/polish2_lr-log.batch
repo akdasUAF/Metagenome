@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=t1small
+#SBATCH --partition=t1small       # Or your preferred partition
 #SBATCH --ntasks=1                # Total number of tasks
 #SBATCH --cpus-per-task=24        # Number of CPU cores per task (adjust as needed for --threads)
 #SBATCH --mem=64G                 # Total memory for the job (adjust based on assembly/read size)
@@ -40,16 +40,13 @@ declare -r RAW_READS_FULLPATH="$1"
 declare -r DRAFT_ASSEMBLY_FULLPATH="$2"
 
 # Extract base names for consistent output naming
-# This assumes your raw reads are like 'my_reads.fastq' and assembly 'my_draft.fasta'
-# Adjust if your naming conventions are more complex (e.g., use basename -s .fastq)
 RAW_READS_BASENAME=$(basename "$RAW_READS_FULLPATH" | cut -d'.' -f1)
 ASSEMBLY_BASENAME=$(basename "$DRAFT_ASSEMBLY_FULLPATH" | cut -d'.' -f1)
 
-# Conda Environment Name (this is the one you verified has minimap2, samtools, medaka)
+# Conda Environment Name
 declare -r MEDAKA_ENV_NAME="medaka"
 
-# Medaka Model to use (e.g., for R9.4.1 reads; adjust for your chemistry)
-# For R10.4.1, you might use 'r1041_e81_sup_g615' or similar. Check Medaka docs for latest models.
+# Medaka Model to use (adjust for your chemistry)
 declare -r MEDAKA_MODEL="r941_min_sup_g507" 
 
 # --- 2. Derived Paths & Logging Setup ---
@@ -93,64 +90,51 @@ fi
 echo "Current memory usage before alignment:"
 free -h
 
-# --- 3. Alignment with Minimap2 and Samtools ---
-echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########"
+# --- 3. Alignment with mini_align ---
+echo "########## Running Alignment Stage (mini_align) ##########"
 
-# Define temporary and final BAM file paths
-declare -r TEMP_UNSORTED_BAM="${ALIGNMENT_DIR}/reads_to_draft_temp_unsorted.bam"
+# Define final BAM file path (mini_align with -m will create this sorted)
 declare -r ALIGNED_SORTED_BAM="${ALIGNMENT_DIR}/reads_to_draft.sorted.bam"
-declare -r ALIGNED_SORTED_BAM_IDX="${ALIGNED_SORTED_BAM}.bai"
+declare -r ALIGNED_SORTED_BAM_IDX="${ALIGNED_SORTED_BAM}.bai" # For consistency, assuming it needs indexing
 
-echo "Running Minimap2: Aligning reads to draft assembly..."
-set -o pipefail # Ensures that if any command in a pipeline fails, the whole pipeline fails
+echo "Running mini_align: Aligning reads to draft assembly..."
 
-# Use a direct pipe from minimap2 to samtools view to avoid large intermediate SAM file
-# And then redirect samtools view output to the temporary BAM file
-conda run -n "${MEDAKA_ENV_NAME}" minimap2 -ax map-ont \
-    -t "${SLURM_CPUS_PER_TASK}" \
-    "${DRAFT_ASSEMBLY_FULLPATH}" \
-    "${RAW_READS_FULLPATH}" \
-    | conda run -n "${MEDAKA_ENV_NAME}" samtools view -bS -@ "${SLURM_CPUS_PER_TASK}" --verbosity 10 - \
-    > "${TEMP_UNSORTED_BAM}"
+# The -P flag ensures primary alignments only, -m ensures coordinate sorted BAM
+# -p specifies the full path to the output BAM file
+conda run -n "${MEDAKA_ENV_NAME}" mini_align \
+    -i "${RAW_READS_FULLPATH}" \
+    -r "${DRAFT_ASSEMBLY_FULLPATH}" \
+    -P -m \
+    -p "${ALIGNED_SORTED_BAM}" \
+    -t "${SLURM_CPUS_PER_TASK}"
 
 if [ $? -ne 0 ]; then
-    echo "ERROR: Minimap2 to Samtools view pipeline failed. Exit status: $?."
+    echo "ERROR: mini_align failed. Exit status: $?."
     exit 1
 fi
 
-echo "--- Diagnostic: Checking temporary unsorted BAM file ---"
-if [ ! -s "${TEMP_UNSORTED_BAM}" ]; then
-    echo "ERROR: Temporary unsorted BAM file is empty or missing after samtools view: ${TEMP_UNSORTED_BAM}"
+echo "--- Diagnostic: Checking ALIGNED_SORTED_BAM file produced by mini_align ---"
+if [ ! -s "${ALIGNED_SORTED_BAM}" ]; then
+    echo "ERROR: ALIGNED_SORTED_BAM file is empty or missing after mini_align: ${ALIGNED_SORTED_BAM}"
     exit 1
 fi
-ls -lh "${TEMP_UNSORTED_BAM}"
-echo "Running samtools flagstat on unsorted BAM to check integrity:"
-conda run -n "${MEDAKA_ENV_NAME}" samtools flagstat "${TEMP_UNSORTED_BAM}"
+ls -lh "${ALIGNED_SORTED_BAM}"
+echo "Running samtools flagstat on ALIGNED_SORTED_BAM to check integrity:"
+conda run -n "${MEDAKA_ENV_NAME}" samtools flagstat "${ALIGNED_SORTED_BAM}"
 if [ $? -ne 0 ]; then
-    echo "ERROR: samtools flagstat failed on unsorted BAM. This indicates a corrupted BAM header or file."
+    echo "ERROR: samtools flagstat failed on ALIGNED_SORTED_BAM. This indicates a corrupted BAM file produced by mini_align."
     exit 1
 fi
 echo "-------------------------------------------------------"
 
-echo "Sorting temporary BAM file..."
-conda run -n "${MEDAKA_ENV_NAME}" samtools sort -@ "${SLURM_CPUS_PER_TASK}" -o "${ALIGNED_SORTED_BAM}" "${TEMP_UNSORTED_BAM}"
-if [ $? -ne 0 ]; then
-    echo "ERROR: Samtools sorting failed. Exit status: $?."
-    exit 1
-fi
-
-echo "Indexing sorted BAM file..."
+echo "Indexing sorted BAM file (Medaka requires an indexed BAM)..."
+# Even if mini_align produces a sorted BAM, Medaka often requires an accompanying .bai index file.
+# It's safest to explicitly run samtools index.
 conda run -n "${MEDAKA_ENV_NAME}" samtools index -@ "${SLURM_CPUS_PER_TASK}" "${ALIGNED_SORTED_BAM}"
 if [ $? -ne 0 ]; then
     echo "ERROR: Samtools indexing failed. Exit status: $?."
     exit 1
 fi
-
-# Clean up temporary unsorted BAM file
-echo "Cleaning up temporary unsorted BAM file: ${TEMP_UNSORTED_BAM}"
-rm -f "${TEMP_UNSORTED_BAM}"
-
-set +o pipefail # Reset pipefail option
 
 # --- 4. Medaka Polishing ---
 echo "########## Running Medaka Polishing Stage ##########"
