@@ -83,31 +83,44 @@ echo "  Minimap2 Env: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
 echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
 echo "" | tee -a "${path_log}"
 
-# --- NEW SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS ---
+
+
+
+
+# --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS ---
 echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########" | tee -a "${path_log}"
 
+# Define a temporary file for minimap2's output (both stdout and stderr for logging)
+declare -r MINIMAP2_TEMP_LOG="${ALIGNMENT_DIR}/minimap2_temp.log"
+declare -r MINIMAP2_RAW_SAM_FILE="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sam" # Re-introduce explicit SAM file
+
 echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
-# -ax map-ont for Oxford Nanopore reads, -t for threads, -o for output SAM
+# Run minimap2, redirecting all its output (stdout=SAM, stderr=progress) to a temporary file.
 conda run -n "${MINIMAP2_ENV_NAME}" minimap2 -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
-    > "${MINIMAP2_RAW_SAM}" 2>&1 | tee -a "${path_log}" # Redirect stdout to SAM file, stderr to log
-if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM." | tee -a "${path_log}"; exit 1; fi
+    > "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | tee -a "${path_log}" # <-- All output to temp SAM file, also log to main log
 
+if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM file." | tee -a "${path_log}"; exit 1; fi
+
+# Now, filter and sort the *explicitly created SAM file* to BAM
 echo "Filtering and sorting SAM to BAM using Samtools..." | tee -a "${path_log}"
-# samtools view -bS: SAM to BAM conversion
-# samtools sort: sort the BAM by coordinate
-# -o: output file
-# -@: threads for samtools
-conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM}" | \
+conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" | \
 conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+
 if [ $? -ne 0 ]; then echo "ERROR: Samtools conversion/sorting failed." | tee -a "${path_log}"; exit 1; fi
 
 echo "Indexing sorted BAM file..." | tee -a "${path_log}"
-# samtools index: create BAM index (.bai)
 conda run -n "${MINIMAP2_ENV_NAME}" samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Samtools indexing failed." | tee -a "${path_log}"; exit 1; fi
+
+# Optional: Clean up the intermediate SAM file if disk space is a concern
+# rm -f "${MINIMAP2_RAW_SAM_FILE}"
+
+
+
+
 
 
 # --- SECTION 4: MEDAKA POLISHING (PREVIOUSLY SECTION 3) --- # MODIFIED SECTION NUMBER
