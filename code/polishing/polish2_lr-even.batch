@@ -115,11 +115,13 @@ conda run -n "${MINIMAP2_ENV_NAME}" minimap2 -ax map-ont \
 if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM file. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 echo "Filtering and sorting SAM to BAM using Samtools..." | tee -a "${path_log}"
-# Samtools commands also use conda run
-conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | \
-conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+# CRITICAL FIX: Redirect samtools view's stderr to log file (2>> "${path_log}")
+# This ensures only clean BAM output is piped to samtools sort.
+conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}" | \
+conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}" # samtools sort's stderr still goes to log
 
 if [ $? -ne 0 ]; then echo "ERROR: Samtools conversion/sorting failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
+
 
 echo "Indexing sorted BAM file..." | tee -a "${path_log}"
 # Samtools index also uses conda run
