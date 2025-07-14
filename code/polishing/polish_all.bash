@@ -44,7 +44,7 @@
 
 ######## FLYE
 # 430226
-sbatch code/polishing/polish2.batch "lr-even" "flye" "data/raw/lr-even/lr-even_raw.fastq" "data/flye/lr-even/assembly.fasta"
+sbatch code/polishing/polish2_lr-even.batch "lr-even" "flye" "data/raw/lr-even/lr-even_raw.fastq" "data/flye/lr-even/assembly.fasta"
 # 430227
 sbatch code/polishing/polish2.batch "lr-log" "flye" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/flye/lr-log/assembly.fasta"
 # 430225

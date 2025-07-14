@@ -81,7 +81,7 @@ mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output
 echo "Running Medaka consensus..." | tee -a "${path_log}"
 
 conda run -n "${MEDAKA_ENV_NAME}" medaka \
-    consensus \
+    inference \
     --reads "${RAW_READS_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
