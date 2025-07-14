@@ -1,0 +1,100 @@
+#!/bin/bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=24
+#SBATCH --tasks-per-node=24
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+#SBATCH --job-name="medaka_polishing"
+#SBATCH --output=logs/slurm_job_%j.log
+#SBATCH --error=logs/slurm_job_err_%j.log
+#
+
+## Clean out any modules, then reload slurm
+module purge
+module load slurm
+
+ulimit -l unlimited
+
+# --- SECTION 1: USER CONFIGURATION & ARGUMENT PARSING ---
+
+# Parse Command-Line Arguments
+# $1: dataset_id (e.g., lr-even)
+# $2: assembler_id (e.g., flye)
+# $3: raw_reads_fullpath (e.g., data/raw/lr-even/lr-even_raw.fastq)
+# $4: draft_assembly_fullpath (e.g., data/flye/lr-even/assembly.fasta)
+if [ "$#" -ne 4 ]; then
+    echo "Usage: sbatch $0 <dataset_id> <assembler_id> <raw_reads_fullpath> <draft_assembly_fullpath>" | tee /dev/stderr
+    echo "Example: sbatch $0 lr-even flye data/raw/lr-even/lr-even_raw.fastq data/flye/lr-even/assembly.fasta" | tee /dev/stderr
+    exit 1
+fi
+
+declare -r DATASET_ID="$1"
+declare -r ASSEMBLER_ID="$2"
+declare -r RAW_READS_FULLPATH="$3"
+declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
+
+# Verify input files exist before proceeding
+if [ ! -f "${RAW_READS_FULLPATH}" ]; then
+    echo "ERROR: Raw reads file not found: ${RAW_READS_FULLPATH}" | tee /dev/stderr
+    exit 1
+fi
+if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
+    echo "ERROR: Draft assembly file not found: ${DRAFT_ASSEMBLY_FULLPATH}" | tee /dev/stderr
+    exit 1
+fi
+
+# Conda Environment Names
+declare -r MINIMAP2_ENV_NAME="align_minimap2" # Minimap2 is needed for Medaka's internal alignment
+declare -r MEDAKA_ENV_NAME="medaka"
+
+# --- SECTION 2: DERIVED PATHS & LOGGING SETUP ---
+
+# Medaka-specific output directory
+declare -r MEDAKA_OUTPUT_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}/medaka_polished"
+
+# Detailed command log file (separate from SLURM's job logs)
+declare -r LOG_DIR="data/${ASSEMBLER_ID}/logs" # Changed log dir to avoid 'polished' if only medaka is run
+mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
+declare -r path_log="${LOG_DIR}/medaka_commands_${ASSEMBLER_ID}_${DATASET_ID}.log"
+
+# Clear the log file at the start of the script
+> "${path_log}"
+
+echo "Script started at $(date)" | tee -a "${path_log}"
+echo "Configuration:" | tee -a "${path_log}"
+echo "  Dataset ID: ${DATASET_ID}" | tee -a "${path_log}"
+echo "  Assembler ID: ${ASSEMBLER_ID}" | tee -a "${path_log}"
+echo "  Raw Reads Full Path: ${RAW_READS_FULLPATH}" | tee -a "${path_log}"
+echo "  Draft Assembly Full Path: ${DRAFT_ASSEMBLY_FULLPATH}" | tee -a "${path_log}"
+echo "  Minimap2 Env: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
+echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
+echo "" | tee -a "${path_log}"
+
+# --- SECTION 3: MEDAKA POLISHING ---
+
+echo "########## Running Medaka Polishing Stage ##########" | tee -a "${path_log}"
+
+mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; } | tee -a "${path_log}"
+
+echo "Running Medaka consensus..." | tee -a "${path_log}"
+
+# Medaka needs minimap2 to be available within its environment, or a separate minimap2 environment
+# can be used if medaka is set up to find it. The `conda run -n medaka` command should ensure
+# all dependencies within the medaka environment are available.
+conda run -n "${MEDAKA_ENV_NAME}" medaka_consensus \
+    -i "${RAW_READS_FULLPATH}" \
+    -d "${DRAFT_ASSEMBLY_FULLPATH}" \
+    -o "${MEDAKA_OUTPUT_DIR}" \
+    -m r1041_e82_400bps_sup@v4.3.0 # This model is specific to R10.4.1/E8.2 chemistry and 400bps data. Adjust if different.
+    -t 24 2>&1 | tee -a "${path_log}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Medaka failed." | tee -a "${path_log}"
+    exit 1
+fi
+
+echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUTPUT_DIR}/consensus.fasta" | tee -a "${path_log}"
+
+echo "Script finished at $(date)" | tee -a "${path_log}"

@@ -65,6 +65,14 @@ declare -r MINIMAP2_RAW_SAM="${POLISHED_DIR}/overlap_${ASSEMBLER_ID}_${DATASET_I
 declare -r RACON_INPUT_BAM="${POLISHED_DIR}/overlap_${ASSEMBLER_ID}_${DATASET_ID}.filtered.bam"
 declare -r RACON_POLISHED_ASSEMBLY="${POLISHED_DIR}/${DATASET_ID}_assembly_racon.fasta"
 
+
+
+
+#### Herro intermediary files
+declare -r HERRO_PREPROCESSED_READS=${root_dir}/data/polished/${ASSEMBLER_ID}/${DATASET_ID}/herro_pp_${ASSEMBLER_ID}_${DATASET_ID}
+declare -r READ_ID_PATH=${root_dir}/data/read_id/read_id_${ASSEMBLER_ID}_${DATASET_ID}.txt
+
+
 # Detailed command log file (separate from SLURM's job logs)
 declare -r LOG_DIR="data/${ASSEMBLER_ID}/logs/polished"
 mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
@@ -86,8 +94,9 @@ echo "" | tee -a "${path_log}"
 
 # --- HARDCODED TOOL PATHS (NOW WITH YOUR EXACT PATHS) ---
 # Ensure these paths are correct for your system and Conda environments
-MINIMAP2_BIN="/home/wwinnett/miniconda3/envs/align_minimap2/bin/minimap2"
-RACON_BIN="/home/wwinnett/miniconda3/envs/racon/bin/racon"
+# Base location of metagenome directory
+root_dir=$(pwd)
+PATH_HERRO="tools/polishing/herro/"
 MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus"
 # You might need to add Samtools path here if it's not in the specified envs or your PATH
 # SAMTOOLS_BIN="/path/to/samtools"
@@ -96,18 +105,86 @@ MEDAKA_CONSENSUS_BIN="/home/wwinnett/miniconda3/envs/medaka/bin/medaka_consensus
 mkdir -p "${POLISHED_DIR}" || { echo "ERROR: Could not create output directory ${POLISHED_DIR}"; exit 1; }
 
 
+
+
+
+
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
-echo "########## Running Racon Stage ##########" | tee -a "${path_log}"
+echo "########## Running Herro Stage ##########" | tee -a "${path_log}"
 
-echo "Running Minimap2 to generate raw SAM alignments..." | tee -a "${path_log}"
+echo "Running Herro: Pre-processing reads" | tee -a "${path_log}"
+conda run -n "${herro}" ./scripts/preprocess.sh \
+    "${root_dir}/${RAW_READS_FULLPATH}" \ 
+    "${HERRO_PREPROCESSED_READS}" \
+    24 \
+    1  2>&1 | tee -a "${path_log}"
 
-conda run -n "${MINIMAP2_ENV_NAME}" minimap2 \
-    -ax map-ont \
-    -t 24 \
+if [ $? -ne 0 ]; then echo "ERROR: Herro failed to generate pre-processed reads" | tee -a "${path_log}"; exit 1; fi
+
+
+
+
+
+
+
+seqkit seq -n -i ${root_dir}/data/raw/lr-ms/lr-ms_raw.fastq > ${root_dir}/data/read_id/read_id_raven_lr-ms.txt
+seqkit seq -n -i ${RAW_READS_FULLPATH} > ${READ_ID_PATH}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+echo "Running Herro: Creating batched alignments" | tee -a "${path_log}"
+conda run -n "herro" scripts/create_batched_alignments.sh \
+    "${HERRO_PREPROCESSED_READS}.fastq.gz" \
+    "${READ_ID_PATH}" \
+    24 \
+    "${HERRO_PREPROCESSED_READS}" 2>&1 | tee -a "${path_log}"
+
+if [ $? -ne 0 ]; then echo "ERROR: Herro failed to generate pre-processed reads" | tee -a "${path_log}"; exit 1; fi
+
+
+
+scripts/create_batched_alignments.sh ${root_dir}/temp_out/test.fastq.gz ${root_dir}/data/read_id/read_id_raven_lr-ms.txt 24 ${root_dir}/temp_out/test
+
+
+
+conda run -n "${herro}" singularity \
+    exec \
+    herro.sif \
+    herro \
+    inference \
+    -m model_R10_v0.1.pt \ 
+    -b 64 \
+    --read-alns "${HERRO_PREPROCESSED_READS}" \
+    #--reads "${root_dir}/${RAW_READS_FULLPATH}" \
+
+
+     --reads ${root_dir}/data/raw/lr-ms/lr-ms_raw.fastq  --out_dir ${root_dir}/temp_output/test
+
+
+     Usage: herro inference [OPTIONS] -m <MODEL> -b <BATCH_SIZE> <READS> <OUTPUT>
+
+
+
+
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
     > "${MINIMAP2_RAW_SAM}" 2>> "${path_log}" # Output to the raw SAM file
 if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM." | tee -a "${path_log}"; exit 1; fi
+
+
+
+
 
 echo "Filtering SAM file and converting to BAM (removing unmapped reads)..." | tee -a "${path_log}"
 # Samtools view -F 4 (exclude unmapped reads) -bS (output BAM, input SAM)
@@ -124,6 +201,9 @@ conda run -n "${RACON_ENV_NAME}" racon \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     > "${RACON_POLISHED_ASSEMBLY}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Racon failed." | tee -a "${path_log}"; exit 1; fi
+
+
+
 
 
 ###$~~~~~#~####$~~~~~#~####$~~~~~#~####$~~~~~#~#
