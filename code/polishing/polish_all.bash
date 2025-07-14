@@ -46,29 +46,29 @@
 # 430240
 sbatch code/polishing/polish2_lr-log.batch "lr-even" "flye" "data/raw/lr-even/lr-even_raw.fastq" "data/flye/lr-even/assembly.fasta"
 # 430241
-sbatch code/polishing/polish2_lr-even.batch "lr-log" "flye" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/flye/lr-log/assembly.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-log" "flye" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/flye/lr-log/assembly.fasta"
 # 430242
-sbatch code/polishing/polish2_lr-even.batch "lr-ms" "flye" "data/raw/lr-ms/lr-ms_raw.fastq" "data/flye/lr-ms/assembly.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-ms" "flye" "data/raw/lr-ms/lr-ms_raw.fastq" "data/flye/lr-ms/assembly.fasta"
 
 
 
 ######## CANU
 # 430243
-sbatch code/polishing/polish2_lr-even.batch "lr-even" "canu" "data/raw/lr-even/lr-even_raw.fastq" "data/canu/lr-even/lr-even_task.contigs.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-even" "canu" "data/raw/lr-even/lr-even_raw.fastq" "data/canu/lr-even/lr-even_task.contigs.fasta"
 # 430244
-sbatch code/polishing/polish2_lr-even.batch "lr-log" "canu" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/canu/lr-log/lr-log_task.contigs.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-log" "canu" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/canu/lr-log/lr-log_task.contigs.fasta"
 # 430258
-sbatch code/polishing/polish2_lr-even.batch "lr-ms" "canu" "data/raw/lr-ms/lr-ms_raw.fastq" "data/canu/lr-ms/lr-ms_task.contigs.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-ms" "canu" "data/raw/lr-ms/lr-ms_raw.fastq" "data/canu/lr-ms/lr-ms_task.contigs.fasta"
 
 
 
 ######## RAVEN
 # 430246
-sbatch code/polishing/polish2_lr-even.batch "lr-even" "raven" "data/raw/lr-even/lr-even_raw.fastq" "data/raven/lr-even/assembly_raven_lr-even.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-even" "raven" "data/raw/lr-even/lr-even_raw.fastq" "data/raven/lr-even/assembly_raven_lr-even.fasta"
 # 430247
-sbatch code/polishing/polish2_lr-even.batch "lr-log" "raven" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/raven/lr-log/assembly_raven_lr-log.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-log" "raven" "data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq" "data/raven/lr-log/assembly_raven_lr-log.fasta"
 # 430248
-sbatch code/polishing/polish2_lr-even.batch "lr-ms" "raven" "data/raw/lr-ms/lr-ms_raw.fastq" "data/raven/lr-ms/assembly_raven_lr-ms.fasta"
+sbatch code/polishing/polish2_lr-log.batch "lr-ms" "raven" "data/raw/lr-ms/lr-ms_raw.fastq" "data/raven/lr-ms/assembly_raven_lr-ms.fasta"
 
 
 
