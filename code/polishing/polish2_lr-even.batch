@@ -148,7 +148,7 @@ conda activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda e
 declare -r MEDAKA_MODEL="r941_min_sup_g507"
 
 # CHANGE THIS BLOCK CAREFULLY:
-medaka inference \ # <--- Put "inference" on the same line as "medaka", with a single space.
+medaka inference \
     --reads "${ALIGNED_SORTED_BAM}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
