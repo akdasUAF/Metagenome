@@ -1,160 +1,173 @@
 #!/bin/bash
 #SBATCH --partition=t1small
-#SBATCH --ntasks=24
-#SBATCH --tasks-per-node=24
+#SBATCH --ntasks=1                # Total number of tasks
+#SBATCH --cpus-per-task=24        # Number of CPU cores per task (adjust as needed for --threads)
+#SBATCH --mem=64G                 # Total memory for the job (adjust based on assembly/read size)
 #SBATCH --mail-user=wwinnett@alaska.edu
-#SBATCH --mail-type=BEGIN
-#SBATCH --mail-type=END
-#SBATCH --mail-type=FAIL
-#SBATCH --job-name="medaka_polishing"
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="medaka_polish"
 #SBATCH --output=logs/slurm_job_%j.log
 #SBATCH --error=logs/slurm_job_err_%j.log
-#
 
-## Clean out any modules, then reload slurm
+# Ensure modules are clean and slurm is loaded
 module purge
 module load slurm
 
+# Set unlimited locked memory for processes (good for large jobs)
 ulimit -l unlimited
 
-# --- START CONDA INITIALIZATION (Still good practice to source conda.sh once) ---
-# This block explicitly sources the conda.sh script, which is useful for
-# ensuring 'conda' command is available in the shell, even if 'conda run' is used.
+# --- Conda Initialization ---
 CONDA_BASE=$(conda info --base)
 if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
     . "${CONDA_BASE}/etc/profile.d/conda.sh"
-    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh" | tee -a "${path_log}"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
 else
-    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh." | tee -a "${path_log}"
-    echo "Please ensure Conda is installed and 'conda init bash' has been run." | tee -a "${path_log}"
-    exit 1
-fi
-# --- END CONDA INITIALIZATION ---
-
-
-# --- SECTION 1: USER CONFIGURATION & ARGUMENT PARSING ---
-
-# Parse Command-Line Arguments
-# $1: dataset_id (e.g., lr-even)
-# $2: assembler_id (e.g., flye)
-# $3: raw_reads_fullpath (e.g., data/raw/lr-even/lr-even_raw.fastq)
-# $4: draft_assembly_fullpath (e.g., data/flye/lr-even/assembly.fasta)
-if [ "$#" -ne 4 ]; then
-    echo "Usage: sbatch $0 <dataset_id> <assembler_id> <raw_reads_fullpath> <draft_assembly_fullpath>" | tee /dev/stderr
-    echo "Example: sbatch $0 lr-even flye data/raw/lr-even/lr-even_raw.fastq data/flye/lr-even/assembly.fasta" | tee /dev/stderr
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
     exit 1
 fi
 
-declare -r DATASET_ID="$1"
-declare -r ASSEMBLER_ID="$2"
-declare -r RAW_READS_FULLPATH="$3"
-declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
-
-# Verify input files exist before proceeding
-if [ ! -f "${RAW_READS_FULLPATH}" ]; then
-    echo "ERROR: Raw reads file not found: ${RAW_READS_FULLPATH}" | tee /dev/stderr
-    exit 1
-fi
-if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
-    echo "ERROR: Draft assembly file not found: ${DRAFT_ASSEMBLY_FULLPATH}" | tee /dev/stderr
+# --- 1. User Configuration & Argument Parsing ---
+# Input files: Raw Reads (FASTQ) and Draft Assembly (FASTA)
+# Usage: sbatch this_script.sh <raw_reads_fastq_path> <draft_assembly_fasta_path>
+if [ "$#" -ne 2 ]; then
+    echo "Usage: sbatch $0 <raw_reads_fastq_path> <draft_assembly_fasta_path>"
+    echo "Example: sbatch $0 data/raw/my_reads.fastq data/assembly/my_draft.fasta"
     exit 1
 fi
 
-# Conda Environment Names
-declare -r MINIMAP2_ENV_NAME="align_minimap2" # Minimap2 is needed for Medaka's internal alignment
+declare -r RAW_READS_FULLPATH="$1"
+declare -r DRAFT_ASSEMBLY_FULLPATH="$2"
+
+# Extract base names for consistent output naming
+# This assumes your raw reads are like 'my_reads.fastq' and assembly 'my_draft.fasta'
+# Adjust if your naming conventions are more complex (e.g., use basename -s .fastq)
+RAW_READS_BASENAME=$(basename "$RAW_READS_FULLPATH" | cut -d'.' -f1)
+ASSEMBLY_BASENAME=$(basename "$DRAFT_ASSEMBLY_FULLPATH" | cut -d'.' -f1)
+
+# Conda Environment Name (this is the one you verified has minimap2, samtools, medaka)
 declare -r MEDAKA_ENV_NAME="medaka"
 
-# --- SECTION 2: DERIVED PATHS & LOGGING SETUP ---
+# Medaka Model to use (e.g., for R9.4.1 reads; adjust for your chemistry)
+# For R10.4.1, you might use 'r1041_e81_sup_g615' or similar. Check Medaka docs for latest models.
+declare -r MEDAKA_MODEL="r941_min_sup_g507" 
 
-# A common base for polished outputs (useful for aligning to this path structure)
-declare -r POLISHED_BASE_DIR="data/${ASSEMBLER_ID}/${DATASET_ID}"
+# --- 2. Derived Paths & Logging Setup ---
+declare -r OUTPUT_BASE_DIR="medaka_polish_output/${ASSEMBLY_BASENAME}"
+declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
+declare -r ALIGNMENT_DIR="${OUTPUT_BASE_DIR}/alignment"
+declare -r MEDAKA_OUT_DIR="${OUTPUT_BASE_DIR}/polished_assembly"
 
-# Medaka-specific output directory
-declare -r MEDAKA_OUTPUT_DIR="${POLISHED_BASE_DIR}/medaka_polished"
-
-# Intermediate files for alignment
-declare -r ALIGNMENT_DIR="${POLISHED_BASE_DIR}/alignment"
-mkdir -p "${ALIGNMENT_DIR}" || { echo "ERROR: Could not create alignment directory ${ALIGNMENT_DIR}"; exit 1; }
-
-# Re-introducing explicit SAM file for robust piping
-declare -r MINIMAP2_RAW_SAM_FILE="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sam"
-
-declare -r ALIGNED_SORTED_BAM="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sorted.bam"
-declare -r ALIGNED_SORTED_BAM_IDX="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sorted.bam.bai"
-
-# Detailed command log file (separate from SLURM's job logs)
-declare -r LOG_DIR="data/${ASSEMBLER_ID}/logs"
+# Create necessary directories
 mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
-declare -r path_log="${LOG_DIR}/medaka_commands_${ASSEMBLER_ID}_${DATASET_ID}.log"
+mkdir -p "${ALIGNMENT_DIR}" || { echo "ERROR: Could not create alignment directory ${ALIGNMENT_DIR}"; exit 1; }
+mkdir -p "${MEDAKA_OUT_DIR}" || { echo "ERROR: Could not create medaka output directory ${MEDAKA_OUT_DIR}"; exit 1; }
 
+# Detailed command log file
+declare -r path_log="${LOG_DIR}/medaka_workflow_${ASSEMBLY_BASENAME}.log"
 # Clear the log file at the start of the script
 > "${path_log}"
 
-echo "Script started at $(date)" | tee -a "${path_log}"
-echo "Configuration:" | tee -a "${path_log}"
-echo "  Dataset ID: ${DATASET_ID}" | tee -a "${path_log}"
-echo "  Assembler ID: ${ASSEMBLER_ID}" | tee -a "${path_log}"
-echo "  Raw Reads Full Path: ${RAW_READS_FULLPATH}" | tee -a "${path_log}"
-echo "  Draft Assembly Full Path: ${DRAFT_ASSEMBLY_FULLPATH}" | tee -a "${path_log}"
-echo "  Minimap2 Env: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
-echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
-echo "" | tee -a "${path_log}"
+# Redirect all script output to path_log
+exec &> >(tee -a "${path_log}") # This redirects stdout and stderr to the log file AND to the slurm_job_*.log
 
+echo "Script started at $(date)"
+echo "Configuration:"
+echo "  Raw Reads: ${RAW_READS_FULLPATH}"
+echo "  Draft Assembly: ${DRAFT_ASSEMBLY_FULLPATH}"
+echo "  Medaka Env: ${MEDAKA_ENV_NAME}"
+echo "  Medaka Model: ${MEDAKA_MODEL}"
+echo "  Output Directory: ${OUTPUT_BASE_DIR}"
+echo ""
 
-# --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS (USING CONDA RUN) ---
-echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########" | tee -a "${path_log}"
-
-echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
-set -o pipefail # Added for robust pipeline error checking
-conda run -n "${MINIMAP2_ENV_NAME}" minimap2 -ax map-ont \
-    -t 24 \
-    "${DRAFT_ASSEMBLY_FULLPATH}" \
-    "${RAW_READS_FULLPATH}" \
-    > "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}" # SAM output to file, stderr to log
-
-if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM file. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
-
-echo "Filtering and sorting SAM to BAM using Samtools..." | tee -a "${path_log}"
-# Samtools commands also use conda run
-conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | \
-conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
-
-if [ $? -ne 0 ]; then echo "ERROR: Samtools conversion/sorting failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
-
-echo "Indexing sorted BAM file..." | tee -a "${path_log}"
-# Samtools index also uses conda run
-conda run -n "${MINIMAP2_ENV_NAME}" samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
-if [ $? -ne 0 ]; then echo "ERROR: Samtools indexing failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
-
-set +o pipefail # Reset pipefail option
-
-# Removed explicit deactivate as conda run handles environment context for each command
-
-
-# --- SECTION 4: MEDAKA POLISHING (USING CONDA RUN) ---
-echo "########## Running Medaka Polishing Stage ##########" | tee -a "${path_log}"
-
-mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output directory ${MEDAKA_OUTPUT_DIR}"; exit 1; } | tee -a "${path_log}"
-
-echo "Running Medaka inference (polishing)..." | tee -a "${path_log}"
-
-declare -r MEDAKA_MODEL="r941_min_sup_g507" # Confirmed this model is available for Medaka 2.1.0
-
-# Medaka command uses conda run
-conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
-    --reads "${ALIGNED_SORTED_BAM}" \
-    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
-    --out_dir "${MEDAKA_OUTPUT_DIR}" \
-    --model "${MEDAKA_MODEL}" \
-    --threads 24 2>&1 | tee -a "${path_log}"
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka failed. Exit status: $?." | tee -a "${path_log}"
+# Verify input files exist
+if [ ! -f "${RAW_READS_FULLPATH}" ]; then
+    echo "ERROR: Raw reads file not found: ${RAW_READS_FULLPATH}"
+    exit 1
+fi
+if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
+    echo "ERROR: Draft assembly file not found: ${DRAFT_ASSEMBLY_FULLPATH}"
     exit 1
 fi
 
-# Removed explicit deactivate as conda run handles environment context for each command
+echo "Current memory usage before alignment:"
+free -h
 
-echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUTPUT_DIR}/consensus.fasta" | tee -a "${path_log}"
+# --- 3. Alignment with Minimap2 and Samtools ---
+echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########"
 
-echo "Script finished at $(date)" | tee -a "${path_log}"
+# Define temporary and final BAM file paths
+declare -r TEMP_UNSORTED_BAM="${ALIGNMENT_DIR}/reads_to_draft_temp_unsorted.bam"
+declare -r ALIGNED_SORTED_BAM="${ALIGNMENT_DIR}/reads_to_draft.sorted.bam"
+declare -r ALIGNED_SORTED_BAM_IDX="${ALIGNED_SORTED_BAM}.bai"
+
+echo "Running Minimap2: Aligning reads to draft assembly..."
+set -o pipefail # Ensures that if any command in a pipeline fails, the whole pipeline fails
+
+# Use a direct pipe from minimap2 to samtools view to avoid large intermediate SAM file
+# And then redirect samtools view output to the temporary BAM file
+conda run -n "${MEDAKA_ENV_NAME}" minimap2 -ax map-ont \
+    -t "${SLURM_CPUS_PER_TASK}" \
+    "${DRAFT_ASSEMBLY_FULLPATH}" \
+    "${RAW_READS_FULLPATH}" \
+    | conda run -n "${MEDAKA_ENV_NAME}" samtools view -bS -@ "${SLURM_CPUS_PER_TASK}" --verbosity 10 - \
+    > "${TEMP_UNSORTED_BAM}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Minimap2 to Samtools view pipeline failed. Exit status: $?."
+    exit 1
+fi
+
+echo "--- Diagnostic: Checking temporary unsorted BAM file ---"
+if [ ! -s "${TEMP_UNSORTED_BAM}" ]; then
+    echo "ERROR: Temporary unsorted BAM file is empty or missing after samtools view: ${TEMP_UNSORTED_BAM}"
+    exit 1
+fi
+ls -lh "${TEMP_UNSORTED_BAM}"
+echo "Running samtools flagstat on unsorted BAM to check integrity:"
+conda run -n "${MEDAKA_ENV_NAME}" samtools flagstat "${TEMP_UNSORTED_BAM}"
+if [ $? -ne 0 ]; then
+    echo "ERROR: samtools flagstat failed on unsorted BAM. This indicates a corrupted BAM header or file."
+    exit 1
+fi
+echo "-------------------------------------------------------"
+
+echo "Sorting temporary BAM file..."
+conda run -n "${MEDAKA_ENV_NAME}" samtools sort -@ "${SLURM_CPUS_PER_TASK}" -o "${ALIGNED_SORTED_BAM}" "${TEMP_UNSORTED_BAM}"
+if [ $? -ne 0 ]; then
+    echo "ERROR: Samtools sorting failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Indexing sorted BAM file..."
+conda run -n "${MEDAKA_ENV_NAME}" samtools index -@ "${SLURM_CPUS_PER_TASK}" "${ALIGNED_SORTED_BAM}"
+if [ $? -ne 0 ]; then
+    echo "ERROR: Samtools indexing failed. Exit status: $?."
+    exit 1
+fi
+
+# Clean up temporary unsorted BAM file
+echo "Cleaning up temporary unsorted BAM file: ${TEMP_UNSORTED_BAM}"
+rm -f "${TEMP_UNSORTED_BAM}"
+
+set +o pipefail # Reset pipefail option
+
+# --- 4. Medaka Polishing ---
+echo "########## Running Medaka Polishing Stage ##########"
+
+echo "Running Medaka inference (polishing)..."
+
+conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
+    --reads "${ALIGNED_SORTED_BAM}" \
+    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
+    --out_dir "${MEDAKA_OUT_DIR}" \
+    --model "${MEDAKA_MODEL}" \
+    --threads "${SLURM_CPUS_PER_TASK}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Medaka inference failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUT_DIR}/consensus.fasta"
+echo "Script finished at $(date)"

@@ -10,7 +10,6 @@
 #SBATCH --job-name="medaka_polishing"
 #SBATCH --output=logs/slurm_job_%j.log
 #SBATCH --error=logs/slurm_job_err_%j.log
-#
 
 ## Clean out any modules, then reload slurm
 module purge
@@ -205,3 +204,7 @@ fi
 echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUTPUT_DIR}/consensus.fasta" | tee -a "${path_log}"
 
 echo "Script finished at $(date)" | tee -a "${path_log}"
+
+
+
+medaka inference --reads    
