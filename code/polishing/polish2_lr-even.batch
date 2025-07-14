@@ -17,6 +17,22 @@ module load slurm
 
 ulimit -l unlimited
 
+# --- START CONDA INITIALIZATION ---
+# This block explicitly sources the conda.sh script, which is crucial for
+# 'conda activate' to work reliably in non-interactive batch environments.
+# Ensure the path to your miniconda3 is correct.
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh" | tee -a "${path_log}"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh." | tee -a "${path_log}"
+    echo "Please ensure Conda is installed and 'conda init bash' has been run." | tee -a "${path_log}"
+    exit 1
+fi
+# --- END CONDA INITIALIZATION ---
+
+
 # --- SECTION 1: USER CONFIGURATION & ARGUMENT PARSING ---
 
 # Parse Command-Line Arguments
@@ -86,56 +102,37 @@ echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
 echo "" | tee -a "${path_log}"
 
 
-
-
-
-# ... (rest of the script before SECTION 3) ...
-
 # --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS ---
 echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########" | tee -a "${path_log}"
 
-# Define a temporary file for minimap2's output (both stdout and stderr for logging)
-# MINIMAP2_RAW_SAM_FILE is already defined in Section 2
-# declare -r MINIMAP2_RAW_SAM_FILE="${ALIGNMENT_DIR}/reads_to_draft_${ASSEMBLER_ID}_${DATASET_ID}.sam" # No need to declare again
-
 echo "Activating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
-source activate "${MINIMAP2_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MINIMAP2_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
+conda activate "${MINIMAP2_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MINIMAP2_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
 
-echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
-# Run minimap2. Redirect its standard output (SAM) to the designated SAM file.
-# Redirect its standard error (progress messages) to be appended to the main log file.
-# The `set -o pipefail` is important if you want the exit status of any command in a pipe to cause the pipeline to fail.
-# It's usually good practice for robust scripting. Let's add it.
 set -o pipefail # Added for robust pipeline error checking
 
-# NEW: Minimap2 writes its SAM output to the file, and its stderr (progress) to the main log.
+echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
 minimap2 -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
-    > "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}" # <-- CHANGE HERE: Direct stdout to file, stderr to log
+    > "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}"
 
 if [ $? -ne 0 ]; then echo "ERROR: Minimap2 failed to generate SAM file. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 echo "Filtering and sorting SAM to BAM using Samtools..." | tee -a "${path_log}"
-# Samtools view reads from the explicit SAM file, pipes to Samtools sort,
-# which then writes to the final sorted BAM file.
-# Also log stdout and stderr of this pipeline to the main log.
 samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>&1 | \
-samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}" # <-- Added 2>&1 before tee
+samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then echo "ERROR: Samtools conversion/sorting failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 echo "Indexing sorted BAM file..." | tee -a "${path_log}"
-samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}" # <-- Added 2>&1 before tee
+samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Samtools indexing failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 set +o pipefail # Reset pipefail option
 
 echo "Deactivating Conda environment: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
 conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MINIMAP2_ENV_NAME}."; } | tee -a "${path_log}"
-
-
 
 
 # --- SECTION 4: MEDAKA POLISHING ---
@@ -146,22 +143,33 @@ mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output
 echo "Running Medaka inference (polishing)..." | tee -a "${path_log}"
 
 echo "Activating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
-source activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MEDAKA_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
+conda activate "${MEDAKA_ENV_NAME}" || { echo "ERROR: Could not activate Conda environment ${MEDAKA_ENV_NAME}."; exit 1; } | tee -a "${path_log}"
+
+# MEDAKA 2.1.0 MODEL SELECTION
+# For Medaka 2.x, the `--model` flag typically takes a "model family" name,
+# rather than specific model files like 'r941_min_high_g360' or 'r941_e81_sup'.
+# Medaka 2.x often infers the exact model from the BAM header or uses a more generic name.
+# Given R9.4.1 chemistry and "super-accuracy" preference,
+# common model family names are 'r941_hac' (high-accuracy) or 'r941_sup' (super-accuracy).
+# Since 'r941_e81_sup' was not recognized, let's try the more generic 'r941_sup'
+# based on your previous 'r941_min_sup_g507' usage, assuming this implies 'super' accuracy.
+# If 'r941_sup' still doesn't work, 'r941_hac' is another common fallback for R9.4.1.
+# The definitive way is to consult Medaka 2.1.0 documentation or experiment.
+declare -r MEDAKA_MODEL="r941_min_sup_g507" # <--- CHANGED MODEL NAME HERE
 
 medaka \
     inference \
     --reads "${ALIGNED_SORTED_BAM}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
-    --model r941_e81_sup \
+    --model "${MEDAKA_MODEL}" \
     --threads 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka failed." | tee -a "${path_log}"
+    echo "ERROR: Medaka failed. Exit status: $?." | tee -a "${path_log}"
     exit 1
 fi
 
-# Deactivate the medaka environment
 echo "Deactivating Conda environment: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
 conda deactivate || { echo "WARNING: Could not deactivate Conda environment ${MEDAKA_ENV_NAME}."; } | tee -a "${path_log}"
 
