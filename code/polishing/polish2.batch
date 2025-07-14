@@ -87,7 +87,7 @@ conda run -n "${MEDAKA_ENV_NAME}" medaka_consensus \
     -i "${RAW_READS_FULLPATH}" \
     -d "${DRAFT_ASSEMBLY_FULLPATH}" \
     -o "${MEDAKA_OUTPUT_DIR}" \
-    -m r1041_e82_400bps_sup@v4.3.0 # This model is specific to R10.4.1/E8.2 chemistry and 400bps data. Adjust if different.
+    -m r941_min_sup_g507 \
     -t 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
