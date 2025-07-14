@@ -80,15 +80,13 @@ mkdir -p "${MEDAKA_OUTPUT_DIR}" || { echo "ERROR: Could not create Medaka output
 
 echo "Running Medaka consensus..." | tee -a "${path_log}"
 
-# Medaka needs minimap2 to be available within its environment, or a separate minimap2 environment
-# can be used if medaka is set up to find it. The `conda run -n medaka` command should ensure
-# all dependencies within the medaka environment are available.
 conda run -n "${MEDAKA_ENV_NAME}" medaka \
+    consensus \
     --reads "${RAW_READS_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
     --model r941_min_high_g360 \
-    --threads 24 2>&1 | tee -a "${path_log}" # Changed -t to --threads as per Medaka CLI
+    --threads 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Medaka failed." | tee -a "${path_log}"

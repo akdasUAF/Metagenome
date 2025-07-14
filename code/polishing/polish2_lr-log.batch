@@ -84,6 +84,7 @@ echo "Running Medaka consensus..." | tee -a "${path_log}"
 # can be used if medaka is set up to find it. The `conda run -n medaka` command should ensure
 # all dependencies within the medaka environment are available.
 conda run -n "${MEDAKA_ENV_NAME}" medaka \
+    consensus \
     --reads "${RAW_READS_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
