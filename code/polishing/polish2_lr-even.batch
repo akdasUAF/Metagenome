@@ -3,6 +3,7 @@
 #SBATCH --ntasks=24
 #SBATCH --tasks-per-node=24
 #SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mem=64G
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
