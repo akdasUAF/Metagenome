@@ -153,7 +153,7 @@ medaka \
     --reads "${ALIGNED_SORTED_BAM}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
-    --model r941_min_high_g360 \
+    --model r941_e81_sup \
     --threads 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
