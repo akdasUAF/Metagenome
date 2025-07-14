@@ -60,8 +60,7 @@ if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
     exit 1
 fi
 
-# Conda Environment Names
-declare -r MINIMAP2_ENV_NAME="align_minimap2" # Minimap2 is needed for Medaka's internal alignment
+# Conda Environment Name (only one now!)
 declare -r MEDAKA_ENV_NAME="medaka"
 
 # --- SECTION 2: DERIVED PATHS & LOGGING SETUP ---
@@ -96,17 +95,16 @@ echo "  Dataset ID: ${DATASET_ID}" | tee -a "${path_log}"
 echo "  Assembler ID: ${ASSEMBLER_ID}" | tee -a "${path_log}"
 echo "  Raw Reads Full Path: ${RAW_READS_FULLPATH}" | tee -a "${path_log}"
 echo "  Draft Assembly Full Path: ${DRAFT_ASSEMBLY_FULLPATH}" | tee -a "${path_log}"
-echo "  Minimap2 Env: ${MINIMAP2_ENV_NAME}" | tee -a "${path_log}"
-echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}"
+echo "  Medaka Env: ${MEDAKA_ENV_NAME}" | tee -a "${path_log}" # Only one environment listed now
 echo "" | tee -a "${path_log}"
 
 
-# --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS (USING CONDA RUN) ---
+# --- SECTION 3: ALIGNMENT WITH MINIMAP2 AND SAMTOOLS (USING ONE CONDA ENVIRONMENT) ---
 echo "########## Running Alignment Stage (Minimap2 & Samtools) ##########" | tee -a "${path_log}"
 
 echo "Running Minimap2: Aligning reads to draft assembly..." | tee -a "${path_log}"
 set -o pipefail # Added for robust pipeline error checking
-conda run -n "${MINIMAP2_ENV_NAME}" minimap2 -ax map-ont \
+conda run -n "${MEDAKA_ENV_NAME}" minimap2 -ax map-ont \
     -t 24 \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
     "${RAW_READS_FULLPATH}" \
@@ -138,10 +136,11 @@ declare -r TEMP_UNSORTED_BAM="${ALIGNMENT_DIR}/temp_reads_to_draft_${ASSEMBLER_I
 
 # Convert SAM to unsorted BAM
 echo "Converting SAM to unsorted BAM: ${MINIMAP2_RAW_SAM_FILE} -> ${TEMP_UNSORTED_BAM}" | tee -a "${path_log}"
-conda run -n "${MINIMAP2_ENV_NAME}" samtools view -bS -@ 24 "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}" > "${TEMP_UNSORTED_BAM}"
+# CRITICAL FIX: Added --verbosity 10 to force samtools view to print more detailed errors
+conda run -n "${MEDAKA_ENV_NAME}" samtools view -bS -@ 24 --verbosity 10 "${MINIMAP2_RAW_SAM_FILE}" 2>> "${path_log}" > "${TEMP_UNSORTED_BAM}"
 SAMTOOLS_VIEW_EXIT_STATUS=$?
 if [ ${SAMTOOLS_VIEW_EXIT_STATUS} -ne 0 ]; then
-    echo "ERROR: samtools view failed to convert SAM to unsorted BAM. Exit status: ${SAMTOOLS_VIEW_EXIT_STATUS}." | tee -a "${path_log}"
+    echo "ERROR: samtools view failed to convert SAM to unsorted BAM. Exit status: ${SAMTOOLS_VIEW_EXIT_STATUS}. Check full log for samtools specific errors." | tee -a "${path_log}"
     exit 1
 fi
 
@@ -154,7 +153,7 @@ fi
 ls -lh "${TEMP_UNSORTED_BAM}" 2>&1 | tee -a "${path_log}"
 # Try samtools flagstat on the unsorted BAM to check header validity
 echo "Running samtools flagstat on unsorted BAM:" | tee -a "${path_log}"
-conda run -n "${MINIMAP2_ENV_NAME}" samtools flagstat "${TEMP_UNSORTED_BAM}" 2>&1 | tee -a "${path_log}"
+conda run -n "${MEDAKA_ENV_NAME}" samtools flagstat "${TEMP_UNSORTED_BAM}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then
     echo "ERROR: samtools flagstat failed on unsorted BAM. This indicates a corrupted BAM header." | tee -a "${path_log}"
     exit 1
@@ -164,7 +163,7 @@ echo "-------------------------------------------------------" | tee -a "${path_
 
 # Sort the temporary BAM file
 echo "Sorting temporary BAM file: ${TEMP_UNSORTED_BAM} -> ${ALIGNED_SORTED_BAM}" | tee -a "${path_log}"
-conda run -n "${MINIMAP2_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" "${TEMP_UNSORTED_BAM}" 2>&1 | tee -a "${path_log}"
+conda run -n "${MEDAKA_ENV_NAME}" samtools sort -@ 24 -o "${ALIGNED_SORTED_BAM}" "${TEMP_UNSORTED_BAM}" 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then echo "ERROR: Samtools sorting failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
@@ -174,7 +173,7 @@ rm -f "${TEMP_UNSORTED_BAM}" 2>> "${path_log}"
 
 
 echo "Indexing sorted BAM file..." | tee -a "${path_log}"
-conda run -n "${MINIMAP2_ENV_NAME}" samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
+conda run -n "${MEDAKA_ENV_NAME}" samtools index -@ 24 "${ALIGNED_SORTED_BAM}" 2>&1 | tee -a "${path_log}"
 if [ $? -ne 0 ]; then echo "ERROR: Samtools indexing failed. Exit status: $?." | tee -a "${path_log}"; exit 1; fi
 
 set +o pipefail # Reset pipefail option
