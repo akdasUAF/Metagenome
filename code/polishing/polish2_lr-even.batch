@@ -85,7 +85,7 @@ conda run -n "${MEDAKA_ENV_NAME}" medaka \
     --reads "${RAW_READS_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUTPUT_DIR}" \
-    --model r941_min_high_g360 \
+    --model r941_min_sup_g507s \
     --threads 24 2>&1 | tee -a "${path_log}"
 
 if [ $? -ne 0 ]; then
