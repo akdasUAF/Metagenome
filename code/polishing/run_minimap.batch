@@ -21,7 +21,7 @@
 # You MUST replace '/path/to/your/conda/installation' with the actual path
 # where your Miniconda/Anaconda is installed.
 # Example: source /home/wwinnett/miniconda3/etc/profile.d/conda.sh
-source /path/to/your/conda/installation/etc/profile.d/conda.sh
+source ~/miniconda3/etc/profile.d/conda.sh 
 
 # Essential for large memory allocations on some systems
 ulimit -l unlimited
