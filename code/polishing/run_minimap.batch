@@ -29,6 +29,43 @@ ulimit -l unlimited
 # Activate your Medaka conda environment
 conda activate medaka
 
+# Check if environment activation was successful and tools are available
+echo "--- Checking conda environment and tools ---" | tee -a "${LOG_FILE}"
+
+if command -v conda &> /dev/null; then
+    echo "conda is found in PATH." | tee -a "${LOG_FILE}"
+else
+    echo "ERROR: conda is NOT found in PATH. Check source path." | tee -a "${LOG_FILE}"
+    exit 1
+fi
+
+CURRENT_CONDA_ENV=$(conda env list | grep "*" | awk '{print $1}')
+echo "Currently active conda environment: ${CURRENT_CONDA_ENV}" | tee -a "${LOG_FILE}"
+if [ "${CURRENT_CONDA_ENV}" != "medaka" ]; then
+    echo "WARNING: 'medaka' environment not activated. Actual: ${CURRENT_CONDA_ENV}" | tee -a "${LOG_FILE}"
+    # This might indicate the activation failed, or it's not in base
+fi
+
+if command -v minimap2 &> /dev/null; then
+    echo "minimap2 is found in PATH." | tee -a "${LOG_FILE}"
+    echo "minimap2 location: $(which minimap2)" | tee -a "${LOG_FILE}"
+    echo "minimap2 version: $(minimap2 --version 2>&1)" | tee -a "${LOG_FILE}" # Get version to confirm it runs
+else
+    echo "ERROR: minimap2 is NOT found in PATH after activating medaka env. Is it installed?" | tee -a "${LOG_FILE}"
+    exit 1
+fi
+
+if command -v samtools &> /dev/null; then
+    echo "samtools is found in PATH." | tee -a "${LOG_FILE}"
+    echo "samtools location: $(which samtools)" | tee -a "${LOG_FILE}"
+    echo "samtools version: $(samtools --version | head -n 1)" | tee -a "${LOG_FILE}" # Get version to confirm it runs
+else
+    echo "ERROR: samtools is NOT found in PATH after activating medaka env. Is it installed?" | tee -a "${LOG_FILE}"
+    exit 1
+fi
+echo "--- Conda environment and tools check complete ---" | tee -a "${LOG_FILE}"
+
+
 # --- Input Parameters (passed as arguments to the sbatch script) ---
 # Usage: sbatch minimap_script.sh <DATASET_ID> <ASSEMBLER_ID> <RAW_READS_FULLPATH> <DRAFT_ASSEMBLY_FULLPATH>
 declare -r DATASET_ID="$1"
