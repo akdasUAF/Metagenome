@@ -101,7 +101,6 @@ echo "Output BAM: ${ALIGNMENT_BAM_FILE}" | tee -a "${LOG_BAM}" # <-- **POTENTIAL
 echo "Requested CPUs: ${SLURM_CPUS_PER_TASK}" | tee -a "${LOG_FILE}"
 echo "Requested Memory: ${SLURM_MEM}" | tee -a "${LOG_FILE}"
 
-
 # --- Step 1: Run minimap2 for alignment ---
 echo "Running minimap2 alignment..." | tee -a "${LOG_FILE}"
 # minimap2 is now directly available because the environment is activated
