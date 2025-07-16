@@ -66,8 +66,7 @@ fi
 echo "--- Conda environment and tools check complete ---" | tee -a "${LOG_FILE}"
 
 
-# --- Input Parameters (passed as arguments to the sbatch script) ---
-# Usage: sbatch minimap_script.sh <DATASET_ID> <ASSEMBLER_ID> <RAW_READS_FULLPATH> <DRAFT_ASSEMBLY_FULLPATH>
+# --- Input Parameters ---
 declare -r DATASET_ID="$1"
 declare -r ASSEMBLER_ID="$2"
 declare -r RAW_READS_FULLPATH="$3"
@@ -84,15 +83,24 @@ declare -r LOG_FILE="logs/${DATASET_ID}_${ASSEMBLER_ID}_minimap_samtools.log" # 
 # Ensure the logs directory exists
 mkdir -p logs
 
+# --- Diagnostic Echos for LOG_FILE ---
+echo "--- LOG_FILE DEBUG ---"
+echo "Value of DATASET_ID: '${DATASET_ID}'"
+echo "Value of ASSEMBLER_ID: '${ASSEMBLER_ID}'"
+echo "Calculated LOG_FILE path before initial tee: '${LOG_FILE}'"
+echo "--- END LOG_FILE DEBUG ---"
+
+# Start actual logging with tee
 echo "--- Job Started: $(date) ---" | tee -a "${LOG_FILE}"
 echo "Dataset ID: ${DATASET_ID}" | tee -a "${LOG_FILE}"
 echo "Assembler ID: ${ASSEMBLER_ID}" | tee -a "${LOG_FILE}"
 echo "Raw Reads: ${RAW_READS_FULLPATH}" | tee -a "${LOG_FILE}"
 echo "Draft Assembly: ${DRAFT_ASSEMBLY_FULLPATH}" | tee -a "${LOG_FILE}"
 echo "Output SAM: ${ALIGNMENT_SAM_FILE}" | tee -a "${LOG_FILE}"
-echo "Output BAM: ${ALIGNMENT_BAM_FILE}" | tee -a "${LOG_FILE}"
+echo "Output BAM: ${ALIGNMENT_BAM_FILE}" | tee -a "${LOG_BAM}" # <-- **POTENTIAL CULPRIT HERE!** Check this line!
 echo "Requested CPUs: ${SLURM_CPUS_PER_TASK}" | tee -a "${LOG_FILE}"
 echo "Requested Memory: ${SLURM_MEM}" | tee -a "${LOG_FILE}"
+
 
 # --- Step 1: Run minimap2 for alignment ---
 echo "Running minimap2 alignment..." | tee -a "${LOG_FILE}"
