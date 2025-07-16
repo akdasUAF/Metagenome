@@ -1,0 +1,134 @@
+#!/bin/bash
+#
+# SLURM script for running Minimap2 alignment followed by Samtools processing.
+#
+
+#SBATCH --partition=t1small       # Your desired partition
+#SBATCH --ntasks=1                # We will run one main task (the script itself)
+#SBATCH --cpus-per-task=24        # Request 24 CPU cores for this task
+#SBATCH --mem=64G                 # Request 64 GB of RAM for the entire job
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="Minimap2_Samtools_Align"
+#SBATCH --output=logs/slurm_minimap2_%j.log   # Standard output log
+#SBATCH --error=logs/slurm_minimap2_err_%j.log # Standard error log
+
+## Clean out any modules, then reload slurm (this might be site-specific, adjust if needed)
+# module purge
+# module load slurm
+
+# Essential for large memory allocations on some systems
+ulimit -l unlimited
+
+# Activate your Medaka conda environment
+# Ensure 'conda' is in your PATH or specify full path if needed (e.g., /path/to/miniconda3/bin/conda)
+conda activate medaka
+
+# --- Input Parameters (passed as arguments to the sbatch script) ---
+# Usage: sbatch minimap_script.sh <DATASET_ID> <ASSEMBLER_ID> <RAW_READS_FULLPATH> <DRAFT_ASSEMBLY_FULLPATH>
+declare -r DATASET_ID="$1"
+declare -r ASSEMBLER_ID="$2"
+declare -r RAW_READS_FULLPATH="$3"
+declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
+
+# --- Define Output Paths ---
+# It's good practice to define output directories relative to your job's working directory
+# or a specific scratch space if your cluster has one (e.g., $SCRATCH or $TMPDIR)
+# For now, let's assume `data/raven/lr-even/` is accessible and writable from the job.
+# Adjust these paths as necessary for your cluster's file system layout.
+
+# Base directory for outputs (ensure this path is appropriate for your system, e.g., scratch)
+# Using SLURM_SUBMIT_DIR ensures output goes where you submitted the job from,
+# or you might want to change it to a scratch directory for better I/O.
+# For this example, I'll keep it as provided, assuming it's writable.
+# If "data/raven/lr-even/" is a fixed output location, make sure it's created and accessible.
+OUTPUT_DIR="data/raven/lr-even"
+mkdir -p "${OUTPUT_DIR}" # Ensure the output directory exists
+
+declare -r ALIGNMENT_SAM_FILE="${OUTPUT_DIR}/${DATASET_ID}_${ASSEMBLER_ID}_alignment.sam"
+declare -r ALIGNMENT_BAM_FILE="${OUTPUT_DIR}/${DATASET_ID}_${ASSEMBLER_ID}_calls_to_draft.bam"
+declare -r LOG_FILE="logs/${DATASET_ID}_${ASSEMBLER_ID}_minimap_samtools.log" # Combined log for main commands
+
+# Ensure the logs directory exists
+mkdir -p logs
+
+echo "--- Job Started: $(date) ---" | tee -a "${LOG_FILE}"
+echo "Dataset ID: ${DATASET_ID}" | tee -a "${LOG_FILE}"
+echo "Assembler ID: ${ASSEMBLER_ID}" | tee -a "${LOG_FILE}"
+echo "Raw Reads: ${RAW_READS_FULLPATH}" | tee -a "${LOG_FILE}"
+echo "Draft Assembly: ${DRAFT_ASSEMBLY_FULLPATH}" | tee -a "${LOG_FILE}"
+echo "Output SAM: ${ALIGNMENT_SAM_FILE}" | tee -a "${LOG_FILE}"
+echo "Output BAM: ${ALIGNMENT_BAM_FILE}" | tee -a "${LOG_FILE}"
+echo "Requested CPUs: ${SLURM_CPUS_PER_TASK}" | tee -a "${LOG_FILE}"
+echo "Requested Memory: ${SLURM_MEM}" | tee -a "${LOG_FILE}"
+
+# --- Step 1: Run minimap2 for alignment ---
+echo "Running minimap2 alignment..." | tee -a "${LOG_FILE}"
+# Using SLURM_CPUS_PER_TASK to pass thread count to minimap2
+# Redirect stderr to the combined log file as well
+conda run -n medaka minimap2 -ax map-ont \
+    -t "${SLURM_CPUS_PER_TASK}" \
+    "${DRAFT_ASSEMBLY_FULLPATH}" \
+    "${RAW_READS_FULLPATH}" \
+    > "${ALIGNMENT_SAM_FILE}" 2>> "${LOG_FILE}"
+
+# Check if minimap2 was successful
+if [ $? -ne 0 ]; then
+    echo "ERROR: minimap2 alignment failed." | tee -a "${LOG_FILE}"
+    exit 1
+fi
+echo "Minimap2 alignment completed successfully." | tee -a "${LOG_FILE}"
+
+# --- Step 2: Convert SAM to BAM and Sort BAM ---
+echo "Converting SAM to BAM and sorting..." | tee -a "${LOG_FILE}"
+# It's crucial to set memory for samtools sort appropriately.
+# SLURM_MEM is total memory. For samtools sort -m, it's memory PER THREAD.
+# Let's aim for a total of (e.g.) 10GB for sorting, distributed among threads.
+# Max threads for samtools sort should be reasonable.
+# Given your 64GB request and 16GB available, aiming for 10-15GB for sort is a start.
+# If you use 24 threads, that's 10GB / 24 threads ~= 400MB/thread.
+# Let's try to be safe with 500MB per thread if using all 24 threads.
+# Or, if you want more memory per thread, reduce the number of threads for sorting.
+# For example, 1GB per thread for 10 threads = 10GB total.
+# Let's use the SLURM_CPUS_PER_TASK for -@, and calculate -m based on total requested memory
+# divided by tasks, then divided by threads, or a fixed reasonable value.
+# A fixed value (e.g., 500M or 1G) for -m is often safer than trying to dynamically calculate from SLURM_MEM for per-thread.
+# Given your 64GB --mem request, and the memory issues you had, let's pick a conservative -m
+# that still uses most threads, say 1GB per thread for half the cores, or 500MB for all cores.
+# Let's choose 500M for -m to utilize all 24 cores for sorting, aiming for 12GB total.
+
+# Option 1: Use all requested cores for sorting, conservative memory per thread.
+# SAMTOOLS_SORT_MEM_PER_THREAD="500M" # 500MB per thread * 24 threads = 12GB total
+# samtools view -bS "${ALIGNMENT_SAM_FILE}" 2>> "${LOG_FILE}" | \
+#     samtools sort -m "${SAMTOOLS_SORT_MEM_PER_THREAD}" -@ "${SLURM_CPUS_PER_TASK}" -o "${ALIGNMENT_BAM_FILE}" 2>> "${LOG_FILE}"
+
+# Option 2: Use fewer cores for sorting but more memory per thread. This might be safer if you have memory fragmentation.
+# Let's try 10 threads, with 1.5GB per thread, aiming for 15GB total for sorting.
+SAMTOOLS_SORT_THREADS=10
+SAMTOOLS_SORT_MEM_PER_THREAD="1500M" # 1.5GB per thread
+
+samtools view -bS "${ALIGNMENT_SAM_FILE}" 2>> "${LOG_FILE}" | \
+    samtools sort -m "${SAMTOOLS_SORT_MEM_PER_THREAD}" -@ "${SAMTOOLS_SORT_THREADS}" -o "${ALIGNMENT_BAM_FILE}" 2>> "${LOG_FILE}"
+
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Samtools conversion/sorting failed." | tee -a "${LOG_FILE}"
+    exit 1
+fi
+echo "Samtools conversion and sorting completed successfully." | tee -a "${LOG_FILE}"
+
+# --- Step 3: Index the sorted BAM file ---
+echo "Indexing BAM file..." | tee -a "${LOG_FILE}"
+samtools index "${ALIGNMENT_BAM_FILE}" 2>> "${LOG_FILE}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Samtools indexing failed." | tee -a "${LOG_FILE}"
+    exit 1
+fi
+echo "BAM file indexed successfully." | tee -a "${LOG_FILE}"
+
+# --- Clean up intermediate SAM file (optional but recommended for disk space) ---
+echo "Cleaning up intermediate SAM file: ${ALIGNMENT_SAM_FILE}" | tee -a "${LOG_FILE}"
+rm -f "${ALIGNMENT_SAM_FILE}" 2>> "${LOG_FILE}"
+
+echo "--- Job Finished: $(date) ---" | tee -a "${LOG_FILE}"
