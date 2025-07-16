@@ -3,7 +3,6 @@
 #SBATCH --ntasks=1                # We will run one main task (the script itself)
 #SBATCH --cpus-per-task=24        # Request 24 CPU cores for this task (adjust as needed for pypolca -t)
 #SBATCH --mem=64G                 # Request 64 GB of RAM for the entire job (adjust as needed)
-#SBATCH --time=12:00:00           # Maximum wall-clock time (e.g., 12 hours) - adjust as needed
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --job-name="Pypolca_Polishing"
@@ -18,7 +17,7 @@
 # Replace '/path/to/your/conda/installation/etc/profile.d/conda.sh' with the actual path
 # where your Miniconda/Anaconda is installed.
 # Example: source /home/wwinnett/miniconda3/etc/profile.d/conda.sh
-source /path/to/your/conda/installation/etc/profile.d/conda.sh
+source ~/miniconda3/etc/profile.d/conda.sh 
 
 # Essential for large memory allocations on some systems
 ulimit -l unlimited
