@@ -41,22 +41,19 @@ declare -r ASSEMBLER_NAME="$2"
 declare -r ALIGNED_READS_BAM_FULLPATH="$3" # Now arg 3: the pre-aligned BAM
 declare -r DRAFT_ASSEMBLY_FULLPATH="$4"    # Now arg 4: the draft assembly
 
-# No need for RAW_READS_BASENAME as we are not dealing with raw FASTQ here
-
 # Conda Environment Name
 declare -r MEDAKA_ENV_NAME="medaka" # Ensure you have this environment set up: conda create -n medaka -c bioconda medaka
 
 # Medaka Model to use (adjust for your specific sequencing chemistry and basecalling)
 # IMPORTANT: This must match your data (e.g., r941_min_hac_g507, r104_min_hac_g610)
-declare -r MEDAKA_MODEL="r941_min_hac_g507" # Changed to HAC as it's common
+declare -r MEDAKA_MODEL="r941_min_hac_g507"
 
 # --- 2. Derived Paths & Logging Setup ---
-# NEW OUTPUT STRUCTURE: data/<assembler>/<dataset>/medaka_polish_results/
-declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_prealigned" # Updated output suffix for clarity
+# NEW OUTPUT STRUCTURE: data/<assembler>/<dataset>/medaka_polish_results_prealigned/
+declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_prealigned"
 
 # All sub-directories will be under this new base
 declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
-# No separate ALIGNMENT_DIR needed as we use pre-existing BAM
 declare -r MEDAKA_OUT_DIR="${OUTPUT_BASE_DIR}/polished_assembly" # This is where consensus.fasta will land
 
 # Create necessary directories
@@ -64,7 +61,7 @@ mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR
 mkdir -p "${MEDAKA_OUT_DIR}" || { echo "ERROR: Could not create medaka output directory ${MEDAKA_OUT_DIR}"; exit 1; }
 
 # Detailed command log file
-declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_prealigned_workflow.log" # Updated log file name
+declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_prealigned_workflow.log"
 # Clear the log file at the start of the script
 > "${path_log}"
 
@@ -75,7 +72,7 @@ echo "Script started at $(date)"
 echo "Configuration:"
 echo "  Dataset Name: ${DATASET_NAME}"
 echo "  Assembler Name: ${ASSEMBLER_NAME}"
-echo "  Aligned Reads BAM: ${ALIGNED_READS_BAM_FULLPATH}" # New echo
+echo "  Aligned Reads BAM: ${ALIGNED_READS_BAM_FULLPATH}"
 echo "  Draft Assembly: ${DRAFT_ASSEMBLY_FULLPATH}"
 echo "  Medaka Env: ${MEDAKA_ENV_NAME}"
 echo "  Medaka Model: ${MEDAKA_MODEL}"
@@ -107,21 +104,25 @@ echo "########## Running Medaka Polishing Stage ##########"
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
 
-# Check if medaka inference is available
-if ! command -v medaka inference &> /dev/null; then
-    echo "ERROR: medaka inference not found. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}' environment."
+# Check if medaka is available in the activated environment
+if ! command -v medaka &> /dev/null; then
+    echo "ERROR: 'medaka' command not found after activating environment. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}'."
     exit 1
 fi
 
 echo "Running Medaka inference (polishing) with pre-aligned BAM..."
 
-medaka inference \
+# Debugging: Print the exact command being executed
+set -x
+conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
     --reads "${ALIGNED_READS_BAM_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUT_DIR}" \
     --model "${MEDAKA_MODEL}" \
     --threads "${SLURM_CPUS_PER_TASK}"
+set +x # Turn off debugging output
 
+# Check if Medaka was successful (note: Medaka might return 0 even on errors as seen in your log)
 if [ $? -ne 0 ]; then
     echo "ERROR: Medaka inference failed. Exit status: $?."
     exit 1
