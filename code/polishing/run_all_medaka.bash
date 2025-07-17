@@ -30,3 +30,11 @@ sbatch code/polishing/run_medaka.batch \
 # lr-ms: data/raven/lr-ms/assembly_raven_lr-ms.fasta
 #root_dir=$(pwd)
 #cd tools/polishing/herro/
+
+
+
+sbatch code/polishing/run_medaka.batch \
+    "lr-even" \
+    "raven" \
+    "path/to/your/lr-even_raw_reads.fastq" \
+    "data/raven/lr-even/assembly_raven_lr-even.fasta"
