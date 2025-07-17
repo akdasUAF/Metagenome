@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=polypolish           # Job name
-#SBATCH --partition=t1standard               # Partition name (e.g., debug, standard, highmem) - **Adjust this**
+#SBATCH --partition=t1small               # Partition name (e.g., debug, standard, highmem) - **Adjust this**
 #SBATCH --nodes=1                       # Number of nodes
 #SBATCH --ntasks=1                      # Number of tasks
 #SBATCH --cpus-per-task=24              # Number of CPU cores per task - **Adjust this based on available resources**
