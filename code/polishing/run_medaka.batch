@@ -55,10 +55,12 @@ declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish
 # All sub-directories will be under this new base
 declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
 declare -r MEDAKA_OUT_DIR="${OUTPUT_BASE_DIR}/polished_assembly" # This is where consensus.fasta will land
+declare -r FEATURES_DIR="${OUTPUT_BASE_DIR}/medaka_features" # New: Directory for intermediate features
 
 # Create necessary directories
 mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
 mkdir -p "${MEDAKA_OUT_DIR}" || { echo "ERROR: Could not create medaka output directory ${MEDAKA_OUT_DIR}"; exit 1; }
+mkdir -p "${FEATURES_DIR}" || { echo "ERROR: Could not create features directory ${FEATURES_DIR}"; exit 1; } # New: Create features dir
 
 # Detailed command log file
 declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_prealigned_workflow.log"
@@ -98,27 +100,14 @@ fi
 echo "Current memory usage before Medaka:"
 free -h
 
-# --- 3. Medaka Polishing ---
-echo "########## Running Medaka Polishing Stage ##########"
+# --- 3. Medaka Polishing (Two-Step Process for Medaka 2.0.1) ---
+echo "########## Running Medaka Polishing Stage (Two-Step) ##########"
 
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
 
-# --- DIAGNOSTIC COMMANDS ---
-echo "--- Medaka Diagnostic Info ---"
 echo "Medaka version:"
 conda run -n "${MEDAKA_ENV_NAME}" medaka --version
-echo ""
-
-echo "Conda list for medaka environment:"
-conda list -n "${MEDAKA_ENV_NAME}" | grep medaka
-echo ""
-
-echo "Medaka full help message:"
-conda run -n "${MEDAKA_ENV_NAME}" medaka --help
-echo "----------------------------"
-echo ""
-# --- END DIAGNOSTIC COMMANDS ---
 
 # Check if medaka is available in the activated environment
 if ! command -v medaka &> /dev/null; then
@@ -126,24 +115,43 @@ if ! command -v medaka &> /dev/null; then
     exit 1
 fi
 
-# **COMMENT OUT THE MEDAKA POLISHING COMMAND FOR NOW**
-# We need to analyze the diagnostic output before trying another command.
-# echo "Running Medaka polishing with 'medaka polish' command..."
-# set -x
-# conda run -n "${MEDAKA_ENV_NAME}" medaka polish \
-#     --reads "${ALIGNED_READS_BAM_FULLPATH}" \
-#     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
-#     --out_dir "${MEDAKA_OUT_DIR}" \
-#     --model "${MEDAKA_MODEL}" \
-#     --threads "${SLURM_CPUS_PER_TASK}"
-# set +x
+# --- Step 1: Generate Features ---
+echo "--- Step 1/2: Running Medaka features to create variant features ---"
+echo "Command: medaka features --reads ${ALIGNED_READS_BAM_FULLPATH} --draft ${DRAFT_ASSEMBLY_FULLPATH} --out_dir ${FEATURES_DIR} --threads ${SLURM_CPUS_PER_TASK}"
 
-# Remove the error check for Medaka polishing since we're commenting it out
-# if [ $? -ne 0 ]; then
-#     echo "ERROR: Medaka polishing failed. Exit status: $?."
-#     exit 1
-# fi
+set -x
+conda run -n "${MEDAKA_ENV_NAME}" medaka features \
+    --reads "${ALIGNED_READS_BAM_FULLPATH}" \
+    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
+    --out_dir "${FEATURES_DIR}" \
+    --threads "${SLURM_CPUS_PER_TASK}"
+set +x
 
+if [ $? -ne 0 ]; then
+    echo "ERROR: Medaka features step failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Medaka features generation completed. Features are in: ${FEATURES_DIR}"
+
+# --- Step 2: Generate Consensus from Features ---
+echo "--- Step 2/2: Running Medaka consensus_from_features to produce polished assembly ---"
+echo "Command: medaka consensus_from_features --features ${FEATURES_DIR} --out_dir ${MEDAKA_OUT_DIR} --model ${MEDAKA_MODEL} --threads ${SLURM_CPUS_PER_TASK}"
+
+set -x
+conda run -n "${MEDAKA_ENV_NAME}" medaka consensus_from_features \
+    --features "${FEATURES_DIR}" \
+    --out_dir "${MEDAKA_OUT_DIR}" \
+    --model "${MEDAKA_MODEL}" \
+    --threads "${SLURM_CPUS_PER_TASK}"
+set +x
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Medaka consensus_from_features step failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUT_DIR}/consensus.fasta"
 echo "Script finished at $(date)"
 
 # Deactivate conda environment
