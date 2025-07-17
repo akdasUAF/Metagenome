@@ -102,6 +102,8 @@ else
 fi
 echo "--- Conda Environment and Tool Check Complete ---"
 
+# ... (previous script content)
+
 echo "Starting Pypolca polishing..."
 
 # --- Construct Pypolca Command Array ---
@@ -125,9 +127,11 @@ for f in "${R2_FASTQ_ARRAY[@]}"; do
     PYPOLCA_COMMAND_ARRAY+=("-2" "${f}")
 done
 
-# --- Execute Pypolca ---
-# Using the constructed array to ensure arguments are passed correctly.
-"${PYPOLCA_COMMAND_ARRAY[@]}"
+# --- Debugging: Print the exact command being executed ---
+# This line will show the full pypolca command that Bash constructs.
+set -x
+"${PYPOLCA_COMMAND_ARRAY[@]}" # Execute the command from the array
+set +x # Turn off debugging output immediately after the command
 
 # Check if Pypolca was successful
 if [ $? -ne 0 ]; then
