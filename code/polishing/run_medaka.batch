@@ -38,36 +38,32 @@ fi
 
 declare -r DATASET_NAME="$1"
 declare -r ASSEMBLER_NAME="$2"
-declare -r ALIGNED_READS_BAM_FULLPATH="$3" # Now arg 3: the pre-aligned BAM
-declare -r DRAFT_ASSEMBLY_FULLPATH="$4"    # Now arg 4: the draft assembly
+declare -r ALIGNED_READS_BAM_FULLPATH="$3"
+declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
 
 # Conda Environment Name
-declare -r MEDAKA_ENV_NAME="medaka" # Ensure you have this environment set up: conda create -n medaka -c bioconda medaka
+declare -r MEDAKA_ENV_NAME="medaka"
 
-# Medaka Model to use (adjust for your specific sequencing chemistry and basecalling)
-# IMPORTANT: This must match your data (e.g., r941_min_hac_g507, r104_min_hac_g610)
+# Medaka Model to use
 declare -r MEDAKA_MODEL="r941_min_hac_g507"
 
 # --- 2. Derived Paths & Logging Setup ---
-# NEW OUTPUT STRUCTURE: data/<assembler>/<dataset>/medaka_polish_results_prealigned/
 declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_prealigned"
 
-# All sub-directories will be under this new base
 declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
-declare -r MEDAKA_OUT_DIR="${OUTPUT_BASE_DIR}/polished_assembly" # This is where consensus.fasta will land
-declare -r FEATURES_DIR="${OUTPUT_BASE_DIR}/medaka_features" # New: Directory for intermediate features
+declare -r FEATURES_DIR="${OUTPUT_BASE_DIR}/medaka_features" # For medaka features output
+declare -r INFERENCE_DIR="${OUTPUT_BASE_DIR}/medaka_inference" # For medaka inference output
+declare -r POLISHED_ASSEMBLY_DIR="${OUTPUT_BASE_DIR}/polished_assembly" # For final consensus.fasta
 
 # Create necessary directories
 mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
-mkdir -p "${MEDAKA_OUT_DIR}" || { echo "ERROR: Could not create medaka output directory ${MEDAKA_OUT_DIR}"; exit 1; }
-mkdir -p "${FEATURES_DIR}" || { echo "ERROR: Could not create features directory ${FEATURES_DIR}"; exit 1; } # New: Create features dir
+mkdir -p "${FEATURES_DIR}" || { echo "ERROR: Could not create features directory ${FEATURES_DIR}"; exit 1; }
+mkdir -p "${INFERENCE_DIR}" || { echo "ERROR: Could not create inference directory ${INFERENCE_DIR}"; exit 1; }
+mkdir -p "${POLISHED_ASSEMBLY_DIR}" || { echo "ERROR: Could not create polished assembly directory ${POLISHED_ASSEMBLY_DIR}"; exit 1; }
 
-# Detailed command log file
+
 declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_prealigned_workflow.log"
-# Clear the log file at the start of the script
 > "${path_log}"
-
-# Redirect all script output to path_log and to the slurm_job_*.log (using tee)
 exec &> >(tee -a "${path_log}")
 
 echo "Script started at $(date)"
@@ -81,12 +77,10 @@ echo "  Medaka Model: ${MEDAKA_MODEL}"
 echo "  Output Base Directory: ${OUTPUT_BASE_DIR}"
 echo ""
 
-# Verify input files exist
 if [ ! -f "${ALIGNED_READS_BAM_FULLPATH}" ]; then
     echo "ERROR: Aligned reads BAM file not found: ${ALIGNED_READS_BAM_FULLPATH}"
     exit 1
 fi
-# Verify BAM index exists (Medaka needs it)
 if [ ! -f "${ALIGNED_READS_BAM_FULLPATH}.bai" ]; then
     echo "ERROR: BAM index file not found: ${ALIGNED_READS_BAM_FULLPATH}.bai"
     echo "Please ensure your BAM file is indexed (e.g., with 'samtools index')."
@@ -100,8 +94,8 @@ fi
 echo "Current memory usage before Medaka:"
 free -h
 
-# --- 3. Medaka Polishing (Two-Step Process for Medaka 2.0.1) ---
-echo "########## Running Medaka Polishing Stage (Two-Step) ##########"
+# --- 3. Medaka Polishing (Three-Step Process for Medaka 2.0.1) ---
+echo "########## Running Medaka Polishing Stage (Three-Step) ##########"
 
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
@@ -109,21 +103,21 @@ conda activate "${MEDAKA_ENV_NAME}"
 echo "Medaka version:"
 conda run -n "${MEDAKA_ENV_NAME}" medaka --version
 
-# Check if medaka is available in the activated environment
 if ! command -v medaka &> /dev/null; then
     echo "ERROR: 'medaka' command not found after activating environment. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}'."
     exit 1
 fi
 
-# --- Step 1: Generate Features ---
-echo "--- Step 1/2: Running Medaka features to create variant features ---"
-echo "Command: medaka features --reads ${ALIGNED_READS_BAM_FULLPATH} --draft ${DRAFT_ASSEMBLY_FULLPATH} --out_dir ${FEATURES_DIR} --threads ${SLURM_CPUS_PER_TASK}"
+# --- Step 1/3: Generate Features ---
+echo "--- Step 1/3: Running Medaka features to create variant features ---"
+# Medaka features requires the BAM and an output directory (for features).
+# The draft is not a direct input to 'features' in this version, it relies on the BAM being aligned to it.
+echo "Command: medaka features ${ALIGNED_READS_BAM_FULLPATH} ${FEATURES_DIR} --threads ${SLURM_CPUS_PER_TASK}"
 
 set -x
 conda run -n "${MEDAKA_ENV_NAME}" medaka features \
-    --reads "${ALIGNED_READS_BAM_FULLPATH}" \
-    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
-    --out_dir "${FEATURES_DIR}" \
+    "${ALIGNED_READS_BAM_FULLPATH}" \
+    "${FEATURES_DIR}" \
     --threads "${SLURM_CPUS_PER_TASK}"
 set +x
 
@@ -134,24 +128,49 @@ fi
 
 echo "Medaka features generation completed. Features are in: ${FEATURES_DIR}"
 
-# --- Step 2: Generate Consensus from Features ---
-echo "--- Step 2/2: Running Medaka consensus_from_features to produce polished assembly ---"
-echo "Command: medaka consensus_from_features --features ${FEATURES_DIR} --out_dir ${MEDAKA_OUT_DIR} --model ${MEDAKA_MODEL} --threads ${SLURM_CPUS_PER_TASK}"
+
+# --- Step 2/3: Run Inference (Apply Model to Features) ---
+echo "--- Step 2/3: Running Medaka inference to apply model to features ---"
+# Medaka inference takes features and outputs inference results.
+# Note: The 'inference' command's --help also shows 'bam output', but the general Medaka help suggests it works with features.
+# It seems `medaka inference` when used with features might be implicit, or it's designed to take a *directory* of features.
+# Let's try passing the features directory to it as the 'bam' argument from its help, and the inference output directory.
+# This is a bit of a guess based on the 'sequence' subcommand's description.
+echo "Command: medaka inference ${FEATURES_DIR} ${INFERENCE_DIR} --model ${MEDAKA_MODEL}"
 
 set -x
-conda run -n "${MEDAKA_ENV_NAME}" medaka consensus_from_features \
-    --features "${FEATURES_DIR}" \
-    --out_dir "${MEDAKA_OUT_DIR}" \
-    --model "${MEDAKA_MODEL}" \
-    --threads "${SLURM_CPUS_PER_TASK}"
+conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
+    "${FEATURES_DIR}" \
+    "${INFERENCE_DIR}" \
+    --model "${MEDAKA_MODEL}"
 set +x
 
 if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka consensus_from_features step failed. Exit status: $?."
+    echo "ERROR: Medaka inference (from features) step failed. Exit status: $?."
     exit 1
 fi
 
-echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUT_DIR}/consensus.fasta"
+echo "Medaka inference completed. Inference results are in: ${INFERENCE_DIR}"
+
+
+# --- Step 3/3: Generate Consensus Sequence from Inference Results ---
+echo "--- Step 3/3: Running Medaka sequence to produce final polished assembly ---"
+# Medaka sequence takes the inference output directory and the original draft to produce the consensus.
+echo "Command: medaka sequence ${INFERENCE_DIR} ${DRAFT_ASSEMBLY_FULLPATH} ${POLISHED_ASSEMBLY_DIR}"
+
+set -x
+conda run -n "${MEDAKA_ENV_NAME}" medaka sequence \
+    "${INFERENCE_DIR}" \
+    "${DRAFT_ASSEMBLY_FULLPATH}" \
+    "${POLISHED_ASSEMBLY_DIR}"
+set +x
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Medaka sequence step failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Medaka polishing completed. Final polished assembly will be in: ${POLISHED_ASSEMBLY_DIR}/consensus.fasta"
 echo "Script finished at $(date)"
 
 # Deactivate conda environment
