@@ -106,15 +106,23 @@ echo "--- Conda Environment and Tool Check Complete ---"
 
 echo "Starting Pypolca polishing..."
 
+
+
+# Join the arrays back into comma-separated strings
+# (This is what pypolca appears to expect for multiple reads)
+JOINED_R1_FASTQ=$(IFS=,; echo "${R1_FASTQ_ARRAY[*]}")
+JOINED_R2_FASTQ=$(IFS=,; echo "${R2_FASTQ_ARRAY[*]}")
+
 # --- Construct Pypolca Command Array ---
-# This is the key change to handle multiple read files correctly.
 PYPOLCA_COMMAND_ARRAY=(
     pypolca run
     -a "${GENOME_FASTA}"
     -t "${SLURM_CPUS_PER_TASK}"
     -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}"
     --careful
-    --memory_limit 2G # Re-added this based on your previous pypolca log output. Adjust if you need more.
+    --memory_limit 2G
+    -1 "${JOINED_R1_FASTQ}" # Pass as a single comma-separated string
+    -2 "${JOINED_R2_FASTQ}" # Pass as a single comma-separated string
 )
 
 # Append R1 files by repeating '-1' for each file
