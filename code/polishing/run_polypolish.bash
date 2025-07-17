@@ -5,9 +5,8 @@
 #SBATCH --ntasks=1                      # Number of tasks
 #SBATCH --cpus-per-task=24              # Number of CPU cores per task - **Adjust this based on available resources**
 #SBATCH --mem=32G                       # Memory per node - **Adjust this based on your data size**
-#SBATCH --time=04:00:00                 # Wall clock time limit (HH:MM:SS) - **Adjust this for longer jobs**
-#SBATCH --error=slurm-%j.err            # Standard error file
-#SBATCH --output=slurm-%j.out           # Standard output file
+#SBATCH --error=slurm-polypolish_%j.err            # Standard error file
+#SBATCH --output=slurm-polypolish_%j.out           # Standard output file
 
 # --- Load necessary modules ---
 # These commands load the software into your environment.

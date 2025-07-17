@@ -35,11 +35,11 @@
 
 #### Megahit
 # sr-even - COMPLETE
-sbatch code/polishing/run_pypolca.batch \
-    "data/megahit/sr-even/final.contigs.fa" \
+sbatch code/polishing/run_polypolish.bash \
+    "data/polished/megahit_sr-even_polished/pypolca_corrected.fasta" \
     "data/raw/sr-even/sr-even_trimmed_1.fastq" \
     "data/raw/sr-even/sr-even_trimmed_2.fastq" \
-    "megahit_sr-even_polished"
+    "pypolca_megahit_sr-even_polypolished"
 
 # sr-log - COMPLETE
 sbatch code/polishing/run_pypolca.batch \
