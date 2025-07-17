@@ -12,11 +12,9 @@
 # These commands load the software into your environment.
 # If these modules aren't available on your HPC, you might need to
 # adjust your PATH environment variable to point directly to the executables.
-module load bwa
-module load samtools
-# Note: 'polypolish' is assumed to be in your PATH or specified by its full path later.
-# If you built it yourself in '~/Polypolish/target/release/polypolish',
-# you'll use './target/release/polypolish' or the full path.
+module load GCC/11.3.0
+module load BWA/0.7.17
+module load SAMtools/1.17
 
 echo "--- Starting Polypolish Job ---"
 echo "Job ID: ${SLURM_JOB_ID}"
