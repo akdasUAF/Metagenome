@@ -107,13 +107,30 @@ echo "--- Conda Environment and Tool Check Complete ---"
 echo "Starting Pypolca polishing..."
 
 
+# Define paths for concatenated files
+CONCAT_R1_FASTQ="${OUTPUT_DIR}/${OUTPUT_PREFIX}_all_R1.fastq"
+CONCAT_R2_FASTQ="${OUTPUT_DIR}/${OUTPUT_PREFIX}_all_R2.fastq"
 
-# Join the arrays back into comma-separated strings
-# (This is what pypolca appears to expect for multiple reads)
-JOINED_R1_FASTQ=$(IFS=,; echo "${R1_FASTQ_ARRAY[*]}")
-JOINED_R2_FASTQ=$(IFS=,; echo "${R2_FASTQ_ARRAY[*]}")
+echo "Concatenating R1 files into: ${CONCAT_R1_FASTQ}"
+# Concatenate all R1 files into a single output file
+cat "${R1_FASTQ_ARRAY[@]}" > "${CONCAT_R1_FASTQ}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to concatenate R1 files."
+    exit 1
+fi
+
+echo "Concatenating R2 files into: ${CONCAT_R2_FASTQ}"
+# Concatenate all R2 files into a single output file
+cat "${R2_FASTQ_ARRAY[@]}" > "${CONCAT_R2_FASTQ}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to concatenate R2 files."
+    exit 1
+fi
 
 # --- Construct Pypolca Command Array ---
+# Now, we only pass the two concatenated files to pypolca
 PYPOLCA_COMMAND_ARRAY=(
     pypolca run
     -a "${GENOME_FASTA}"
@@ -121,19 +138,9 @@ PYPOLCA_COMMAND_ARRAY=(
     -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}"
     --careful
     --memory_limit 2G
-    -1 "${JOINED_R1_FASTQ}" # Pass as a single comma-separated string
-    -2 "${JOINED_R2_FASTQ}" # Pass as a single comma-separated string
+    -1 "${CONCAT_R1_FASTQ}" # Pass the single concatenated R1 file
+    -2 "${CONCAT_R2_FASTQ}" # Pass the single concatenated R2 file
 )
-
-# Append R1 files by repeating '-1' for each file
-for f in "${R1_FASTQ_ARRAY[@]}"; do
-    PYPOLCA_COMMAND_ARRAY+=("-1" "${f}")
-done
-
-# Append R2 files by repeating '-2' for each file
-for f in "${R2_FASTQ_ARRAY[@]}"; do
-    PYPOLCA_COMMAND_ARRAY+=("-2" "${f}")
-done
 
 # --- Debugging: Print the exact command being executed ---
 # This line will show the full pypolca command that Bash constructs.
@@ -149,5 +156,8 @@ fi
 echo "Pypolca polishing completed successfully."
 
 echo "--- Job Finished: $(date) ---"
+
+# Optionally, remove the concatenated temporary files if you don't need them
+# rm "${CONCAT_R1_FASTQ}" "${CONCAT_R2_FASTQ}"
 
 conda deactivate
