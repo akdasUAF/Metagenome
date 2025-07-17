@@ -104,13 +104,17 @@ echo "########## Running Medaka Polishing Stage ##########"
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
 
+# Add this line to get the version
+echo "Medaka version:"
+conda run -n "${MEDAKA_ENV_NAME}" medaka --version
+
 # Check if medaka is available in the activated environment
 if ! command -v medaka &> /dev/null; then
     echo "ERROR: 'medaka' command not found after activating environment. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}'."
     exit 1
 fi
 
-# ... (rest of your script)
+echo "Running Medaka inference (polishing) with pre-aligned BAM..."
 
 echo "Running Medaka inference (polishing) with pre-aligned BAM (Attempt 4)..."
 
