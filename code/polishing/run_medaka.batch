@@ -1,0 +1,134 @@
+#!/bin/bash
+#SBATCH --partition=t1small       # Or your preferred partition
+#SBATCH --ntasks=1                # Total number of tasks
+#SBATCH --cpus-per-task=24        # Number of CPU cores per task (adjust as needed for --threads)
+#SBATCH --mem=64G                 # Total memory for the job (adjust based on assembly/read size)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="medaka_polish_prealigned" # Changed job name
+#SBATCH --output=logs/slurm_medaka_prealigned_%j.log # Changed log file name
+#SBATCH --error=logs/slurm_medaka_prealigned_err_%j.log # Changed log file name
+
+# Set unlimited locked memory for processes (good for large jobs)
+ulimit -l unlimited
+ulimit -n 65536 # Increase open file descriptor limit if needed
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+# --- 1. User Configuration & Argument Parsing ---
+# Input arguments for this script:
+# $1: <dataset_name> (e.g., "lr-even")
+# $2: <assembler_name> (e.g., "raven")
+# $3: <aligned_reads_bam_path> (Full path to your pre-aligned and indexed BAM file)
+# $4: <draft_assembly_fasta_path> (Full path to draft assembly file)
+if [ "$#" -ne 4 ]; then
+    echo "Usage: sbatch $0 <dataset_name> <assembler_name> <aligned_reads_bam_path> <draft_assembly_fasta_path>"
+    echo "Example: sbatch $0 lr-even raven data/raven/lr-even/lr-even_raven_calls_to_draft.bam data/raven/lr-even/assembly_raven_lr-even.fasta"
+    exit 1
+fi
+
+declare -r DATASET_NAME="$1"
+declare -r ASSEMBLER_NAME="$2"
+declare -r ALIGNED_READS_BAM_FULLPATH="$3" # Now arg 3: the pre-aligned BAM
+declare -r DRAFT_ASSEMBLY_FULLPATH="$4"    # Now arg 4: the draft assembly
+
+# No need for RAW_READS_BASENAME as we are not dealing with raw FASTQ here
+
+# Conda Environment Name
+declare -r MEDAKA_ENV_NAME="medaka" # Ensure you have this environment set up: conda create -n medaka -c bioconda medaka
+
+# Medaka Model to use (adjust for your specific sequencing chemistry and basecalling)
+# IMPORTANT: This must match your data (e.g., r941_min_hac_g507, r104_min_hac_g610)
+declare -r MEDAKA_MODEL="r941_min_hac_g507" # Changed to HAC as it's common
+
+# --- 2. Derived Paths & Logging Setup ---
+# NEW OUTPUT STRUCTURE: data/<assembler>/<dataset>/medaka_polish_results/
+declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_prealigned" # Updated output suffix for clarity
+
+# All sub-directories will be under this new base
+declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
+# No separate ALIGNMENT_DIR needed as we use pre-existing BAM
+declare -r MEDAKA_OUT_DIR="${OUTPUT_BASE_DIR}/polished_assembly" # This is where consensus.fasta will land
+
+# Create necessary directories
+mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
+mkdir -p "${MEDAKA_OUT_DIR}" || { echo "ERROR: Could not create medaka output directory ${MEDAKA_OUT_DIR}"; exit 1; }
+
+# Detailed command log file
+declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_prealigned_workflow.log" # Updated log file name
+# Clear the log file at the start of the script
+> "${path_log}"
+
+# Redirect all script output to path_log and to the slurm_job_*.log (using tee)
+exec &> >(tee -a "${path_log}")
+
+echo "Script started at $(date)"
+echo "Configuration:"
+echo "  Dataset Name: ${DATASET_NAME}"
+echo "  Assembler Name: ${ASSEMBLER_NAME}"
+echo "  Aligned Reads BAM: ${ALIGNED_READS_BAM_FULLPATH}" # New echo
+echo "  Draft Assembly: ${DRAFT_ASSEMBLY_FULLPATH}"
+echo "  Medaka Env: ${MEDAKA_ENV_NAME}"
+echo "  Medaka Model: ${MEDAKA_MODEL}"
+echo "  Output Base Directory: ${OUTPUT_BASE_DIR}"
+echo ""
+
+# Verify input files exist
+if [ ! -f "${ALIGNED_READS_BAM_FULLPATH}" ]; then
+    echo "ERROR: Aligned reads BAM file not found: ${ALIGNED_READS_BAM_FULLPATH}"
+    exit 1
+fi
+# Verify BAM index exists (Medaka needs it)
+if [ ! -f "${ALIGNED_READS_BAM_FULLPATH}.bai" ]; then
+    echo "ERROR: BAM index file not found: ${ALIGNED_READS_BAM_FULLPATH}.bai"
+    echo "Please ensure your BAM file is indexed (e.g., with 'samtools index')."
+    exit 1
+fi
+if [ ! -f "${DRAFT_ASSEMBLY_FULLPATH}" ]; then
+    echo "ERROR: Draft assembly file not found: ${DRAFT_ASSEMBLY_FULLPATH}"
+    exit 1
+fi
+
+echo "Current memory usage before Medaka:"
+free -h
+
+# --- 3. Medaka Polishing ---
+echo "########## Running Medaka Polishing Stage ##########"
+
+echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
+conda activate "${MEDAKA_ENV_NAME}"
+
+# Check if medaka inference is available
+if ! command -v medaka inference &> /dev/null; then
+    echo "ERROR: medaka inference not found. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}' environment."
+    exit 1
+fi
+
+echo "Running Medaka inference (polishing) with pre-aligned BAM..."
+
+medaka inference \
+    --reads "${ALIGNED_READS_BAM_FULLPATH}" \
+    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
+    --out_dir "${MEDAKA_OUT_DIR}" \
+    --model "${MEDAKA_MODEL}" \
+    --threads "${SLURM_CPUS_PER_TASK}"
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Medaka inference failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUT_DIR}/consensus.fasta"
+echo "Script finished at $(date)"
+
+# Deactivate conda environment
+conda deactivate

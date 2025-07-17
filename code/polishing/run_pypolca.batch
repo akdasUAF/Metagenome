@@ -41,7 +41,7 @@ declare -r OUTPUT_PREFIX="$4" # e.g., "polished_assembly_lr-even_raven"
 # OUTPUT_DIR is now set to 'data/polished'
 OUTPUT_DIR="data/polished"
 mkdir -p "${OUTPUT_DIR}" # Ensure the output directory exists
-mkdir -p "${OUTPUT_DIR}/${OUTPUT_PREFIX}" # Pypolca creates a subdirectory with OUTPUT_PREFIX inside OUTPUT_DIR
+# mkdir -p "${OUTPUT_DIR}/${OUTPUT_PREFIX}" # Pypolca creates a subdirectory with OUTPUT_PREFIX inside OUTPUT_DIR
 
 # Define a combined log file that pypolca will also write its stdout/stderr to
 # This will be in addition to the SLURM job's main stdout/stderr logs

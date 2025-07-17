@@ -33,7 +33,8 @@ root_dir=$(pwd)
 cd tools/polishing/herro/
 
 
-scripts/preprocess.sh ${root_dir}/data/raw/lr-even/lr-even_raw.fastq temp_out/ 24 1
+scripts/preprocess.sh ${root_dir}/data/raw/lr-even/lr-even_raw.fastq ${root_dir}/temp_out/ 24 1
+scripts/preprocess.sh ${root_dir}/data/raw/lr-ms/lr-ms_raw.fastq ${root_dir}/temp_out/ 24 1
 
 
 
