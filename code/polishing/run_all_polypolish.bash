@@ -46,13 +46,13 @@ sbatch code/polishing/run_polypolish.bash \
 
 **#### Megahit Assemblies (Polished with Polypolish from pypolca output)**
 
-# sr-even 431257
+# sr-even 431263
 sbatch code/polishing/run_polypolish.bash "data/polished/megahit_sr-even_polished/pypolca_corrected.fasta" "data/raw/sr-even/sr-even_trimmed_1.fastq" "data/raw/sr-even/sr-even_trimmed_2.fastq" "pypolca_megahit_sr-even_polypolished"
 
-# sr-log - 431260
+# sr-log - 431264
 sbatch code/polishing/run_polypolish.bash "data/polished/megahit_sr-log_polished/pypolca_corrected.fasta" "data/raw/sr-log/SRR18488969_1.fastq,data/raw/sr-log/SRR18488971_1.fastq,data/raw/sr-log/SRR18488973_1.fastq" "data/raw/sr-log/SRR18488969_2.fastq,data/raw/sr-log/SRR18488971_2.fastq,data/raw/sr-log/SRR18488973_2.fastq" "pypolca_megahit_sr-log_polypolished"
 
-# sr-ms - 431260
+# sr-ms - 431262
 sbatch code/polishing/run_polypolish.bash "data/polished/megahit_sr-ms_polished/pypolca_corrected.fasta" "data/raw/sr-ms/sr-ms_trimmed_1.fastq" "data/raw/sr-ms/sr-ms_trimmed_2.fastq" "pypolca_megahit_sr-ms_polypolished"
 
 # cami-low (Single-End Reads)
