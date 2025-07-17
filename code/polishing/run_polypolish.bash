@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=polypolish           # Job name
-#SBATCH --partition=debug               # Partition name (e.g., debug, standard, highmem) - **Adjust this**
+#SBATCH --partition=t1standard               # Partition name (e.g., debug, standard, highmem) - **Adjust this**
 #SBATCH --nodes=1                       # Number of nodes
 #SBATCH --ntasks=1                      # Number of tasks
 #SBATCH --cpus-per-task=24              # Number of CPU cores per task - **Adjust this based on available resources**
@@ -84,7 +84,7 @@ if [ -n "${R2_INPUT_STRING}" ]; then # If R2 string is NOT empty, it's paired-en
     echo "$(date): Step 3/5 - Running Polypolish filter for paired-end alignments..."
     # Assuming polypolish executable is in ./target/release/polypolish as per your -h output,
     # or modify to just 'polypolish' if it's in your PATH
-    ./target/release/polypolish filter \
+    ./tools/polishing/Polypolish/target/release/polypolish filter \
         --in1 "${ALIGNED_R1_SAM}" \
         --in2 "${ALIGNED_R2_SAM}" \
         --out1 "${FILTERED_R1_SAM}" \
@@ -100,9 +100,7 @@ fi
 # --- Step 4: Run Polypolish Polish ---
 echo "$(date): Step 4/5 - Running Polypolish polish..."
 # The 'POLISH_SAM_INPUTS' variable dynamically holds either one or two SAM files.
-./target/release/polypolish polish "${ASSEMBLY_FASTA}" ${POLISH_SAM_INPUTS} > "${POLISHED_ASSEMBLY_OUT}" || \
-    { echo "$(date): ERROR: Polypolish polish failed!"; exit 1; }
-echo "$(date): Polypolish polish complete. Polished assembly saved to: ${POLISHED_ASSEMBLY_OUT}"
+tools/polishing/Polypolish/target/release/polypolish polish "${ASSEMBLY_FASTA}" ${POLISH_SAM_INPUTS} > "${POLISHED_ASSEMBLY_OUT}" || \    { echo "$(date): ERROR: Polypolish polish failed!"; exit 1; }
 
 # --- Step 5: Clean up temporary files ---
 echo "$(date): Step 5/5 - Cleaning up temporary files..."
