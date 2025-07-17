@@ -104,9 +104,21 @@ echo "########## Running Medaka Polishing Stage ##########"
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
 
-# Add this line to get the version
+# --- DIAGNOSTIC COMMANDS ---
+echo "--- Medaka Diagnostic Info ---"
 echo "Medaka version:"
 conda run -n "${MEDAKA_ENV_NAME}" medaka --version
+echo ""
+
+echo "Conda list for medaka environment:"
+conda list -n "${MEDAKA_ENV_NAME}" | grep medaka
+echo ""
+
+echo "Medaka full help message:"
+conda run -n "${MEDAKA_ENV_NAME}" medaka --help
+echo "----------------------------"
+echo ""
+# --- END DIAGNOSTIC COMMANDS ---
 
 # Check if medaka is available in the activated environment
 if ! command -v medaka &> /dev/null; then
@@ -114,25 +126,24 @@ if ! command -v medaka &> /dev/null; then
     exit 1
 fi
 
-echo "Running Medaka polishing with 'medaka polish' command..."
+# **COMMENT OUT THE MEDAKA POLISHING COMMAND FOR NOW**
+# We need to analyze the diagnostic output before trying another command.
+# echo "Running Medaka polishing with 'medaka polish' command..."
+# set -x
+# conda run -n "${MEDAKA_ENV_NAME}" medaka polish \
+#     --reads "${ALIGNED_READS_BAM_FULLPATH}" \
+#     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
+#     --out_dir "${MEDAKA_OUT_DIR}" \
+#     --model "${MEDAKA_MODEL}" \
+#     --threads "${SLURM_CPUS_PER_TASK}"
+# set +x
 
-# Debugging: Print the exact command being executed
-set -x
-conda run -n "${MEDAKA_ENV_NAME}" medaka polish \
-    --reads "${ALIGNED_READS_BAM_FULLPATH}" \
-    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
-    --out_dir "${MEDAKA_OUT_DIR}" \
-    --model "${MEDAKA_MODEL}" \
-    --threads "${SLURM_CPUS_PER_TASK}"
-set +x # Turn off debugging output
+# Remove the error check for Medaka polishing since we're commenting it out
+# if [ $? -ne 0 ]; then
+#     echo "ERROR: Medaka polishing failed. Exit status: $?."
+#     exit 1
+# fi
 
-# Check if Medaka was successful (note: Medaka might return 0 even on errors as seen in your log)
-if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka polishing failed. Exit status: $?."
-    exit 1
-fi
-
-echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUT_DIR}/consensus.fasta"
 echo "Script finished at $(date)"
 
 # Deactivate conda environment
