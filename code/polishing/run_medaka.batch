@@ -114,13 +114,11 @@ if ! command -v medaka &> /dev/null; then
     exit 1
 fi
 
-echo "Running Medaka inference (polishing) with pre-aligned BAM..."
-
-echo "Running Medaka inference (polishing) with pre-aligned BAM (Attempt 4)..."
+echo "Running Medaka polishing with 'medaka polish' command..."
 
 # Debugging: Print the exact command being executed
 set -x
-conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
+conda run -n "${MEDAKA_ENV_NAME}" medaka polish \
     --reads "${ALIGNED_READS_BAM_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUT_DIR}" \
@@ -130,7 +128,7 @@ set +x # Turn off debugging output
 
 # Check if Medaka was successful (note: Medaka might return 0 even on errors as seen in your log)
 if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka inference failed. Exit status: $?."
+    echo "ERROR: Medaka polishing failed. Exit status: $?."
     exit 1
 fi
 
