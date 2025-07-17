@@ -1,64 +1,39 @@
 #!/bin/bash
-#SBATCH --partition=t1small         # Your desired partition (e.g., t1small, long, highmem)
-#SBATCH --ntasks=1                  # We will run one main task (the script itself)
-#SBATCH --cpus-per-task=24          # Request 24 CPU cores for this task (adjust as needed for pypolca -t)
-#SBATCH --mem=64G                   # Request 64 GB of RAM for the entire job (adjust as needed)
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --job-name="Pypolca_Polishing"
-#SBATCH --output=logs/slurm_pypolca_%j.log    # Standard output log (stdout from the job itself)
-#SBATCH --error=logs/slurm_pypolca_err_%j.log # Standard error log (stderr from the job itself)
+#SBATCH --output=logs/slurm_pypolca_%j.log
+#SBATCH --error=logs/slurm_pypolca_err_%j.log
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
+set -e # Exit immediately if a command exits with a non-zero status.
 
-## Clean out any modules, then reload slurm (this might be site-specific, adjust if needed)
-module purge
-module load slurm
-
-# IMPORTANT: Conda initialization for non-interactive shells
-# Replace '/path/to/your/conda/installation/etc/profile.d/conda.sh' with the actual path
-# where your Miniconda/Anaconda is installed.
 source ~/miniconda3/etc/profile.d/conda.sh
 
-# Essential for large memory allocations on some systems
 ulimit -l unlimited
 
-# Activate your Pypolca conda environment
-# Ensure you have created this environment and installed pypolca in it:
-# conda create -n pypolca -c bioconda pypolca
 conda activate pypolca
 
-# --- Input Parameters (passed as arguments to the sbatch script) ---
-# Usage: sbatch pypolca_script.sh <GENOME_FASTA> <R1_FASTQ_COMMAS> <R2_FASTQ_COMMAS> <OUTPUT_PREFIX>
-#
-# <R1_FASTQ_COMMAS> and <R2_FASTQ_COMMAS> should be quoted, comma-separated strings of file paths.
-# Example: sbatch pypolca_script.sh data/megahit/sr-log/final.contigs.fa \
-#            "data/raw/sr-log/SRR18488969_1.fastq,data/raw/sr-log/SRR18488971_1.fastq,data/raw/sr-log/SRR18488973_1.fastq" \
-#            "data/raw/sr-log/SRR18488969_2.fastq,data/raw/sr-log/SRR18488971_2.fastq,data/raw/sr-log/SRR18488973_2.fastq" \
-#            megahit_sr-log_polished
-
 declare -r GENOME_FASTA="$1"
-declare -r R1_FASTQ_STR="$2" # This will receive the comma-separated string for R1
-declare -r R2_FASTQ_STR="$3" # This will receive the comma-separated string for R2
+declare -r R1_FASTQ_STR="$2"
+declare -r R2_FASTQ_STR="$3"
 declare -r OUTPUT_PREFIX="$4"
 
-# Validate input arguments
 if [ "$#" -ne 4 ]; then
     echo "ERROR: Incorrect number of arguments."
     echo "Usage: sbatch $0 <GENOME_FASTA> <R1_FASTQ_COMMAS> <R2_FASTQ_COMMAS> <OUTPUT_PREFIX>"
     exit 1
 fi
 
-# --- Define Output Paths ---
 OUTPUT_DIR="data/polished"
-mkdir -p "${OUTPUT_DIR}" # Ensure the output directory exists
+mkdir -p "${OUTPUT_DIR}"
 
-# Define a combined log file that pypolca will also write its stdout/stderr to
 declare -r PYPOLCA_LOG_FILE="logs/pypolca_${OUTPUT_PREFIX}.log"
-mkdir -p logs # Ensure the logs directory exists for PYPOLCA_LOG_FILE
+mkdir -p logs
 
-# Redirect all script output to PYPOLCA_LOG_FILE and to the SLURM job's main stdout/stderr logs
 exec &> >(tee -a "${PYPOLCA_LOG_FILE}")
 
 echo "--- Job Started: $(date) ---"
@@ -68,7 +43,6 @@ echo "Input Genome: ${GENOME_FASTA}"
 IFS=',' read -r -a R1_FASTQ_ARRAY <<< "${R1_FASTQ_STR}"
 IFS=',' read -r -a R2_FASTQ_ARRAY <<< "${R2_FASTQ_STR}"
 
-# Log and validate the parsed arrays
 echo "R1 Short Reads (parsed):"
 for f in "${R1_FASTQ_ARRAY[@]}"; do
     echo "  - ${f}"
@@ -130,19 +104,30 @@ echo "--- Conda Environment and Tool Check Complete ---"
 
 echo "Starting Pypolca polishing..."
 
-# --- Run Pypolca ---
-# pypolca run -a <genome> -1 <R1 short reads file(s)> -2 <R2 short reads file(s)> -t <threads> -o <output directory> --careful --memory_limit <limit>
-# Note: Pypolca creates a subdirectory within the -o path using the name you give it.
-# So if -o is "data/polished/my_assembly_prefix", it will create that folder.
-# The "${R1_FASTQ_ARRAY[@]}" syntax expands each element of the array into a separate argument.
-pypolca run \
-    -a "${GENOME_FASTA}" \
-    -1 "${R1_FASTQ_ARRAY[@]}" \
-    -2 "${R2_FASTQ_ARRAY[@]}" \
-    -t "${SLURM_CPUS_PER_TASK}" \
-    -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}" \
-    --careful \
-    --memory_limit 2G # Re-added based on your previous pypolca log output. Adjust if you need more.
+# --- Construct Pypolca Command Array ---
+# This is the key change to handle multiple read files correctly.
+PYPOLCA_COMMAND_ARRAY=(
+    pypolca run
+    -a "${GENOME_FASTA}"
+    -t "${SLURM_CPUS_PER_TASK}"
+    -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}"
+    --careful
+    --memory_limit 2G # Re-added this based on your previous pypolca log output. Adjust if you need more.
+)
+
+# Append R1 files by repeating '-1' for each file
+for f in "${R1_FASTQ_ARRAY[@]}"; do
+    PYPOLCA_COMMAND_ARRAY+=("-1" "${f}")
+done
+
+# Append R2 files by repeating '-2' for each file
+for f in "${R2_FASTQ_ARRAY[@]}"; do
+    PYPOLCA_COMMAND_ARRAY+=("-2" "${f}")
+done
+
+# --- Execute Pypolca ---
+# Using the constructed array to ensure arguments are passed correctly.
+"${PYPOLCA_COMMAND_ARRAY[@]}"
 
 # Check if Pypolca was successful
 if [ $? -ne 0 ]; then
@@ -153,5 +138,4 @@ echo "Pypolca polishing completed successfully."
 
 echo "--- Job Finished: $(date) ---"
 
-# Deactivate conda environment
 conda deactivate
