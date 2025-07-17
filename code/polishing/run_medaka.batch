@@ -112,9 +112,11 @@ fi
 
 echo "Running Medaka inference (polishing) with pre-aligned BAM..."
 
+echo "Running Medaka (default polishing) with pre-aligned BAM..."
+
 # Debugging: Print the exact command being executed
 set -x
-conda run -n "${MEDAKA_ENV_NAME}" medaka consensus \
+conda run -n "${MEDAKA_ENV_NAME}" medaka \
     --reads "${ALIGNED_READS_BAM_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUT_DIR}" \
