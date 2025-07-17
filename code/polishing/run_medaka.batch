@@ -121,8 +121,8 @@ echo "Running Medaka inference (polishing) with pre-aligned BAM (Attempt 4)..."
 # Debugging: Print the exact command being executed
 set -x
 conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
-    "${ALIGNED_READS_BAM_FULLPATH}" \
-    "${DRAFT_ASSEMBLY_FULLPATH}" \
+    --reads "${ALIGNED_READS_BAM_FULLPATH}" \
+    --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUT_DIR}" \
     --model "${MEDAKA_MODEL}" \
     --threads "${SLURM_CPUS_PER_TASK}"
