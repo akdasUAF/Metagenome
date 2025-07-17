@@ -110,20 +110,21 @@ if ! command -v medaka &> /dev/null; then
     exit 1
 fi
 
-echo "Running Medaka inference (polishing) with pre-aligned BAM..."
+# ... (rest of your script)
+
+echo "Running Medaka inference (polishing) with pre-aligned BAM (Attempt 4)..."
 
 # Debugging: Print the exact command being executed
 set -x
 conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
     "${ALIGNED_READS_BAM_FULLPATH}" \
     "${DRAFT_ASSEMBLY_FULLPATH}" \
-    "${MEDAKA_OUT_DIR}" \
+    --out_dir "${MEDAKA_OUT_DIR}" \
     --model "${MEDAKA_MODEL}" \
     --threads "${SLURM_CPUS_PER_TASK}"
 set +x # Turn off debugging output
 
 # Check if Medaka was successful (note: Medaka might return 0 even on errors as seen in your log)
-# This check is good to keep.
 if [ $? -ne 0 ]; then
     echo "ERROR: Medaka inference failed. Exit status: $?."
     exit 1
@@ -131,3 +132,6 @@ fi
 
 echo "Medaka polishing completed. Final polished assembly will be in: ${MEDAKA_OUT_DIR}/consensus.fasta"
 echo "Script finished at $(date)"
+
+# Deactivate conda environment
+conda deactivate
