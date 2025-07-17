@@ -1,4 +1,7 @@
 
+
+conda create -n polypolish
+conda activate polypolish
 conda install rust
 
 

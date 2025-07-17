@@ -114,13 +114,14 @@ echo "Running Medaka inference (polishing) with pre-aligned BAM..."
 
 # Debugging: Print the exact command being executed
 set -x
-conda run -n "${MEDAKA_ENV_NAME}" medaka inference \
+conda run -n "${MEDAKA_ENV_NAME}" medaka consensus \
     --reads "${ALIGNED_READS_BAM_FULLPATH}" \
     --draft "${DRAFT_ASSEMBLY_FULLPATH}" \
     --out_dir "${MEDAKA_OUT_DIR}" \
     --model "${MEDAKA_MODEL}" \
     --threads "${SLURM_CPUS_PER_TASK}"
 set +x # Turn off debugging output
+
 
 # Check if Medaka was successful (note: Medaka might return 0 even on errors as seen in your log)
 if [ $? -ne 0 ]; then
