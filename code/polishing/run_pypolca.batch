@@ -1,163 +1,129 @@
 #!/bin/bash
-#SBATCH --partition=t1small
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24
-#SBATCH --mem=64G
-#SBATCH --mail-user=wwinnett@alaska.edu
-#SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name="Pypolca_Polishing"
-#SBATCH --output=logs/slurm_pypolca_%j.log
-#SBATCH --error=logs/slurm_pypolca_err_%j.log
+#SBATCH --job-name=polypolish           # Job name
+#SBATCH --partition=debug               # Partition name (e.g., debug, standard, highmem) - **Adjust this**
+#SBATCH --nodes=1                       # Number of nodes
+#SBATCH --ntasks=1                      # Number of tasks
+#SBATCH --cpus-per-task=24              # Number of CPU cores per task - **Adjust this based on available resources**
+#SBATCH --mem=32G                       # Memory per node - **Adjust this based on your data size**
+#SBATCH --time=04:00:00                 # Wall clock time limit (HH:MM:SS) - **Adjust this for longer jobs**
+#SBATCH --error=slurm-%j.err            # Standard error file
+#SBATCH --output=slurm-%j.out           # Standard output file
 
-set -e # Exit immediately if a command exits with a non-zero status.
+# --- Load necessary modules ---
+# These commands load the software into your environment.
+# If these modules aren't available on your HPC, you might need to
+# adjust your PATH environment variable to point directly to the executables.
+module load bwa
+module load samtools
+# Note: 'polypolish' is assumed to be in your PATH or specified by its full path later.
+# If you built it yourself in '~/Polypolish/target/release/polypolish',
+# you'll use './target/release/polypolish' or the full path.
 
-source ~/miniconda3/etc/profile.d/conda.sh
+echo "--- Starting Polypolish Job ---"
+echo "Job ID: ${SLURM_JOB_ID}"
+echo "Run on host: $(hostname)"
+echo "Start time: $(date)"
 
-ulimit -l unlimited
+# --- Get Input Arguments ---
+# These correspond to the arguments you pass to sbatch after the script name.
+ASSEMBLY_FASTA="$1"       # Path to the assembly FASTA file (e.g., data/megahit/sr-even/final.contigs.fa)
+R1_INPUT_STRING="$2"      # Comma-separated list of R1 FASTQ files (can be .gz)
+R2_INPUT_STRING="$3"      # Comma-separated list of R2 FASTQ files (can be .gz), or an empty string "" for single-end
+OUTPUT_PREFIX="$4"        # Prefix for output files (e.g., megahit_sr-even_polypolished)
 
-conda activate pypolca
+# --- Define Output and Temporary Directories ---
+# All final polished assemblies will go into 'data/polished_polypolish'.
+# Temporary alignment files will be stored in a sub-directory and cleaned up.
+OUTPUT_BASE_DIR="data/polished_polypolish"
+TEMP_DIR="${OUTPUT_BASE_DIR}/${OUTPUT_PREFIX}_temp"
 
-declare -r GENOME_FASTA="$1"
-declare -r R1_FASTQ_STR="$2"
-declare -r R2_FASTQ_STR="$3"
-declare -r OUTPUT_PREFIX="$4"
+# Create directories if they don't exist
+mkdir -p "${OUTPUT_BASE_DIR}" "${TEMP_DIR}" || { echo "ERROR: Failed to create directories! Exiting."; exit 1; }
 
-if [ "$#" -ne 4 ]; then
-    echo "ERROR: Incorrect number of arguments."
-    echo "Usage: sbatch $0 <GENOME_FASTA> <R1_FASTQ_COMMAS> <R2_FASTQ_COMMAS> <OUTPUT_PREFIX>"
-    exit 1
-fi
+# Define full paths for output files
+POLISHED_ASSEMBLY_OUT="${OUTPUT_BASE_DIR}/${OUTPUT_PREFIX}_polished.fasta"
+ALIGNED_R1_SAM="${TEMP_DIR}/${OUTPUT_PREFIX}_R1.sam"
+ALIGNED_R2_SAM="${TEMP_DIR}/${OUTPUT_PREFIX}_R2.sam"
+FILTERED_R1_SAM="${TEMP_DIR}/${OUTPUT_PREFIX}_R1_filtered.sam"
+FILTERED_R2_SAM="${TEMP_DIR}/${OUTPUT_PREFIX}_R2_filtered.sam"
 
-OUTPUT_DIR="data/polished"
-mkdir -p "${OUTPUT_DIR}"
+# --- Prepare Read Files for BWA ---
+# BWA 'mem' command expects space-separated file paths for multiple input files.
+R1_FILES_BWA_ARGS=$(echo "${R1_INPUT_STRING}" | tr ',' ' ')
+R2_FILES_BWA_ARGS=$(echo "${R2_INPUT_STRING}" | tr ',' ' ')
 
-declare -r PYPOLCA_LOG_FILE="logs/pypolca_${OUTPUT_PREFIX}.log"
-mkdir -p logs
-
-exec &> >(tee -a "${PYPOLCA_LOG_FILE}")
-
-echo "--- Job Started: $(date) ---"
-echo "Input Genome: ${GENOME_FASTA}"
-
-# Split comma-separated strings into arrays
-IFS=',' read -r -a R1_FASTQ_ARRAY <<< "${R1_FASTQ_STR}"
-IFS=',' read -r -a R2_FASTQ_ARRAY <<< "${R2_FASTQ_STR}"
-
-echo "R1 Short Reads (parsed):"
-for f in "${R1_FASTQ_ARRAY[@]}"; do
-    echo "  - ${f}"
-    if [ ! -f "${f}" ]; then
-        echo "ERROR: R1 file not found: ${f}"
-        exit 1
-    fi
-done
-
-echo "R2 Short Reads (parsed):"
-for f in "${R2_FASTQ_ARRAY[@]}"; do
-    echo "  - ${f}"
-    if [ ! -f "${f}" ]; then
-        echo "ERROR: R2 file not found: ${f}"
-        exit 1
-    fi
-done
-
-if [ ${#R1_FASTQ_ARRAY[@]} -eq 0 ] || [ ${#R2_FASTQ_ARRAY[@]} -eq 0 ]; then
-    echo "ERROR: No R1 or R2 FASTQ files found after splitting input strings. Check comma separation in arguments."
-    exit 1
-fi
-
-if [ ${#R1_FASTQ_ARRAY[@]} -ne ${#R2_FASTQ_ARRAY[@]} ]; then
-    echo "ERROR: Unequal number of R1 and R2 FASTQ files provided. They must be paired."
-    exit 1
-fi
-
+echo "--- Input Parameters ---"
+echo "Assembly FASTA: ${ASSEMBLY_FASTA}"
+echo "R1 Reads: ${R1_INPUT_STRING}"
+echo "R2 Reads: ${R2_INPUT_STRING:-None (Single-End)}"
 echo "Output Prefix: ${OUTPUT_PREFIX}"
-echo "Base Output Directory: ${OUTPUT_DIR}"
-echo "Pypolca will output to: ${OUTPUT_DIR}/${OUTPUT_PREFIX}"
-echo "Requested CPUs: ${SLURM_CPUS_PER_TASK}"
-echo "Requested Memory: ${SLURM_MEM}"
-echo "Pypolca Log File: ${PYPOLCA_LOG_FILE}"
-echo "--- Conda Environment and Tool Check ---"
+echo "Polished Assembly Output: ${POLISHED_ASSEMBLY_OUT}"
+echo "Temporary files will be in: ${TEMP_DIR}"
+echo "------------------------"
 
-if command -v conda &> /dev/null; then
-    echo "conda is found in PATH."
-else
-    echo "ERROR: conda is NOT found in PATH. Check source path."
-    exit 1
+# --- Step 1: BWA Index Assembly ---
+echo "$(date): Step 1/5 - Indexing assembly with BWA..."
+bwa index "${ASSEMBLY_FASTA}" || { echo "$(date): ERROR: BWA indexing failed for ${ASSEMBLY_FASTA}!"; exit 1; }
+echo "$(date): BWA indexing complete."
+
+# --- Step 2: BWA Align Short Reads (separate for R1 and R2) ---
+echo "$(date): Step 2/5 - Aligning R1 reads to assembly with BWA MEM..."
+bwa mem -t "${SLURM_CPUS_PER_TASK}" -a "${ASSEMBLY_FASTA}" ${R1_FILES_BWA_ARGS} > "${ALIGNED_R1_SAM}" || \
+    { echo "$(date): ERROR: BWA alignment for R1 failed!"; exit 1; }
+echo "$(date): R1 alignment complete. Output SAM: ${ALIGNED_R1_SAM}"
+
+# Only run R2 alignment if R2 files are provided (paired-end scenario)
+if [ -n "${R2_INPUT_STRING}" ]; then
+    echo "$(date): Step 2.5/5 - Aligning R2 reads to assembly with BWA MEM..."
+    bwa mem -t "${SLURM_CPUS_PER_TASK}" -a "${ASSEMBLY_FASTA}" ${R2_FILES_BWA_ARGS} > "${ALIGNED_R2_SAM}" || \
+        { echo "$(date): ERROR: BWA alignment for R2 failed!"; exit 1; }
+    echo "$(date): R2 alignment complete. Output SAM: ${ALIGNED_R2_SAM}"
 fi
 
-CURRENT_CONDA_ENV=$(conda env list | grep "*" | awk '{print $1}')
-echo "Currently active conda environment: ${CURRENT_CONDA_ENV}"
-if [ "${CURRENT_CONDA_ENV}" != "pypolca" ]; then
-    echo "WARNING: 'pypolca' environment not activated. Actual: ${CURRENT_CONDA_ENV}"
+# --- Step 3: Polypolish Filter (only for paired-end) ---
+POLISH_SAM_INPUTS=""
+if [ -n "${R2_INPUT_STRING}" ]; then # If R2 string is NOT empty, it's paired-end, so run filter
+    echo "$(date): Step 3/5 - Running Polypolish filter for paired-end alignments..."
+    # Assuming polypolish executable is in ./target/release/polypolish as per your -h output,
+    # or modify to just 'polypolish' if it's in your PATH
+    ./target/release/polypolish filter \
+        --in1 "${ALIGNED_R1_SAM}" \
+        --in2 "${ALIGNED_R2_SAM}" \
+        --out1 "${FILTERED_R1_SAM}" \
+        --out2 "${FILTERED_R2_SAM}" || \
+        { echo "$(date): ERROR: Polypolish filter failed!"; exit 1; }
+    echo "$(date): Polypolish filter complete. Filtered SAMs: ${FILTERED_R1_SAM}, ${FILTERED_R2_SAM}"
+    POLISH_SAM_INPUTS="${FILTERED_R1_SAM} ${FILTERED_R2_SAM}"
+else # Single-end reads, skip filter and use raw R1 SAM directly
+    echo "$(date): Step 3/5 - Skipping Polypolish filter (single-end reads detected)."
+    POLISH_SAM_INPUTS="${ALIGNED_R1_SAM}"
 fi
 
-if command -v pypolca &> /dev/null; then
-    echo "pypolca is found in PATH."
-    echo "pypolca location: $(which pypolca)"
-    echo "pypolca version: $(pypolca --version 2>&1)"
-else
-    echo "ERROR: pypolca is NOT found in PATH after activating pypolca env. Is it installed?"
-    exit 1
-fi
-echo "--- Conda Environment and Tool Check Complete ---"
+# --- Step 4: Run Polypolish Polish ---
+echo "$(date): Step 4/5 - Running Polypolish polish..."
+# The 'POLISH_SAM_INPUTS' variable dynamically holds either one or two SAM files.
+./target/release/polypolish polish "${ASSEMBLY_FASTA}" ${POLISH_SAM_INPUTS} > "${POLISHED_ASSEMBLY_OUT}" || \
+    { echo "$(date): ERROR: Polypolish polish failed!"; exit 1; }
+echo "$(date): Polypolish polish complete. Polished assembly saved to: ${POLISHED_ASSEMBLY_OUT}"
 
-# ... (previous script content)
+# --- Step 5: Clean up temporary files ---
+echo "$(date): Step 5/5 - Cleaning up temporary files..."
 
-echo "Starting Pypolca polishing..."
+# Remove BWA index files (generated in the same directory as the assembly FASTA)
+# Be careful: Ensure these are specifically the index files created by this run.
+# The basename removes path, and %.* removes extension, giving the prefix BWA uses.
+BWA_INDEX_PREFIX_FOR_CLEANUP=$(basename "${ASSEMBLY_FASTA}")
+BWA_INDEX_DIR_FOR_CLEANUP=$(dirname "${ASSEMBLY_FASTA}")
 
+rm -f "${BWA_INDEX_DIR_FOR_CLEANUP}/${BWA_INDEX_PREFIX_FOR_CLEANUP}.amb" \
+      "${BWA_INDEX_DIR_FOR_CLEANUP}/${BWA_INDEX_PREFIX_FOR_CLEANUP}.ann" \
+      "${BWA_INDEX_DIR_FOR_CLEANUP}/${BWA_INDEX_PREFIX_FOR_CLEANUP}.bwt" \
+      "${BWA_INDEX_DIR_FOR_CLEANUP}/${BWA_INDEX_PREFIX_FOR_CLEANUP}.pac" \
+      "${BWA_INDEX_DIR_FOR_CLEANUP}/${BWA_INDEX_PREFIX_FOR_CLEANUP}.sa" || \
+      { echo "$(date): WARNING: Could not remove all BWA index files in ${BWA_INDEX_DIR_FOR_CLEANUP}."; }
 
-# Define paths for concatenated files
-CONCAT_R1_FASTQ="${OUTPUT_DIR}/${OUTPUT_PREFIX}_all_R1.fastq"
-CONCAT_R2_FASTQ="${OUTPUT_DIR}/${OUTPUT_PREFIX}_all_R2.fastq"
+# Remove the temporary directory and all its contents (SAM/BAM files, etc.)
+rm -rf "${TEMP_DIR}" || { echo "$(date): WARNING: Failed to clean up temporary directory ${TEMP_DIR}. Manual removal may be needed."; }
 
-echo "Concatenating R1 files into: ${CONCAT_R1_FASTQ}"
-# Concatenate all R1 files into a single output file
-cat "${R1_FASTQ_ARRAY[@]}" > "${CONCAT_R1_FASTQ}"
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to concatenate R1 files."
-    exit 1
-fi
-
-echo "Concatenating R2 files into: ${CONCAT_R2_FASTQ}"
-# Concatenate all R2 files into a single output file
-cat "${R2_FASTQ_ARRAY[@]}" > "${CONCAT_R2_FASTQ}"
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to concatenate R2 files."
-    exit 1
-fi
-
-# --- Construct Pypolca Command Array ---
-# Now, we only pass the two concatenated files to pypolca
-PYPOLCA_COMMAND_ARRAY=(
-    pypolca run
-    -a "${GENOME_FASTA}"
-    -t "${SLURM_CPUS_PER_TASK}"
-    -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}"
-    --careful
-    --memory_limit 2G
-    -1 "${CONCAT_R1_FASTQ}" # Pass the single concatenated R1 file
-    -2 "${CONCAT_R2_FASTQ}" # Pass the single concatenated R2 file
-)
-
-# --- Debugging: Print the exact command being executed ---
-# This line will show the full pypolca command that Bash constructs.
-set -x
-"${PYPOLCA_COMMAND_ARRAY[@]}" # Execute the command from the array
-set +x # Turn off debugging output immediately after the command
-
-# Check if Pypolca was successful
-if [ $? -ne 0 ]; then
-    echo "ERROR: Pypolca polishing failed with exit code $?."
-    exit 1
-fi
-echo "Pypolca polishing completed successfully."
-
-echo "--- Job Finished: $(date) ---"
-
-# Optionally, remove the concatenated temporary files if you don't need them
-# rm "${CONCAT_R1_FASTQ}" "${CONCAT_R2_FASTQ}"
-
-conda deactivate
+echo "$(date): All Polypolish steps for ${OUTPUT_PREFIX} completed successfully."
+echo "End time: $(date)"
