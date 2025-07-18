@@ -57,7 +57,7 @@ declare -r BENCHMARKING_SCRIPT="code/benchmarking/scripts/benchmarking_script.sh
 declare -r RUN_MEGAHIT_PREP_SCRIPT="code/assembly/megahit/run_megahit_prep.sh"
 
 # Base directory for all assembly outputs (e.g., where 'sr-log' will be created)
-declare -r ASSEMBLY_BASE_DIR="data/assemblies"
+declare -r ASSEMBLY_BASE_DIR="data/megahit"
 
 # The full path to the specific output directory for *this* assembly run
 declare -r CURRENT_ASSEMBLY_OUTPUT_DIR="${ASSEMBLY_BASE_DIR}/${DATASET_NAME}/${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
