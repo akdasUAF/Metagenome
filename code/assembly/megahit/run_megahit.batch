@@ -50,7 +50,7 @@ declare -r ASSEMBLY_OUTPUT_SUBFOLDER_NAME="$3"
 declare -r BENCHMARKING_TASK_NAME="$4"
 
 # --- 2. Define Paths to other scripts and derived output locations ---
-declare -r BENCHMARKING_SCRIPT="code/benchmarking/scripts/benchmarking_script.sh" # Updated path if you named it differently
+declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash" # Updated path if you named it differently
 declare -r MEGAHIT_RUN_SCRIPT="code/assembly/megahit/megahit.sh" # This is your core megahit.sh script
 
 # Base directory for all assembly outputs
