@@ -2,7 +2,7 @@
 #SBATCH --partition=t1small       # Adjust as needed (e.g., highmem, if you have it)
 #SBATCH --ntasks=1                # Total number of tasks
 #SBATCH --cpus-per-task=24        # Number of CPU cores for MEGAHIT (corresponds to -t in megahit.sh)
-#SBATCH --mem=128G                # Total memory for the job (MEGAHIT can be very memory intensive for large metagenomes)
+#SBATCH --mem=64G                # Total memory for the job (MEGAHIT can be very memory intensive for large metagenomes)
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --job-name="megahit_bench" # Job name for Slurm
