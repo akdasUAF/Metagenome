@@ -1,0 +1,157 @@
+#!/bin/bash
+#SBATCH --partition=t1small       # Or your preferred partition
+#SBATCH --ntasks=1                # Total number of tasks
+#SBATCH --cpus-per-task=16        # Number of CPU cores per task (fastp uses this for -w/threads)
+#SBATCH --mem=32G                 # Total memory for the job (fastp is less memory-intensive, adjust as needed)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="fastp_trimming" # Job name for fastp
+#SBATCH --output=logs/slurm_fastp_trimming_%j.log # Log file for stdout
+#SBATCH --error=logs/slurm_fastp_trimming_err_%j.log # Log file for stderr
+
+# Set unlimited locked memory for processes (good for large jobs)
+ulimit -l unlimited
+ulimit -n 65536 # Increase open file descriptor limit if needed
+
+# Load the Slurm module (if your system requires it)
+module load slurm
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+# --- 1. User Configuration & Argument Parsing ---
+# Input arguments for this script:
+# $1: <dataset_name> (e.g., "my_sample")
+# $2: <raw_reads_forward_fastq_path> (Full path to your raw R1 FASTQ file, can be .fastq or .fastq.gz)
+# $3: <raw_reads_reverse_fastq_path> (Full path to your raw R2 FASTQ file, can be .fastq or .fastq.gz)
+# $4: <target_output_folder_name> (e.g., "fastp_output", "test1", "trimmed_reads" - subdirectory under the raw reads' parent directory)
+
+if [ "$#" -ne 4 ]; then
+    echo "Usage: sbatch $0 <dataset_name> <raw_reads_forward_fastq_path> <raw_reads_reverse_fastq_path> <target_output_folder_name>"
+    echo "Example: sbatch $0 my_sample data/raw_reads/sample_R1.fastq.gz data/raw_reads/sample_R2.fastq.gz trimmed_results"
+    exit 1
+fi
+
+declare -r DATASET_NAME="$1"
+declare -r RAW_READS_FORWARD_FASTQ_FULLPATH="$2"
+declare -r RAW_READS_REVERSE_FASTQ_FULLPATH="$3"
+declare -r TARGET_OUTPUT_FOLDER_NAME="$4" # New argument for the output folder
+
+# Conda Environment Name (ensure this environment exists and has fastp installed)
+# Recommended setup for 'pro_fastp' conda environment:
+# conda create -n pro_fastp fastp -c bioconda -c conda-forge
+# conda activate pro_fastp
+declare -r FASTP_ENV_NAME="pro_fastp"
+
+# --- 2. Derived Paths & Logging Setup ---
+# Output directory for fastp trimmed reads and reports
+# This line places output in the specified folder sibling to the input R1 file
+declare -r OUTPUT_BASE_DIR="$(dirname "${RAW_READS_FORWARD_FASTQ_FULLPATH}")/${TARGET_OUTPUT_FOLDER_NAME}"
+
+declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
+# Trimmed read output paths
+declare -r FORWARD_TRIMMED_PATH="${OUTPUT_BASE_DIR}/${DATASET_NAME}_R1_trimmed.fastq.gz"
+declare -r REVERSE_TRIMMED_PATH="${OUTPUT_BASE_DIR}/${DATASET_NAME}_R2_trimmed.fastq.gz"
+# Report output path
+declare -r HTML_REPORT_PATH="${OUTPUT_BASE_DIR}/${DATASET_NAME}_fastp_report.html"
+declare -r JSON_REPORT_PATH="${OUTPUT_BASE_DIR}/${DATASET_NAME}_fastp_report.json" # fastp also outputs a JSON report by default
+
+# Create necessary directories
+mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
+mkdir -p "${OUTPUT_BASE_DIR}" || { echo "ERROR: Could not create output directory ${OUTPUT_BASE_DIR}"; exit 1; }
+
+
+declare -r path_log="${LOG_DIR}/${DATASET_NAME}_fastp_workflow.log"
+# Redirect all stdout and stderr to the log file, and also print to console
+> "${path_log}" # Clear log file on start
+exec &> >(tee -a "${path_log}")
+
+echo "Script started at $(date)"
+echo "Configuration:"
+echo "  Dataset Name: ${DATASET_NAME}"
+echo "  Raw Reads Forward (R1): ${RAW_READS_FORWARD_FASTQ_FULLPATH}"
+echo "  Raw Reads Reverse (R2): ${RAW_READS_REVERSE_FASTQ_FULLPATH}"
+echo "  Output Folder Name: ${TARGET_OUTPUT_FOLDER_NAME}"
+echo "  Fastp Conda Environment: ${FASTP_ENV_NAME}"
+echo "  Output Directory: ${OUTPUT_BASE_DIR}"
+echo "  Trimmed R1 Output File: ${FORWARD_TRIMMED_PATH}"
+echo "  Trimmed R2 Output File: ${REVERSE_TRIMMED_PATH}"
+echo "  HTML Report File: ${HTML_REPORT_PATH}"
+echo "  JSON Report File: ${JSON_REPORT_PATH}"
+echo ""
+
+# --- Input Validation ---
+if [ ! -f "${RAW_READS_FORWARD_FASTQ_FULLPATH}" ]; then
+    echo "ERROR: Raw reads Forward (R1) FASTQ file not found: ${RAW_READS_FORWARD_FASTQ_FULLPATH}"
+    exit 1
+fi
+if [ ! -f "${RAW_READS_REVERSE_FASTQ_FULLPATH}" ]; then
+    echo "ERROR: Raw reads Reverse (R2) FASTQ file not found: ${RAW_READS_REVERSE_FASTQ_FULLPATH}"
+    exit 1
+fi
+
+echo "Current memory usage before fastp:"
+free -h
+
+# --- 3. fastp Trimming ---
+echo "########## Running fastp Quality Trimming ##########"
+
+echo "Activating fastp environment: ${FASTP_ENV_NAME}"
+conda activate "${FASTP_ENV_NAME}" || { echo "ERROR: Failed to activate conda environment '${FASTP_ENV_NAME}'. Exiting."; exit 1; }
+
+# Check if fastp command is available in the activated environment
+if ! command -v fastp &> /dev/null; then
+    echo "ERROR: 'fastp' command not found after activating environment."
+    echo "Please ensure fastp is installed correctly in your '${FASTP_ENV_NAME}' conda environment."
+    exit 1
+fi
+
+echo "--- Running fastp for quality trimming and filtering ---"
+# fastp command: fastp -i $path_forward -I $path_reverse -o $forward_trimmed_path -O $reverse_trimmed_path -h $path_report -q 20 -p 95 -l 30 -n 10
+# Also adding -w for threads
+echo "Command: conda run -n \"${FASTP_ENV_NAME}\" fastp \
+    -i \"${RAW_READS_FORWARD_FASTQ_FULLPATH}\" \
+    -I \"${RAW_READS_REVERSE_FASTQ_FULLPATH}\" \
+    -o \"${FORWARD_TRIMMED_PATH}\" \
+    -O \"${REVERSE_TRIMMED_PATH}\" \
+    -h \"${HTML_REPORT_PATH}\" \
+    -j \"${JSON_REPORT_PATH}\" \
+    -q 20 -p 95 -l 30 -n 10 \
+    -w ${SLURM_CPUS_PER_TASK}"
+
+set -x # Enable command echoing for debugging
+conda run -n "${FASTP_ENV_NAME}" fastp \
+    -i "${RAW_READS_FORWARD_FASTQ_FULLPATH}" \
+    -I "${RAW_READS_REVERSE_FASTQ_FULLPATH}" \
+    -o "${FORWARD_TRIMMED_PATH}" \
+    -O "${REVERSE_TRIMMED_PATH}" \
+    -h "${HTML_REPORT_PATH}" \
+    -j "${JSON_REPORT_PATH}" \
+    -q 20 -p 95 -l 30 -n 10 \
+    -w "${SLURM_CPUS_PER_TASK}"
+set +x # Disable command echoing
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: fastp trimming step failed. Exit status: $?."
+    exit 1
+fi
+
+echo "fastp trimming completed. Trimmed reads saved to:"
+echo "  R1: ${FORWARD_TRIMMED_PATH}"
+echo "  R2: ${REVERSE_TRIMMED_PATH}"
+echo "Reports saved to:"
+echo "  HTML: ${HTML_REPORT_PATH}"
+echo "  JSON: ${JSON_REPORT_PATH}"
+echo "Script finished at $(date)"
+
+# Deactivate conda environment
+conda deactivate
+echo "Conda environment deactivated."
