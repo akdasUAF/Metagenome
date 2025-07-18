@@ -106,18 +106,19 @@ echo "--- Discovering FASTQ files in ${FASTQ_INPUT_DIR} ---"
 forward_reads_list=$(find "${FASTQ_INPUT_DIR}" -maxdepth 1 -name "*_R1_trimmed.fastq.gz" | sort | paste -s -d ',')
 reverse_reads_list=$(find "${FASTQ_INPUT_DIR}" -maxdepth 1 -name "*_R2_trimmed.fastq.gz" | sort | paste -s -d ',')
 
+
 # --- Determine read type and construct megahit_args ---
 declare megahit_args=""
 if [ -n "$forward_reads_list" ] && [ -n "$reverse_reads_list" ]; then
     echo "Detected paired-end reads."
-    megahit_args="-1 \"${forward_reads_list}\" -2 \"${reverse_reads_list}\""
+    megahit_args="-1 \"${forward_reads_list}\" -2 \"${reverse_reads_list}\" --force" # ADDED --force HERE
 elif [ -z "$forward_reads_list" ] && [ -z "$reverse_reads_list" ]; then
     # If no paired reads, look for single-end reads (adjust patterns if needed)
     single_reads_list=$(find "${FASTQ_INPUT_DIR}" -maxdepth 1 \( -name "*.fastq" -o -name "*.fastq.gz" -o -name "*.fasta" -o -name "*.fasta.gz" \) ! -name "*_R1_trimmed.*" ! -name "*_R2_trimmed.*" | sort | paste -s -d ',')
 
     if [ -n "$single_reads_list" ]; then
         echo "Detected single-end reads."
-        megahit_args="-r \"${single_reads_list}\""
+        megahit_args="-r \"${single_reads_list}\" --force" # ADDED --force HERE
     else
         echo "Error: No matching FASTQ/FASTA files found in ${FASTQ_INPUT_DIR}."
         echo "Expected patterns: *_R1_trimmed.fastq.gz and *_R2_trimmed.fastq.gz for paired-end, or generic *.fastq/gz/*.fasta/gz for single-end."
@@ -135,6 +136,7 @@ echo ""
 # This command will directly run megahit.sh within the 'asm_megahit' conda environment.
 # The benchmarking script's 'run_with_time.sh' will handle redirecting this command's
 # standard output and error to the benchmarking log file (log_full).
+# The ${megahit_args} already contains --force at this point.
 MEGAHIT_COMMAND_TO_RUN_STRING="conda run -n asm_megahit bash ${MEGAHIT_RUN_SCRIPT} ${megahit_args} \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\""
 
 echo "Command that will be passed to benchmarking script for execution:"
