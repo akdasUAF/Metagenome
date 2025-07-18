@@ -1,56 +1,133 @@
 #!/bin/bash
+#SBATCH --partition=t1small       # Adjust as needed (e.g., highmem, if you have it)
+#SBATCH --ntasks=1                # Total number of tasks
+#SBATCH --cpus-per-task=24        # Number of CPU cores for MEGAHIT (corresponds to -t in megahit.sh)
+#SBATCH --mem=128G                # Total memory for the job (MEGAHIT can be very memory intensive for large metagenomes)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="megahit_bench" # Job name for Slurm
+#SBATCH --output=logs/slurm_megahit_bench_%j.log # Slurm stdout log
+#SBATCH --error=logs/slurm_megahit_bench_err_%j.log # Slurm stderr log
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <path_to_fastq_dir> <path_output> <path_log_dir>"
-  exit 1
-fi
-
-fastq_dir=$1
-path_output=$2
-path_log_dir=$3
-log_file="${path_log_dir}/megahit_console_output.log"
-
-# --- Determine read type (paired-end or single-end) ---
-
-# Find .fastq and .fastq.gz files for forward reads (paired-end)
-forward_reads_list=$(find "$fastq_dir" -maxdepth 1 \( -name "*_1.fastq" -o -name "*_1.fastq.gz" \) | sort | paste -s -d ',')
-
-# Find .fastq and .fastq.gz files for reverse reads (paired-end)
-reverse_reads_list=$(find "$fastq_dir" -maxdepth 1 \( -name "*_2.fastq" -o -name "*_2.fastq.gz" \) | sort | paste -s -d ',')
-
-# Check if paired-end files were found
-if [ -n "$forward_reads_list" ] && [ -n "$reverse_reads_list" ]; then
-    echo "Detected paired-end reads."
-    read_type="paired"
-    megahit_args="-1 \"$forward_reads_list\" -2 \"$reverse_reads_list\""
-elif [ -z "$forward_reads_list" ] && [ -z "$reverse_reads_list" ]; then
-    # If no paired reads, look for single-end reads (fasta or fasta.gz, no _1 or _2)
-    single_reads_list=$(find "$fastq_dir" -maxdepth 1 \( -name "*.fastq" -o -name "*.fastq.gz" -o -name "*.fasta" -o -name "*.fasta.gz" \) ! -name "*_1.*" ! -name "*_2.*" | sort | paste -s -d ',')
-
-    if [ -n "$single_reads_list" ]; then
-        echo "Detected single-end reads."
-        read_type="single"
-        megahit_args="-r \"$single_reads_list\""
-    else
-        echo "Error: No matching FASTQ/FASTA files found in $fastq_dir."
-        echo "Expected patterns for paired-end: *_1.fastq/gz and *_2.fastq/gz"
-        echo "Expected patterns for single-end: *.fastq/gz or *.fasta/gz (without _1 or _2)"
-        exit 1
-    fi
+# --- Conda Initialization ---
+# This ensures 'conda' command is available within the Slurm job.
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
 else
-    echo "Error: Found partial paired-end reads (e.g., only _1 but not _2). Please check your input files in $fastq_dir."
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
     exit 1
 fi
 
-# Construct the command to pass to the actual megahit.sh
-# We will pass the constructed arguments directly to megahit.sh
-bash_to_run="code/assembly/megahit/megahit.sh ${megahit_args} \"$path_output\""
+# --- 1. User Configuration & Argument Parsing ---
+# This script orchestrates MEGAHIT assembly with integrated benchmarking.
+# It uses the 'run_megahit_prep.sh' to find and pass reads to MEGAHIT,
+# and 'benchmarking_script.sh' to monitor system performance during the run.
+#
+# Arguments expected when submitting this Slurm script:
+# $1: <dataset_name>             (e.g., "sr-log") - A descriptive name for your dataset.
+#                                 Used for organizing output directories and benchmarking logs.
+# $2: <fastq_input_directory>    (e.g., "data/raw/sr-log/test1/")
+#                                 This directory should contain ALL the FASTQ files (e.g., *_1.fastq, *_2.fastq)
+#                                 for all libraries you want to assemble together.
+# $3: <assembly_output_subfolder_name> (e.g., "megahit_assembly_run1")
+#                                 A unique name for the specific output folder for *this* assembly run.
+#                                 This folder will be created inside 'data/assemblies/<dataset_name>/'.
+# $4: <benchmarking_task_name>   (e.g., "megahit_assembly_full_sr-log")
+#                                 A unique name to identify this particular benchmarking run within the dataset.
+#                                 This influences the names of the dool and full logs:
+#                                 data/logs/<dataset_name>/<benchmarking_task_name>/log_dool_<benchmarking_task_name>_<dataset_name>.log
+#                                 data/logs/<dataset_name>/<benchmarking_task_name>/log_full_<benchmarking_task_name>_<dataset_name>.log
 
-echo "Executing: ${bash_to_run}"
-echo "Output will be logged to: ${log_file}"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: sbatch $0 <dataset_name> <fastq_input_directory> <assembly_output_subfolder_name> <benchmarking_task_name>"
+    echo "Example: sbatch $0 sr-log data/raw/sr-log/test1/ megahit_run_all_libs megahit_assembly_full_sr-log"
+    exit 1
+fi
 
-# Ensure the log directory exists
-mkdir -p "${path_log_dir}"
+declare -r DATASET_NAME="$1"
+declare -r FASTQ_INPUT_DIR="$2"
+declare -r ASSEMBLY_OUTPUT_SUBFOLDER_NAME="$3"
+declare -r BENCHMARKING_TASK_NAME="$4"
 
-# Execute the megahit command, redirecting output to log file
-conda run -n asm_megahit bash -c "${bash_to_run}" | tee "$log_file"
+# --- 2. Define Paths to other scripts and derived output locations ---
+declare -r BENCHMARKING_SCRIPT="code/benchmarking/scripts/benchmarking_script.sh"
+declare -r RUN_MEGAHIT_PREP_SCRIPT="code/assembly/megahit/run_megahit_prep.sh"
+
+# Base directory for all assembly outputs (e.g., where 'sr-log' will be created)
+declare -r ASSEMBLY_BASE_DIR="data/assemblies"
+
+# The full path to the specific output directory for *this* assembly run
+declare -r CURRENT_ASSEMBLY_OUTPUT_DIR="${ASSEMBLY_BASE_DIR}/${DATASET_NAME}/${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
+
+# The benchmarking script will handle creating its own log directory structure:
+# data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}/
+# We pass this path to 'run_megahit_prep.sh' so that the megahit_console_output.log
+# (created by tee in run_megahit_prep.sh) lands in the same benchmarking log folder.
+declare -r BENCHMARKING_LOG_DIR="data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}"
+
+# --- 3. Input Validation ---
+if [ ! -d "${FASTQ_INPUT_DIR}" ]; then
+    echo "ERROR: FASTQ input directory not found: ${FASTQ_INPUT_DIR}"
+    echo "Please ensure the directory exists and contains your FASTQ files."
+    exit 1
+fi
+if [ ! -f "${BENCHMARKING_SCRIPT}" ]; then
+    echo "ERROR: Benchmarking script not found: ${BENCHMARKING_SCRIPT}"
+    echo "Expected at: ${BENCHMARKING_SCRIPT}"
+    exit 1
+fi
+if [ ! -f "${RUN_MEGAHIT_PREP_SCRIPT}" ]; then
+    echo "ERROR: MEGAHIT prep script not found: ${RUN_MEGAHIT_PREP_SCRIPT}"
+    echo "Expected at: ${RUN_MEGAHIT_PREP_SCRIPT}"
+    exit 1
+fi
+
+echo "Script started at $(date)"
+echo "Configuration:"
+echo "  Dataset Name: ${DATASET_NAME}"
+echo "  FASTQ Input Directory: ${FASTQ_INPUT_DIR}"
+echo "  Assembly Output Subfolder Name: ${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
+echo "  Benchmarking Task Name: ${BENCHMARKING_TASK_NAME}"
+echo "  Full Assembly Output Directory: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
+echo "  Benchmarking Log Directory: ${BENCHMARKING_LOG_DIR}"
+echo ""
+
+echo "Current memory usage before assembly job submission:"
+free -h
+
+# --- 4. Prepare base output directory ---
+# The specific assembly output directory (${CURRENT_ASSEMBLY_OUTPUT_DIR}) will be created by run_megahit_prep.sh.
+# We ensure the parent dataset directory under 'data/assemblies' exists.
+mkdir -p "${ASSEMBLY_BASE_DIR}/${DATASET_NAME}" || { echo "ERROR: Could not create base assembly directory ${ASSEMBLY_BASE_DIR}/${DATASET_NAME}"; exit 1; }
+
+# --- 5. Construct the command to be passed to the benchmarking script ---
+# The 'benchmarking_script.sh' expects one command to run, and then dataset/task names.
+# The command it will run is our 'run_megahit_prep.sh' script with its own arguments.
+# Arguments for run_megahit_prep.sh: <path_to_fastq_dir> <path_output> <path_log_dir>
+# We pass the benchmarking log directory to run_megahit_prep.sh so that
+# its 'megahit_console_output.log' also lands in the designated benchmarking log folder.
+MEGAHIT_COMMAND_TO_RUN_STRING="${RUN_MEGAHIT_PREP_SCRIPT} \"${FASTQ_INPUT_DIR}\" \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\" \"${BENCHMARKING_LOG_DIR}\""
+
+echo "Command that will be passed to benchmarking script:"
+echo "${BENCHMARKING_SCRIPT} \"${MEGAHIT_COMMAND_TO_RUN_STRING}\" \"${DATASET_NAME}\" \"${BENCHMARKING_TASK_NAME}\""
+echo ""
+
+# --- 6. Execute the benchmarking script ---
+# This will then trigger run_megahit_prep.sh, which in turn calls megahit.sh.
+set -x # Enable command echoing for debugging the overall execution flow
+"${BENCHMARKING_SCRIPT}" "${MEGAHIT_COMMAND_TO_RUN_STRING}" "${DATASET_NAME}" "${BENCHMARKING_TASK_NAME}"
+set +x # Disable command echoing
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: The benchmarking/MEGAHIT assembly process failed. Exit status: $?."
+    echo "Check logs in ${BENCHMARKING_LOG_DIR} for more details, including megahit_console_output.log."
+    exit 1
+fi
+
+echo "MEGAHIT assembly with benchmarking completed successfully."
+echo "Assembly output located in: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
+echo "Benchmarking logs (dool, full console output) in: ${BENCHMARKING_LOG_DIR}"
+echo "Script finished at $(date)"
