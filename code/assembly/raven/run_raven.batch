@@ -137,5 +137,5 @@ fi
 
 echo "Raven assembly with benchmarking completed successfully."
 echo "Assembly output located in: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
-echo "Benchmarking logs (dool, full console output) in: data/logs/${DATAET_NAME}/${BENCHMARKING_TASK_NAME}/"
+echo "Benchmarking logs (dool, full console output) in: data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}/"
 echo "Script finished at $(date)"
