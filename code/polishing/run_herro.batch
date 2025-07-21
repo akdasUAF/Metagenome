@@ -1,20 +1,17 @@
 #!/bin/bash
-#SBATCH --partition=t1small       # Or your preferred partition (e.g., highmem, gpu if using GPU HERRO)
-#SBATCH --ntasks=1                # Total number of tasks
-#SBATCH --cpus-per-task=24        # Number of CPU cores per task (adjust as needed, HERRO uses this for -t)
-#SBATCH --mem=64G                 # Total memory for the job (adjust based on read size, HERRO can be memory intensive for large datasets/reads)
+#SBATCH --partition=t1small        # Adjust as needed (e.g., highmem, if you have it)
+#SBATCH --ntasks=1                 # Total number of tasks
+#SBATCH --cpus-per-task=24         # Number of CPU cores for Herro (corresponds to -t in Herro)
+#SBATCH --mem=64G                  # Total memory for the job (Herro can be memory intensive for large metagenomes)
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name="herro_error_correction" # Job name for HERRO
-#SBATCH --output=logs/slurm_herro_correction_%j.log # Log file for stdout
-#SBATCH --error=logs/slurm_herro_correction_err_%j.log # Log file for stderr
+#SBATCH --job-name="herro_single" # Default job name if not overridden by command line
+#SBATCH --output=logs/slurm_herro_single_%j.log # Default stdout log if not overridden
+#SBATCH --error=logs/slurm_herro_single_err_%j.log # Default stderr log if not overridden
 
-# Set unlimited locked memory for processes (good for large jobs)
-ulimit -l unlimited
-ulimit -n 65536 # Increase open file descriptor limit if needed
-
-# Load the Slurm module (if your system requires it)
-module load slurm
+declare -r DATASET_ID="$1"          # e.g., lr-even
+declare -r RAW_READS_PATH="$2"   # e.g., data/raw/lr-even/lr-even_raw.fastq
+declare -r TEST_ID="$3" # e.g., 1-5
 
 # --- Conda Initialization ---
 CONDA_BASE=$(conda info --base)
@@ -27,103 +24,52 @@ else
     exit 1
 fi
 
-# --- 1. User Configuration & Argument Parsing ---
-# Input arguments for this script:
-# $1: <dataset_name> (e.g., "my_metagenome_sample")
-# $2: <raw_reads_fastq_path> (Full path to your raw long reads FASTQ file, can be .fastq or .fastq.gz)
-# $3: <herro_model_path> (Full path to the downloaded herro.ckpt model file)
-# $4: <target_test_folder_name> (e.g., "test1", "test2", "test3" - subdirectory under the raw reads' parent directory)
+declare -r ROOT_DIR=$(pwd)
+declare -r RAW_READS="${ROOT_DIR}/${RAW_READS_PATH}"
+declare -r HERRO_OUT_DIR="${ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/"
+declare -r READ_ID_PATH="${ROOT_DIR}data/raw/${DATASET_ID}/test${TEST_ID}/${DATASET_ID}_test${TEST_ID}_read_id.txt"
+declare -r PRE_PROCESSED_READS_PATH="${HERRO_OUT_DIR}/duplex_tools_output_dir/porechopped_split.fastq.gz"
+declare -r BATCHED_ALIGNMENT_PATH="${HERRO_OUT_DIR}/batched/"
+declare -r NUM_THREADS="24"
+declare -r NUM_JOBS=2
 
-if [ "$#" -ne 4 ]; then # Changed from 3 to 4 arguments
-    echo "Usage: sbatch $0 <dataset_name> <raw_reads_fastq_path> <herro_model_path> <target_test_folder_name>"
-    echo "Example: sbatch $0 lr-even data/raw/lr-even/lr-even_raw.fastq /path/to/herro/herro.ckpt test1"
-    exit 1
-fi
+declare -r HERRO_MODEL="${HERRO_REPO_DIR}/model_R9_v0.1.pt"
 
-declare -r DATASET_NAME="$1"
-declare -r RAW_READS_FASTQ_FULLPATH="$2"
-declare -r HERRO_MODEL_PATH="$3"
-declare -r TARGET_TEST_FOLDER_NAME="$4" # New argument for the test folder
-
-# Conda Environment Name (ensure this environment exists and has herro installed)
-declare -r HERRO_ENV_NAME="herro"
-
-# --- 2. Derived Paths & Logging Setup ---
-# Output directory for HERRO corrected reads
-# This line is changed to use the new TARGET_TEST_FOLDER_NAME argument
-declare -r OUTPUT_BASE_DIR="$(dirname "${RAW_READS_FASTQ_FULLPATH}")/${TARGET_TEST_FOLDER_NAME}"
-
-declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
-# The corrected reads will be directly in OUTPUT_BASE_DIR
-declare -r CORRECTED_READS_OUTPUT_PATH="${OUTPUT_BASE_DIR}/${DATASET_NAME}_herro_corrected.fastq.gz" # HERRO outputs gzipped FASTQ by default
-
-# Create necessary directories
-mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
-mkdir -p "${OUTPUT_BASE_DIR}" || { echo "ERROR: Could not create output directory ${OUTPUT_BASE_DIR}"; exit 1; }
+declare -r HERRO_REPO_DIR="${ROOT_DIR}/tools/herro/"
+declare -r HERRO_PREPROCESS_SCRIPT="${HERRO_REPO_DIR}/scripts/preprocess.sh"
+declare -r HERRO_BATCH_ALIGN_SCRIPT="${HERRO_REPO_DIR}/scripts/create_batched_alignments.sh"
 
 
-declare -r path_log="${LOG_DIR}/${DATASET_NAME}_herro_workflow.log"
-# Redirect all stdout and stderr to the log file, and also print to console
-> "${path_log}" # Clear log file on start
-exec &> >(tee -a "${path_log}")
+declare -r HERRO_SIG_BUILD="${HERRO_REPO_DIR}/herro.sif"
 
-echo "Script started at $(date)"
-echo "Configuration:"
-echo "  Dataset Name: ${DATASET_NAME}"
-echo "  Raw Reads FASTQ: ${RAW_READS_FASTQ_FULLPATH}"
-echo "  HERRO Model Path: ${HERRO_MODEL_PATH}"
-echo "  HERRO Conda Environment: ${HERRO_ENV_NAME}"
-echo "  Output Directory: ${OUTPUT_BASE_DIR}"
-echo "  Corrected Reads Output File: ${CORRECTED_READS_OUTPUT_PATH}"
-echo ""
 
-# --- Input Validation ---
-if [ ! -f "${RAW_READS_FASTQ_FULLPATH}" ]; then
-    echo "ERROR: Raw reads FASTQ file not found: ${RAW_READS_FASTQ_FULLPATH}"
-    exit 1
-fi
-if [ ! -f "${HERRO_MODEL_PATH}" ]; then
-    echo "ERROR: HERRO model file not found: ${HERRO_MODEL_PATH}."
-    echo "Please download 'herro.ckpt' from HERRO releases (e.g., https://github.com/lbcb-sci/herro/releases) or ensure the path is correct."
-    exit 1
-fi
+declare -r HERRO_COMMAND="singularity run --nv ${HERRO_SIG_BUILD} inference \
+-m ${HERRO_MODEL} \
+-b ${NUM_JOBS} \
+${RAW_READS} \
+${HERRO_OUT_DIR}"
 
-echo "Current memory usage before HERRO:"
-free -h
 
-# --- 3. HERRO Error Correction ---
-echo "########## Running HERRO Error Correction ##########"
 
-echo "Activating HERRO environment: ${HERRO_ENV_NAME}"
-conda activate "${HERRO_ENV_NAME}" || { echo "ERROR: Failed to activate conda environment '${HERRO_ENV_NAME}'. Exiting."; exit 1; }
+### ~~~~~~~~
 
-# Check if herro command is available in the activated environment
-if ! command -v herro &> /dev/null; then
-    echo "ERROR: 'herro' command not found after activating environment."
-    echo "Please ensure HERRO is installed correctly in your '${HERRO_ENV_NAME}' conda environment."
-    exit 1
-fi
+## Ensure in directory
+cd tools/herro/
 
-echo "--- Running HERRO for error correction ---"
-# HERRO usage: herro -i <input.fastq> -o <output.fastq> [-t num_threads] [--min_len MIN_LENGTH] [--model_path MODEL_PATH]
-echo "Command: herro -i ${RAW_READS_FASTQ_FULLPATH} -o ${CORRECTED_READS_OUTPUT_PATH} -t ${SLURM_CPUS_PER_TASK} --model_path "${HERRO_MODEL_PATH}""
 
-set -x # Enable command echoing
-conda run -n "${HERRO_ENV_NAME}" herro \
-    -i "${RAW_READS_FASTQ_FULLPATH}" \
-    -o "${CORRECTED_READS_OUTPUT_PATH}" \
-    -t "${SLURM_CPUS_PER_TASK}" \
-    --model_path "${HERRO_MODEL_PATH}"
-set +x # Disable command echoing
+conda run -n herro bash -c "${HERRO_PREPROCESS_SCRIPT}" \
+  "${RAW_READS}" \
+  "${HERRO_OUT_DIR}" \
+  "${NUM_THREADS}" \
+  "${NUM_JOBS}"
 
-if [ $? -ne 0 ]; then
-    echo "ERROR: HERRO error correction step failed. Exit status: $?."
-    exit 1
-fi
+gunzip -c "${PRE_PROCESSED_READS_PATH}" | grep "^@" | cut -d' ' -f1 > "${READ_ID_PATH}"
 
-echo "HERRO error correction completed. Corrected reads saved to: ${CORRECTED_READS_OUTPUT_PATH}"
-echo "Script finished at $(date)"
 
-# Deactivate conda environment
-conda deactivate
-echo "Conda environment deactivated."
+conda run -n herro bash -c "${HERRO_BATCH_ALIGN_SCRIPT}" \
+  "${PRE_PROCESSED_READS_PATH}" \
+  "${READ_ID_PATH}" \
+  "${NUM_THREADS}" \
+  "${BATCHED_ALIGNMENT_PATH}"
+
+conda run -n herro bash -c "${HERRO_COMMAND}"
