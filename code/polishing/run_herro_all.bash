@@ -146,7 +146,7 @@ conda run -n herro bash "${HERRO_COMMAND}"
 
 
 
-  
+
 
 
 ### Raw reads
@@ -180,6 +180,27 @@ scripts/preprocess.sh ${root_dir}/data/raw/lr-ms/lr-ms_raw.fastq ${root_dir}/tem
 
 
 sbatch your_herro_script.sh lr-even data/raw/lr-even/lr-even_raw.fastq /path/to/herro/herro.ckpt
+
+
+
+
+
+
+declare -r DATASET_ID="$1"          # e.g., lr-even
+declare -r RAW_READS_PATH="$2"   # e.g., data/raw/lr-even/lr-even_raw.fastq
+declare -r TEST_ID="$3" # e.g., 1-5
+
+
+##### lr-even
+## Test 1
+# 431628
+
+## Test 2
+sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "2"
+
+
+
+
 
 
 
