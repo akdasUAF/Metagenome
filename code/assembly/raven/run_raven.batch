@@ -1,0 +1,153 @@
+#!/bin/bash
+#SBATCH --partition=t1small       # Adjust as needed
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24        # Number of CPU cores for Raven
+#SBATCH --mem=64G                 # Total memory for the job (adjust based on genome size and depth)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="raven_bench"  # Job name for Slurm
+#SBATCH --output=logs/slurm_raven_bench_%j.log # Slurm stdout log
+#SBATCH --error=logs/slurm_raven_bench_err_%j.log # Slurm stderr log
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+# --- 1. User Configuration & Argument Parsing ---
+# This script orchestrates Raven assembly with integrated benchmarking.
+# It directly finds the FASTQ files and constructs the Raven command,
+# then calls 'benchmarking_script.sh' to monitor system performance.
+#
+# Arguments expected when submitting this Slurm script:
+# $1: <dataset_name>             (e.g., "lr-hifi") - A descriptive name for your dataset.
+#                                 Used for organizing output directories and benchmarking logs.
+# $2: <fastq_input_directory>    (e.g., "data/raw/lr-hifi/test1/")
+#                                 This directory should contain ALL the long-read FASTQ files.
+# $3: <assembly_output_subfolder_name> (e.g., "raven_assembly_run1")
+#                                 A unique name for the specific output folder for *this* assembly run.
+#                                 This folder will be created inside 'data/raven/<dataset_name>/'.
+# $4: <benchmarking_task_name>   (e.g., "raven_assembly_full_lr-hifi")
+#                                 A unique name to identify this particular benchmarking run within the dataset.
+# $5: <read_type_flag>           (REQUIRED: "-p" for PacBio CLR, "-x" for Nanopore, "-s" for PacBio HiFi)
+
+if [ "$#" -ne 5 ]; then
+    echo "Usage: sbatch $0 <dataset_name> <fastq_input_directory> <assembly_output_subfolder_name> <benchmarking_task_name> <read_type_flag>"
+    echo "Example: sbatch $0 lr-hifi data/raw/lr-hifi/test1/ raven_run_all_libs raven_assembly_full_lr-hifi -s"
+    exit 1
+fi
+
+declare -r DATASET_NAME="$1"
+declare -r FASTQ_INPUT_DIR="$2"
+declare -r ASSEMBLY_OUTPUT_SUBFOLDER_NAME="$3"
+declare -r BENCHMARKING_TASK_NAME="$4"
+declare -r READ_TYPE_FLAG="$5" # New argument for Raven
+
+# --- 2. Define Paths to other scripts and derived output locations ---
+declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash"
+declare -r RAVEN_RUN_SCRIPT="code/assembly/raven/raven.sh" # NEW: Path to your core raven.sh script
+
+# Base directory for all assembly outputs
+declare -r ASSEMBLY_BASE_DIR="data/raven" # NEW: Changed to 'data/raven'
+
+# The full path to the specific output directory for *this* assembly run
+declare -r CURRENT_ASSEMBLY_OUTPUT_DIR="${ASSEMBLY_BASE_DIR}/${DATASET_NAME}/${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
+
+# The benchmarking script will handle creating its own log directory structure:
+declare -r BENCHMARKING_LOG_DIR="data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}"
+
+# --- 3. Input Validation ---
+if [ ! -d "${FASTQ_INPUT_DIR}" ]; then
+    echo "ERROR: FASTQ input directory not found: ${FASTQ_INPUT_DIR}"
+    echo "Please ensure the directory exists and contains your FASTQ files."
+    exit 1
+fi
+if [ ! -f "${BENCHMARKING_SCRIPT}" ]; then
+    echo "ERROR: Benchmarking script not found: ${BENCHMARKING_SCRIPT}"
+    echo "Expected at: ${BENCHMARKING_SCRIPT}"
+    exit 1
+fi
+if [ ! -f "${RAVEN_RUN_SCRIPT}" ]; then # NEW: Check for Raven script
+    echo "ERROR: Raven run script not found: ${RAVEN_RUN_SCRIPT}"
+    echo "Expected at: ${RAVEN_RUN_SCRIPT}"
+    exit 1
+fi
+
+# Validate READ_TYPE_FLAG
+if [[ ! "$READ_TYPE_FLAG" =~ ^(-p|-x|-s)$ ]]; then
+    echo "ERROR: Invalid read type flag: ${READ_TYPE_FLAG}"
+    echo "Accepted flags are: -p (PacBio CLR), -x (Nanopore), -s (PacBio HiFi)"
+    exit 1
+fi
+
+
+echo "Script started at $(date)"
+echo "Configuration:"
+echo "  Dataset Name: ${DATASET_NAME}"
+echo "  FASTQ Input Directory: ${FASTQ_INPUT_DIR}"
+echo "  Assembly Output Subfolder Name: ${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
+echo "  Benchmarking Task Name: ${BENCHMARKING_TASK_NAME}"
+echo "  Full Assembly Output Directory: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
+echo "  Benchmarking Log Directory: ${BENCHMARKING_LOG_DIR}"
+echo "  Raven Read Type Flag: ${READ_TYPE_FLAG}" # New display
+echo ""
+
+echo "Current memory usage before assembly job submission:"
+free -h
+
+# --- 4. Prepare base output directory for assembly ---
+mkdir -p "${ASSEMBLY_BASE_DIR}/${DATASET_NAME}" || { echo "ERROR: Could not create base assembly directory ${ASSEMBLY_BASE_DIR}/${DATASET_NAME}"; exit 1; }
+mkdir -p "${CURRENT_ASSEMBLY_OUTPUT_DIR}" || { echo "ERROR: Could not create assembly output directory ${CURRENT_ASSEMBLY_OUTPUT_DIR}"; exit 1; }
+
+
+# --- 5. Find FASTQ files and construct Raven arguments ---
+echo "--- Discovering FASTQ files in ${FASTQ_INPUT_DIR} ---"
+
+# Raven typically takes a single FASTQ/FASTA file for long reads
+# Find all .fastq/.fasta/.fastq.gz/.fasta.gz files and combine them into a comma-separated list
+long_reads_list=$(find "${FASTQ_INPUT_DIR}" -maxdepth 1 \( -name "*.fastq" -o -name "*.fastq.gz" -o -name "*.fasta" -o -name "*.fasta.gz" \) | sort | paste -s -d ',')
+
+if [ -z "$long_reads_list" ]; then
+    echo "Error: No long-read FASTQ/FASTA files found in ${FASTQ_INPUT_DIR}."
+    echo "Expected patterns: *.fastq, *.fastq.gz, *.fasta, *.fasta.gz"
+    exit 1
+fi
+
+# Raven arguments will now be the read type flag followed by the comma-separated list of files
+raven_args="${READ_TYPE_FLAG} \"${long_reads_list}\""
+
+echo "Raven Read Arguments: ${raven_args}"
+echo ""
+
+# --- 6. Construct the command to be passed to the benchmarking script ---
+# This command will directly run raven.sh within its conda environment.
+# The benchmarking script's 'run_with_time.sh' will handle redirecting this command's
+# standard output and error to the benchmarking log file (log_full).
+# Note: Raven does not have a --force flag.
+RAVEN_COMMAND_TO_RUN_STRING="conda run -n asm_raven bash ${RAVEN_RUN_SCRIPT} ${raven_args} \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\"" # NEW conda env and script
+
+echo "Command that will be passed to benchmarking script for execution:"
+echo "${BENCHMARKING_SCRIPT} \"${RAVEN_COMMAND_TO_RUN_STRING}\" \"${DATASET_NAME}\" \"${BENCHMARKING_TASK_NAME}\""
+echo ""
+
+# --- 7. Execute the benchmarking script ---
+set -x # Enable command echoing for debugging the overall execution flow
+"${BENCHMARKING_SCRIPT}" "${RAVEN_COMMAND_TO_RUN_STRING}" "${DATASET_NAME}" "${BENCHMARKING_TASK_NAME}"
+set +x # Disable command echoing
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: The benchmarking/Raven assembly process failed. Exit status: $?."
+    echo "Check logs in data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}/ for more details, especially log_full_<task>_<dataset>.log."
+    exit 1
+fi
+
+echo "Raven assembly with benchmarking completed successfully."
+echo "Assembly output located in: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
+echo "Benchmarking logs (dool, full console output) in: data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}/"
+echo "Script finished at $(date)"

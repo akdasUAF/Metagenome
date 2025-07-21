@@ -1,15 +1,29 @@
 #!/bin/bash
-## Assembler: megahit
+## Assembler: Raven
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <raw_path> <MAG_path> <log_path>"
+# The last argument is the path_output
+path_output="${!#}"
+
+# All arguments except the last one are the read arguments for raven (e.g., -s /path/to/reads.fastq.gz)
+raven_read_args=("${@:1:$#-1}")
+
+if [ ${#raven_read_args[@]} -eq 0 ]; then
+  echo "Usage: $0 <read_arguments_for_raven> <path_output>"
+  echo "  <read_arguments_for_raven> can be: -p <pacbio_clr_reads> OR -x <nanopore_reads> OR -s <pacbio_hifi_reads>"
   exit 1
 fi
 
-path_reads=$1
-path_output=$2
-path_log=$3
+# *** ADD THIS LINE FOR DEBUGGING ***
+echo "DEBUG: Raven command will be:"
+echo "raven \"${raven_read_args[@]}\" --threads 24 --graph-output \"$path_output/intermediate_graph\" > \"$path_output/final.contigs.fasta\""
+echo "*********************************"
 
-echo $PWD
-
-./tools/assemblers/raven/build/bin/raven -t 24 $path_reads > $path_output 2> $path_log
+# Construct the Raven command
+# Raven outputs to stdout by default, so we redirect to a file.
+# It also allows for graph output for debugging/visualization.
+# Note: Raven uses --threads, not -t
+raven "${raven_read_args[@]}" \
+  --threads 24 \
+  --graph-output "$path_output/intermediate_graph" \
+  > "$path_output/final.contigs.fasta" \
+  2>&1 # Redirect stderr to stdout as well

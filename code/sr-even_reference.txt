@@ -1,0 +1,12 @@
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Cohaesibacter_es.047_2615840601.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Halomonas_HL-4_2623620617.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Halomonas_HL-93_2623620618.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Marinobacter_LV10MA510-1_2616644829.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Marinobacter_LV10R510-8_2615840697.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Micromonospora_coxensis_2623620609.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Micromonospora_echinaurantiaca_2623620557.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Micromonospora_echinofusca_2623620567.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Muricauda_ES.050_2615840527.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Propionibacteriaceae_bacterium_ES.041_2615840646.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Psychrobacter_LV10R520-6_2617270709.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-even/reference_sequences/Thioclava_ES.032_2615840533.fasta
