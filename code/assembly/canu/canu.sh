@@ -6,8 +6,8 @@
 # $2: <space_separated_read_paths> (e.g., "file1.fastq file2.fastq")
 # $3: <output_path> (e.g., /path/to/canu_output_dir)
 # $4: <genome_size> (e.g., 5m, 1.2g)
-# $5: <num_threads> (e.g., 24)
-# $6: <memory_requested> (e.g., 64G)
+# $5: <num_threads> (e.g., 24) - Passed from SLURM_CPUS_PER_TASK but Canu auto-detects when useGrid=false
+# $6: <memory_requested> (e.g., 64G or 65536) - Passed from SLURM_MEM_PER_NODE but Canu auto-detects when useGrid=false
 
 if [ "$#" -ne 6 ]; then
   echo "Usage: $0 <canu_read_type_flag> <space_separated_read_paths> <output_path> <genome_size> <num_threads> <memory_requested>"
@@ -16,18 +16,11 @@ if [ "$#" -ne 6 ]; then
 fi
 
 declare -r CANU_READ_TYPE_FLAG="$1"
-# The second argument is a single string containing space-separated paths.
-# We need to expand it properly so Canu sees individual filenames.
-declare -r READ_PATHS="$2" # This is a string, e.g., "file1.fastq file2.fastq"
+declare -r READ_PATHS="$2"
 declare -r PATH_OUTPUT="$3"
 declare -r GENOME_SIZE="$4"
 declare -r NUM_THREADS="$5"
-declare -r MEMORY_REQUESTED="$6" # e.g., "64G"
-
-# Extract numeric memory value for Canu's maxMemory parameter (e.g., 64G -> 64)
-# Canu's maxMemory needs to be in GB, so remove the 'G'. Leave some overhead for OS.
-MEMORY_GB_VALUE=$(echo "${MEMORY_REQUESTED}" | sed 's/G$//')
-MEMORY_GB_FOR_CANU=$(( MEMORY_GB_VALUE - 4 )) # Deduct 4GB for OS/other processes as a buffer
+declare -r MEMORY_REQUESTED="$6"  
 
 # Determine Canu project name from the output directory
 # For example, if PATH_OUTPUT is data/canu/lr-log/test5, PROJECT_NAME will be test5
@@ -35,21 +28,20 @@ PROJECT_NAME=$(basename "${PATH_OUTPUT}")
 
 # --- DEBUGGING COMMAND ECHO ---
 echo "DEBUG: Canu command will be:"
-echo "./tools/assemblers/canu-2.2/bin/canu -p ${PROJECT_NAME} -d ${PATH_OUTPUT} genomeSize=${GENOME_SIZE} ${CANU_READ_TYPE_FLAG} ${READ_PATHS} threads=${NUM_THREADS} maxMemory=${MEMORY_GB_FOR_CANU}g useGrid=false 2>&1 | tee \"${PATH_OUTPUT}/canu_run.log\""
+# Removed 'threads=' and 'maxMemory=' parameters. Canu generally auto-detects these
+# from Slurm environment variables ($SLURM_CPUS_PER_TASK, $SLURM_MEM_PER_NODE) when useGrid=false.
+echo "./tools/assemblers/canu-2.2/bin/canu -p ${PROJECT_NAME} -d ${PATH_OUTPUT} genomeSize=${GENOME_SIZE} ${CANU_READ_TYPE_FLAG} ${READ_PATHS} useGrid=false 2>&1 | tee \"${PATH_OUTPUT}/canu_run.log\""
 echo "******************************************************************"
 # ------------------------------
 
 # Construct and execute the Canu command
-# Canu writes its main log file and assembly output to the specified -d directory.
-# We'll tee stdout/stderr to a general log file within the output directory for capturing all console output.
-
-./tools/assemblers/canu-2.2/bin/canu \
-     -p "${PROJECT_NAME}" \
+# Canu automatically detects threads and memory from SLURM_CPUS_PER_TASK and SLURM_MEM_PER_NODE
+# when 'useGrid=false' is specified. Explicit 'threads=' and 'maxMemory=' are typically
+# not needed and can cause issues if not used in a specific format Canu expects.
+./tools/assemblers/canu-2.2/bin/canu -p "${PROJECT_NAME}" \
      -d "${PATH_OUTPUT}" \
      genomeSize="${GENOME_SIZE}" \
      "${CANU_READ_TYPE_FLAG}" "${READ_PATHS}" \
-     threads="${NUM_THREADS}" \
-     maxMemory="${MEMORY_GB_FOR_CANU}g" \
      useGrid=false \
      2>&1 | tee "${PATH_OUTPUT}/canu_run.log"
 
@@ -61,7 +53,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Canu places its final assembly in <output_dir>/<project_name>.contigs.fasta
-# You might want to symlink/copy it to a common name like final.contigs.fasta
+# Create a symlink to a common name (final.contigs.fasta) for consistency
 if [ -f "${PATH_OUTPUT}/${PROJECT_NAME}.contigs.fasta" ]; then
     ln -s "${PATH_OUTPUT}/${PROJECT_NAME}.contigs.fasta" "${PATH_OUTPUT}/final.contigs.fasta"
     echo "Canu final assembly linked to: ${PATH_OUTPUT}/final.contigs.fasta"
@@ -72,5 +64,5 @@ else
     echo "WARNING: Could not find a primary assembly file in ${PATH_OUTPUT}. Check Canu logs."
 fi
 
-# Canu creates many intermediate files. Consider if you want to clean them up.
-# For now, no cleanup is explicitly added.
+# Canu creates many intermediate files in its output directory.
+# No explicit cleanup is added here, as these might be useful for debugging or later stages.
