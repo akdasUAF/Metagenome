@@ -195,11 +195,32 @@ declare -r TEST_ID="$3" # e.g., 1-5
 ## Test 1
 # 431628
 
-## Test 2
+## Test 2 - 
 sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "2"
 
+## Test 3 - 431633
+sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "3"
 
 
+
+
+##### lr-log
+## Test 1
+sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "1"
+
+
+## Test 2 - 431634
+sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "2"
+
+
+
+##### lr-ms
+## Test 1 431635
+sbatch code/polishing/run_herro.batch "lr-ms" "data/raw/lr-ms/lr-ms_raw.fastq" "1"
+
+
+## Test 2
+sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "2"
 
 
 

@@ -67,7 +67,7 @@ echo "Herro Run Output Directory: ${HERRO_RUN_OUT_DIR}"
 
 # Paths for Herro components within your repository structure
 declare -r HERRO_REPO_DIR="${ROOT_DIR}/tools/herro"
-declare -r HERRO_MODEL="${HERRO_REPO_DIR}/model_R9_v0.1.pt" # Check if this model path is correct, should be relative to herro.sif usually or an absolute path
+declare -r HERRO_MODEL="${HERRO_REPO_DIR}/model_R9_v0.1.pt"
 declare -r HERRO_PREPROCESS_SCRIPT="${HERRO_REPO_DIR}/scripts/preprocess.sh"
 declare -r HERRO_BATCH_ALIGN_SCRIPT="${HERRO_REPO_DIR}/scripts/create_batched_alignments.sh"
 declare -r HERRO_SIG_BUILD="${HERRO_REPO_DIR}/herro.sif" # Path to your Singularity image
@@ -78,7 +78,6 @@ declare -r PRE_PROCESSED_READS_PATH="${HERRO_RUN_OUT_DIR}/raw_preprocessed/duple
 echo "Preprocessed Reads Path (for subsequent steps): ${PRE_PROCESSED_READS_PATH}"
 
 # Read IDs file (output of seqkit, input for create_batched_alignments.sh)
-# FIX: Added missing '/' between ROOT_DIR and 'data'
 declare -r READ_ID_PATH="${HERRO_RUN_OUT_DIR}/${DATASET_ID}_test${TEST_ID}_read_id.txt"
 echo "Read ID File Path: ${READ_ID_PATH}"
 
@@ -104,29 +103,23 @@ mkdir -p "${BATCHED_ALIGNMENT_PATH}"                # For alignment batches
 mkdir -p "$(dirname "${CORRECTED_FASTA_FILE}")"      # For final FASTA output
 echo "--- Directories Created ---"
 
-# --- Remove `cd tools/herro/` ---
-# It's better to use absolute paths for scripts and avoid changing directories unless absolutely required
-# cd tools/herro/ # REMOVED
-
-# --- 1. Preprocess Reads (scripts/preprocess.sh) ---
+# --- Preprocess Reads (scripts/preprocess.sh) ---
 echo "--- STEP 1: Starting Preprocessing with preprocess.sh ---"
 echo "Command: conda run -n herro bash -c 'bash \"${HERRO_PREPROCESS_SCRIPT}\" \"${RAW_READS_ABS_PATH}\" \"${PRE_PROCESSED_READS_PATH%.fastq.gz}\" \"${NUM_THREADS}\" 2'"
-# Note: The second argument to preprocess.sh is an OUTPUT PREFIX, not the full path with .fastq.gz
-# Removing .fastq.gz from PRE_PROCESSED_READS_PATH for the prefix argument
 conda run -n herro bash -c "bash '${HERRO_PREPROCESS_SCRIPT}' \
   '${RAW_READS_ABS_PATH}' \
   '${PRE_PROCESSED_READS_PATH%.fastq.gz}' \
   '${NUM_THREADS}' \
-  '2'" # Using 2 parts for Porechop as you had before. Adjust if needed.
+  '2'"
 echo "--- STEP 1: Preprocessing Complete ---"
-ls -lh "$(dirname "${PRE_PROCESSED_READS_PATH}")" # Debug: show contents of preprocess output dir
+ls -lh "$(dirname "${PRE_PROCESSED_READS_PATH}")"
 
 # --- 2. Generate Read IDs (using seqkit) ---
 echo "--- STEP 2: Generating Read IDs with seqkit ---"
 echo "Command: conda run -n herro bash -c 'seqkit seq -n -i \"${PRE_PROCESSED_READS_PATH}\" > \"${READ_ID_PATH}\"'"
 conda run -n herro bash -c "seqkit seq -n -i '${PRE_PROCESSED_READS_PATH}' > '${READ_ID_PATH}'"
 echo "--- STEP 2: Read IDs Generated ---"
-ls -lh "${READ_ID_PATH}" # Debug: confirm read ID file exists and size
+ls -lh "${READ_ID_PATH}"
 
 # --- 3. Create Batched Alignments (scripts/create_batched_alignments.sh) ---
 echo "--- STEP 3: Creating Batched Alignments with create_batched_alignments.sh ---"
@@ -137,107 +130,44 @@ conda run -n herro bash -c "bash '${HERRO_BATCH_ALIGN_SCRIPT}' \
   '${NUM_THREADS}' \
   '${BATCHED_ALIGNMENT_PATH}'"
 echo "--- STEP 3: Batched Alignments Created ---"
-ls -lh "${BATCHED_ALIGNMENT_PATH}" # Debug: show contents of alignment batches dir
+ls -lh "${BATCHED_ALIGNMENT_PATH}"
 
 # --- 4. Herro Error-Correction (Inference) ---
 echo "--- STEP 4: Starting Herro Inference ---"
-# Define the full command string for Herro inference
-# FIX: Added --read-alns argument
-# FIX: Last argument is now the FASTA output FILE
-HERRO_INFERENCE_COMMAND="singularity run --nv '${HERRO_SIG_BUILD}' inference \
-  --read-alns '${BATCHED_ALIGNMENT_PATH}' \
+
+# --- NEW: Define the path inside the container ---
+# This will be the mount point for your ROOT_DIR inside the Singularity container.
+declare -r CONTAINER_ROOT_DIR="/data" # A common choice, or /mnt/project, etc.
+
+# --- NEW: Construct the Singularity bind mount option ---
+declare -r SINGULARITY_BIND_OPT="--bind ${ROOT_DIR}:${CONTAINER_ROOT_DIR}"
+
+# --- NEW: Adjust paths for Herro Inference to be relative to CONTAINER_ROOT_DIR ---
+# HERRO_SIG_BUILD is still the host path because 'singularity run' needs it to find the SIF.
+# All other paths become relative to CONTAINER_ROOT_DIR inside the container.
+declare -r HERRO_MODEL_IN_CONTAINER="${CONTAINER_ROOT_DIR}/tools/herro/model_R9_v0.1.pt"
+declare -r BATCHED_ALIGNMENT_PATH_IN_CONTAINER="${CONTAINER_ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/herro_align_batches"
+declare -r PRE_PROCESSED_READS_PATH_IN_CONTAINER="${CONTAINER_ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/raw_preprocessed/duplex_tools_output_dir/porechopped_split.fastq.gz"
+declare -r CORRECTED_FASTA_FILE_IN_CONTAINER="${CONTAINER_ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/herro_corrected_reads.fasta"
+
+
+HERRO_INFERENCE_COMMAND="singularity run --nv ${SINGULARITY_BIND_OPT} \
+  '${HERRO_SIG_BUILD}' inference \
+  --read-alns '${BATCHED_ALIGNMENT_PATH_IN_CONTAINER}' \
   -t '${FEAT_GEN_THREADS_PER_DEVICE}' \
   -d '${GPUS}' \
-  -m '${HERRO_MODEL}' \
+  -m '${HERRO_MODEL_IN_CONTAINER}' \
   -b '${BATCH_SIZE}' \
-  '${PRE_PROCESSED_READS_PATH}' \
-  '${CORRECTED_FASTA_FILE}'" # This is the final FASTA output file
+  '${PRE_PROCESSED_READS_PATH_IN_CONTAINER}' \
+  '${CORRECTED_FASTA_FILE_IN_CONTAINER}'"
 
 echo "Full Herro Inference Command: ${HERRO_INFERENCE_COMMAND}"
 
+# Execute the Herro Inference command
 conda run -n herro bash -c "${HERRO_INFERENCE_COMMAND}"
 
 echo "--- STEP 4: Herro Inference Complete ---"
-ls -lh "${CORRECTED_FASTA_FILE}" # Debug: confirm final FASTA output exists and size
+ls -lh "${CORRECTED_FASTA_FILE}" # Check host path for existence and size
 
 echo "--- Full Herro pipeline job finished successfully! ---"
 echo "Job finished at: $(date)"
-
-EOF
-
-
-# #!/bin/bash
-# #SBATCH --partition=t1small        # Adjust as needed (e.g., highmem, if you have it)
-# #SBATCH --ntasks=1                 # Total number of tasks
-# #SBATCH --cpus-per-task=24         # Number of CPU cores for Herro (corresponds to -t in Herro)
-# #SBATCH --mem=64G                  # Total memory for the job (Herro can be memory intensive for large metagenomes)
-# #SBATCH --mail-user=wwinnett@alaska.edu
-# #SBATCH --mail-type=BEGIN,END,FAIL
-# #SBATCH --job-name="herro_single" # Default job name if not overridden by command line
-# #SBATCH --output=logs/slurm_herro_single_%j.log # Default stdout log if not overridden
-# #SBATCH --error=logs/slurm_herro_single_err_%j.log # Default stderr log if not overridden
-
-# declare -r DATASET_ID="$1"          # e.g., lr-even
-# declare -r RAW_READS_PATH="$2"   # e.g., data/raw/lr-even/lr-even_raw.fastq
-# declare -r TEST_ID="$3" # e.g., 1-5
-
-# # --- Conda Initialization ---
-# CONDA_BASE=$(conda info --base)
-# if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
-#     . "${CONDA_BASE}/etc/profile.d/conda.sh"
-#     echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
-# else
-#     echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
-#     echo "Please ensure Conda is installed and 'conda init bash' has been run."
-#     exit 1
-# fi
-
-# declare -r ROOT_DIR=$(pwd)
-# declare -r RAW_READS="${ROOT_DIR}/${RAW_READS_PATH}"
-# declare -r HERRO_OUT_DIR="${ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/"
-# declare -r READ_ID_PATH="${ROOT_DIR}data/raw/${DATASET_ID}/test${TEST_ID}/${DATASET_ID}_test${TEST_ID}_read_id.txt"
-# declare -r PRE_PROCESSED_READS_PATH="${HERRO_OUT_DIR}/duplex_tools_output_dir/porechopped_split.fastq.gz"
-# declare -r BATCHED_ALIGNMENT_PATH="${HERRO_OUT_DIR}/batched/"
-# declare -r NUM_THREADS="24"
-# declare -r NUM_JOBS=2
-
-# declare -r HERRO_MODEL="${HERRO_REPO_DIR}/model_R9_v0.1.pt"
-
-# declare -r HERRO_REPO_DIR="${ROOT_DIR}/tools/herro/"
-# declare -r HERRO_PREPROCESS_SCRIPT="${HERRO_REPO_DIR}/scripts/preprocess.sh"
-# declare -r HERRO_BATCH_ALIGN_SCRIPT="${HERRO_REPO_DIR}/scripts/create_batched_alignments.sh"
-
-
-# declare -r HERRO_SIG_BUILD="${HERRO_REPO_DIR}/herro.sif"
-
-
-# declare -r HERRO_COMMAND="singularity run --nv ${HERRO_SIG_BUILD} inference \
-# -m ${HERRO_MODEL} \
-# -b ${NUM_JOBS} \
-# ${RAW_READS} \
-# ${HERRO_OUT_DIR}"
-
-
-
-# ### ~~~~~~~~
-
-# ## Ensure in directory
-# cd tools/herro/
-
-
-# conda run -n herro bash -c "${HERRO_PREPROCESS_SCRIPT}" \
-#   "${RAW_READS}" \
-#   "${HERRO_OUT_DIR}" \
-#   "${NUM_THREADS}" \
-#   "${NUM_JOBS}"
-
-# gunzip -c "${PRE_PROCESSED_READS_PATH}" | grep "^@" | cut -d' ' -f1 > "${READ_ID_PATH}"
-
-
-# conda run -n herro bash -c "${HERRO_BATCH_ALIGN_SCRIPT}" \
-#   "${PRE_PROCESSED_READS_PATH}" \
-#   "${READ_ID_PATH}" \
-#   "${NUM_THREADS}" \
-#   "${BATCHED_ALIGNMENT_PATH}"
-
-# conda run -n herro bash -c "${HERRO_COMMAND}"
