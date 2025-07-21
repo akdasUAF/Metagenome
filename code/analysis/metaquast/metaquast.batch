@@ -84,3 +84,4 @@ eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$pat
 conda deactivate
 
 echo "MetaQuast analysis completed!"
+

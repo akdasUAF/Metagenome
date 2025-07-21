@@ -1,0 +1,10 @@
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000005845.2_Escherichia_coli.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000006765.1_Pseudomonas_aeruginosa.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000006945.2_Salmonella_enterica.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000009045.1_Bacillus_subtilis.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000013425.1_Staphylococcus_aureus.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000091045.1_Cryptococcus_neoformans.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000146045.2_Saccharomyces_cerevisiae.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000196035.1_Listeria_monocytogenes.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_000393015.1_Enterococcus_faecalis.fasta
+/center1/PANMETA/wwinnett/metagenome_replicates/FINAL/Metagenome/data/reference/sr-log/reference_sequences/GCF_029961225.1_Lactobacillus_fermentum.fasta
