@@ -152,8 +152,6 @@ declare -r CORRECTED_FASTA_FILE_IN_CONTAINER="${CONTAINER_ROOT_DIR}/data/raw/${D
 
 
 HERRO_INFERENCE_COMMAND="singularity run --nv ${SINGULARITY_BIND_OPT} \
-  --bind ${ROOT_DIR}:${ROOT_DIR} \
-  --bind /tmp:/tmp \
   '${HERRO_SIG_BUILD}' inference \
   --read-alns '${BATCHED_ALIGNMENT_PATH_IN_CONTAINER}' \
   -t '${FEAT_GEN_THREADS_PER_DEVICE}' \

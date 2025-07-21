@@ -193,34 +193,43 @@ declare -r TEST_ID="$3" # e.g., 1-5
 
 ##### lr-even
 ## Test 1
-# 431628
+sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "1"
 
 ## Test 2 - 
 sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "2"
 
-## Test 3 - 431633
+## Test 3 - 
 sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "3"
+
+## Test 4 - 
+sbatch code/polishing/run_herro.batch "lr-even" "data/raw/lr-even/lr-even_raw.fastq" "4"
+
+
+
 
 
 
 
 ##### lr-log
-## Test 1
+## Test 1 - 
 sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "1"
 
 
-## Test 2 - 431634
+## Test 2 - 
 sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "2"
+
+## Test 3 - s
+sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "3"
 
 
 
 ##### lr-ms
-## Test 1 431635
-sbatch code/polishing/run_herro.batch "lr-ms" "data/raw/lr-ms/lr-ms_raw.fastq" "1"
+## Test 1 - 
+sbatch code/polishing/run_herro.batch "lr-ms" "data/raw/lr-ms/raw/lr-ms_raw.fastq" "1"
 
 
-## Test 2
-sbatch code/polishing/run_herro.batch "lr-log" "data/raw/lr-log/lr-log_raw.fastq" "2"
+## Test 2 - 
+sbatch code/polishing/run_herro.batch "lr-ms" "data/raw/lr-ms/lr-ms_raw.fastq" "2"
 
 
 
