@@ -9,26 +9,30 @@ raven_read_args=("${@:1:$#-1}")
 
 if [ ${#raven_read_args[@]} -eq 0 ]; then
   echo "Usage: $0 <read_arguments_for_raven> <path_output>"
-  echo "  <read_arguments_for_raven> can be: -p <pacbio_clr_reads> OR -x <nanopore_reads> OR -s <pacbio_hifi_reads>"
+  echo "  <read_arguments_for_raven> should be the path(s) to your long-read FASTQ/FASTA file(s)."
   exit 1
 fi
 
 # Define a temporary log file for Raven's internal stderr
 RAVEN_INTERNAL_LOG="${path_output}/raven_internal.log"
 
+# Define the path for the assembly graph output (using the correct flag)
+RAVEN_GRAPH_OUTPUT="${path_output}/assembly.gfa" # Raven's help says it's GFA format
+
 # *** ADD THIS LINE FOR DEBUGGING ***
 echo "DEBUG: Raven command will be:"
-echo "raven \"${raven_read_args[@]}\" --threads 24 --graph-output \"$path_output/intermediate_graph\" > \"$path_output/final.contigs.fasta\" 2>\"${RAVEN_INTERNAL_LOG}\""
+echo "raven \"${raven_read_args[@]}\" --threads 24 -F \"${RAVEN_GRAPH_OUTPUT}\" > \"$path_output/final.contigs.fasta\" 2>\"${RAVEN_INTERNAL_LOG}\""
 echo "*********************************"
 
 # Construct the Raven command
 # Raven outputs to stdout by default, so we redirect to a file.
 # We also redirect stderr to a separate, temporary log file for robust capture.
+# Use -F for graphical fragment assembly (GFA output).
 raven "${raven_read_args[@]}" \
   --threads 24 \
-  --graph-output "$path_output/intermediate_graph" \
+  -F "${RAVEN_GRAPH_OUTPUT}" \ # <--- CHANGED THIS FLAG
   > "$path_output/final.contigs.fasta" \
-  2> "${RAVEN_INTERNAL_LOG}" # <--- Redirect Raven's stderr to this specific file
+  2> "${RAVEN_INTERNAL_LOG}"
 
 # Check Raven's exit status. If it failed, print the internal log.
 if [ $? -ne 0 ]; then
