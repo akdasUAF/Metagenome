@@ -2,7 +2,7 @@
 #SBATCH --partition=t1small       # Adjust as needed (e.g., highmem, if you have it)
 #SBATCH --ntasks=1                # Total number of tasks
 #SBATCH --cpus-per-task=24        # Number of CPU cores for MetaSPAdes (corresponds to -t in metaspades.sh)
-#SBATCH --mem=64G                 # Total memory for the job (MetaSPAdes can be very memory intensive for large metagenomes; consider 128G+ for larger datasets)
+#SBATCH --mem=64G                 # Total memory for the job (adjust for MetaSPAdes needs)
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --job-name="metaspades_bench" # Job name for Slurm
@@ -10,7 +10,6 @@
 #SBATCH --error=logs/slurm_metaspades_bench_err_%j.log # Slurm stderr log
 
 # --- Conda Initialization ---
-# This ensures 'conda' command is available within the Slurm job.
 CONDA_BASE=$(conda info --base)
 if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
     . "${CONDA_BASE}/etc/profile.d/conda.sh"
@@ -23,24 +22,24 @@ fi
 
 # --- 1. User Configuration & Argument Parsing ---
 # This script orchestrates MetaSPAdes assembly with integrated benchmarking.
-# It passes the FASTQ input directory directly to 'metaspades.sh' to handle file discovery.
-# Then calls 'benchmarking_script.sh' to monitor system performance.
+# It directly finds the FASTQ files (for a single paired-end library) and constructs the MetaSPAdes command,
+# then calls 'benchmark.bash' to monitor system performance.
 #
 # Arguments expected when submitting this Slurm script:
-# $1: <dataset_name>             (e.g., "sr-log") - A descriptive name for your dataset.
+# $1: <dataset_name>             (e.g., "sr-even") - A descriptive name for your dataset.
 #                                 Used for organizing output directories and benchmarking logs.
-# $2: <fastq_input_directory>    (e.g., "data/raw/sr-log/test1/")
-#                                 This directory should contain ALL the FASTQ files (e.g., *_R1_trimmed.fastq.gz, *_R2_trimmed.fastq.gz)
-#                                 for all libraries you want to assemble together.
+# $2: <fastq_input_directory>    (e.g., "data/raw/sr-even/raw/test1/")
+#                                 This directory MUST contain exactly one pair of FASTQ files
+#                                 (e.g., sample_R1_trimmed.fastq.gz, sample_R2_trimmed.fastq.gz).
 # $3: <assembly_output_subfolder_name> (e.g., "metaspades_assembly_run1")
 #                                 A unique name for the specific output folder for *this* assembly run.
 #                                 This folder will be created inside 'data/metaspades/<dataset_name>/'.
-# $4: <benchmarking_task_name>   (e.g., "metaspades_assembly_full_sr-log")
+# $4: <benchmarking_task_name>   (e.g., "metaspades_assembly_sr-even_run1")
 #                                 A unique name to identify this particular benchmarking run within the dataset.
 
 if [ "$#" -ne 4 ]; then
     echo "Usage: sbatch $0 <dataset_name> <fastq_input_directory> <assembly_output_subfolder_name> <benchmarking_task_name>"
-    echo "Example: sbatch $0 sr-log data/raw/sr-log/test1/ metaspades_run_all_libs metaspades_assembly_full_sr-log"
+    echo "Example: sbatch $0 sr-even data/raw/sr-even/raw/test1/ test1 metaspades_bench_sr-even_run1"
     exit 1
 fi
 
@@ -50,10 +49,10 @@ declare -r ASSEMBLY_OUTPUT_SUBFOLDER_NAME="$3"
 declare -r BENCHMARKING_TASK_NAME="$4"
 
 # --- 2. Define Paths to other scripts and derived output locations ---
-declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash" # Path to your benchmarking script
-declare -r METASPADES_RUN_SCRIPT="code/assembly/metaspades/metaspades.sh" # Your core metaspades.sh script
+declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash"
+declare -r METASPADES_RUN_SCRIPT="code/assembly/metaspades/metaspades.sh" # Path to your metaspades.sh wrapper
 
-# Base directory for all assembly outputs
+# Base directory for all assembly outputs (CHANGED for MetaSPAdes)
 declare -r ASSEMBLY_BASE_DIR="data/metaspades"
 
 # The full path to the specific output directory for *this* assembly run
@@ -66,7 +65,7 @@ declare -r BENCHMARKING_LOG_DIR="data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_N
 # --- 3. Input Validation ---
 if [ ! -d "${FASTQ_INPUT_DIR}" ]; then
     echo "ERROR: FASTQ input directory not found: ${FASTQ_INPUT_DIR}"
-    echo "Please ensure the directory exists and contains your FASTQ files (e.g., *_R1_trimmed.fastq.gz)."
+    echo "Please ensure the directory exists and contains your FASTQ files."
     exit 1
 fi
 if [ ! -f "${BENCHMARKING_SCRIPT}" ]; then
@@ -97,19 +96,48 @@ free -h
 mkdir -p "${ASSEMBLY_BASE_DIR}/${DATASET_NAME}" || { echo "ERROR: Could not create base assembly directory ${ASSEMBLY_BASE_DIR}/${DATASET_NAME}"; exit 1; }
 mkdir -p "${CURRENT_ASSEMBLY_OUTPUT_DIR}" || { echo "ERROR: Could not create assembly output directory ${CURRENT_ASSEMBLY_OUTPUT_DIR}"; exit 1; }
 
+# --- 5. Determine memory limit for MetaSPAdes ---
+# SLURM_MEM_PER_NODE is usually in MB, convert to GB for MetaSPAdes' -m argument
+# Handle cases like "64G" directly or "65536" MB
+REQUESTED_MEM_GB=$(echo "${SLURM_MEM_PER_NODE}" | sed 's/G//I') # Remove 'G' (case-insensitive) if present
+if ! [[ "$REQUESTED_MEM_GB" =~ ^[0-9]+$ ]]; then
+    echo "Warning: SLURM_MEM_PER_NODE ('${SLURM_MEM_PER_NODE}') is not a simple integer in G. Attempting conversion assuming MB." >&2
+    # If it's not a direct GB value, assume MB and convert
+    REQUESTED_MEM_GB=$((SLURM_MEM_PER_NODE / 1024))
+    if [ "$REQUESTED_MEM_GB" -eq 0 ]; then
+        echo "Error: Could not determine valid memory limit from SLURM_MEM_PER_NODE. Set to 0." >&2
+        REQUESTED_MEM_GB=0 # Default to 0 if conversion fails or results in 0
+    else
+        echo "Converted SLURM_MEM_PER_NODE (MB) to ${REQUESTED_MEM_GB} GB for MetaSPAdes."
+    fi
+fi
 
-# --- 5. Construct the command to be passed to the benchmarking script ---
+if [ "$REQUESTED_MEM_GB" -eq 0 ]; then
+    echo "WARNING: Could not determine memory limit in GB from SLURM_MEM_PER_NODE. MetaSPAdes might use default."
+fi
+
+echo "Determined memory for MetaSPAdes: ${REQUESTED_MEM_GB} GB"
+echo ""
+
+# --- 6. Construct the command to be passed to the benchmarking script ---
 # This command will directly run metaspades.sh within the 'asm_metaspades' conda environment.
-# The benchmarking script's 'run_with_time.sh' will handle redirecting this command's
-# standard output and error to the benchmarking log file (log_full).
-# metaspades.sh expects: <path_to_fastq_dir> <path_output_dir> <path_log_dir_for_metaspades_internal>
-METASPADES_COMMAND_TO_RUN_STRING="conda run -n asm_metaspades bash ${METASPADES_RUN_SCRIPT} \"${FASTQ_INPUT_DIR}\" \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\" \"${CURRENT_ASSEMBLY_OUTPUT_DIR}/metaspades_logs\" ${SLURM_CPUS_PER_TASK}"
+# metaspades.sh expects:
+# <path_to_fastq_dir> <path_output_dir> <path_log_dir_for_metaspades_internal> <num_threads> <memory_limit_gb>
+
+declare METASPADES_COMMAND_ARGS=""
+METASPADES_COMMAND_ARGS+="\"${FASTQ_INPUT_DIR}\" "
+METASPADES_COMMAND_ARGS+="\"${CURRENT_ASSEMBLY_OUTPUT_DIR}\" "
+METASPADES_COMMAND_ARGS+="\"${CURRENT_ASSEMBLY_OUTPUT_DIR}/metaspades_logs\" " # Internal log dir
+METASPADES_COMMAND_ARGS+="${SLURM_CPUS_PER_TASK} " # Threads
+METASPADES_COMMAND_ARGS+="${REQUESTED_MEM_GB}" # Memory in GB (NO TRAILING SPACE)
+
+METASPADES_COMMAND_TO_RUN_STRING="conda run -n asm_metaspades bash ${METASPADES_RUN_SCRIPT} ${METASPADES_COMMAND_ARGS}"
 
 echo "Command that will be passed to benchmarking script for execution:"
 echo "${BENCHMARKING_SCRIPT} \"${METASPADES_COMMAND_TO_RUN_STRING}\" \"${DATASET_NAME}\" \"${BENCHMARKING_TASK_NAME}\""
 echo ""
 
-# --- 6. Execute the benchmarking script ---
+# --- 7. Execute the benchmarking script ---
 set -x # Enable command echoing for debugging the overall execution flow
 "${BENCHMARKING_SCRIPT}" "${METASPADES_COMMAND_TO_RUN_STRING}" "${DATASET_NAME}" "${BENCHMARKING_TASK_NAME}"
 set +x # Disable command echoing

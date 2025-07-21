@@ -9,20 +9,29 @@
 
 
 root_dir=$(pwd)
+
 cd tools/herro/
 
 
 mkdir -p "${root_dir}/data/raw/lr-even/raw/test1/"
 
 
-scripts/preprocess.sh \
+"${root_dir}/tools/herro/scripts/preprocess.sh" \
   "${root_dir}/data/raw/lr-even/lr-even_raw.fastq" \
-  "${root_dir}/data/raw/lr-even/raw/test1/" \
+  "${root_dir}/data/raw/lr-even/raw/test1/" \ 
   24 \
   2
 
+./tools/herro/scripts/create_batched_alignments.sh \
+  <output_from_reads_preprocessing>  \  
+  <read_ids> \ 
+  24 \ 
+  <directory_for_batches_of_alignments> 
 
- <output_prefix> <number_of_threads> <parts_to_split_job_into>
+
+singularity run --nv herro.sif \
+  
+
 
 ### Raw reads
 # lr-even: data/raw/lr-even/lr-even_raw.fastq
