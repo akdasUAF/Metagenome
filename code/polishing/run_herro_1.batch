@@ -1,83 +1,75 @@
 #!/bin/bash
-#
-# Original SLURM header - these values will be overridden if arguments are used for job name/output
-# #SBATCH --partition=t1small        # Adjust as needed (e.g., highmem, if you have it)
-# #SBATCH --ntasks=1                 # Total number of tasks
-# #SBATCH --cpus-per-task=24         # Number of CPU cores for Herro (corresponds to -t in Herro)
-# #SBATCH --mem=64G                  # Total memory for the job (Herro can be memory intensive for large metagenomes)
-# #SBATCH --mail-user=wwinnett@alaska.edu
-# #SBATCH --mail-type=BEGIN,END,FAIL
-# #SBATCH --job-name="herro_default" # Default job name if not overridden by command line
-# #SBATCH --output=logs/slurm_herro_default_%j.log # Default stdout log if not overridden
-# #SBATCH --error=logs/slurm_herro_default_err_%j.log # Default stderr log if not overridden
+#SBATCH --partition=t1small        # Adjust as needed (e.g., highmem, if you have it)
+#SBATCH --ntasks=1                 # Total number of tasks
+#SBATCH --cpus-per-task=24         # Number of CPU cores for Herro (corresponds to -t in Herro)
+#SBATCH --mem=64G                  # Total memory for the job (Herro can be memory intensive for large metagenomes)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="herro_single" # Default job name if not overridden by command line
+#SBATCH --output=logs/slurm_herro_single_%j.log # Default stdout log if not overridden
+#SBATCH --error=logs/slurm_herro_single_err_%j.log # Default stderr log if not overridden
 
+declare -r DATASET_ID="$1"          # e.g., lr-even
+declare -r RAW_READS_PATH="$2"   # e.g., data/raw/lr-even/lr-even_raw.fastq
+declare -r TEST_ID="1" # e.g., 1-5
 
-# --- Process Command-Line Arguments ---
-# This script requires two arguments: <DATASET_TYPE> <TEST_NUMBER>
-# Example: sbatch herro_preprocess.sh lr-even test1
-
-if [ "$#" -ne 2 ]; then
-  echo "Usage: sbatch $(basename "$0") <DATASET_TYPE> <TEST_NUMBER>"
-  echo "Example: sbatch $(basename "$0") lr-even test1"
-  echo "  DATASET_TYPE: e.g., lr-even, lr-log, lr-ms"
-  echo "  TEST_NUMBER: e.g., test1, test2, test3, etc."
-  exit 1
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
 fi
 
-DATASET_TYPE="$1" # e.g., lr-even, lr-log, lr-ms
-TEST_NUMBER="$2"  # e.g., test1, test2, test3
+declare -r ROOT_DIR=$(pwd)
+declare -r RAW_READS="${ROOT_DIR}/${RAW_READS_PATH}"
+declare -r HERRO_OUT_DIR="${ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/"
+declare -r READ_ID_PATH="${ROOT_DIR}data/raw/${DATASET_ID}/test${TEST_ID}/${DATASET_ID}_test${TEST_ID}_read_id.txt"
+declare -r PRE_PROCESSED_READS_PATH="${HERRO_OUT_DIR}/duplex_tools_output_dir/porechopped_split.fastq.gz"
+declare -r BATCHED_ALIGNMENT_PATH="${HERRO_OUT_DIR}/batched/"
+declare -r NUM_THREADS="24"
+declare -r NUM_JOBS=2
 
-# --- Dynamic SLURM Job Name and Log Paths ---
-# These are dynamically set using a trick:
-# SLURM_JOB_NAME and SLURM_OUTPUT variables are recognized by SLURM
-# if set *before* other commands that might interfere.
-# Although typically you use --job-name directly in sbatch,
-# for internal script dynamic naming, this approach is sometimes used.
-# A more robust way to set SBATCH output dynamically based on script arguments
-# is to call sbatch with the arguments:
-# sbatch --job-name="herro_${DATASET_TYPE}_${TEST_NUMBER}" \
-#        --output="logs/slurm_herro-${DATASET_TYPE}-${TEST_NUMBER}_%j.log" \
-#        --error="logs/slurm_herro-${DATASET_TYPE}-${TEST_NUMBER}_err_%j.log" \
-#        your_script.sh "${DATASET_TYPE}" "${TEST_NUMBER}"
-#
-# FOR THIS SCRIPT: We'll set the internal log paths dynamically,
-# but the #SBATCH lines at the top will define the default SLURM-managed log files.
-# The 'tee' command will handle the *specific Herro process logs*.
+declare -r HERRO_MODEL="${HERRO_REPO_DIR}/model_R9_v0.1.pt"
 
-JOB_NAME="herro_${DATASET_TYPE}_${TEST_NUMBER}"
-LOG_FILE_STEM="slurm_herro-${DATASET_TYPE}-${TEST_NUMBER}"
+declare -r HERRO_REPO_DIR="${ROOT_DIR}/tools/herro/"
+declare -r HERRO_PREPROCESS_SCRIPT="${HERRO_REPO_DIR}/scripts/preprocess.sh"
+declare -r HERRO_BATCH_ALIGN_SCRIPT="${HERRO_REPO_DIR}/scripts/create_batched_alignments.sh"
 
-# Set the actual SLURM job name and log files (these need to be at the top for SBATCH to parse)
-# Since we want dynamic names based on arguments, it's cleaner to remove the fixed names above
-# and pass them directly to sbatch.
-# For now, let's just make sure the script is aware of the names for internal logging/reporting.
-# You would submit this script with:
-# sbatch --job-name="${JOB_NAME}" --output="logs/${LOG_FILE_STEM}_%j.log" --error="logs/${LOG_FILE_STEM}_err_%j.log" herro_preprocess.sh <DATASET_TYPE> <TEST_NUMBER>
 
-# Ensure the logs directory exists
-mkdir -p logs
+declare -r HERRO_SIG_BUILD="${HERRO_REPO_DIR}/herro.sif"
 
-echo "SLURM Job ID: ${SLURM_JOB_ID}"
-echo "Running on host: $(hostname)"
-echo "Starting time: $(date)"
-echo "Dataset Type: ${DATASET_TYPE}"
-echo "Test Number: ${TEST_NUMBER}"
-echo "Dynamic Job Name: ${JOB_NAME}"
 
-# Define the root directory based on where the script is submitted from
-# This assumes your script is submitted from the 'Metagenome' directory
-root_dir=$(pwd)
-echo "Root directory: ${root_dir}"
+declare -r HERRO_COMMAND="singularity run --nv ${HERRO_SIG_BUILD} inference \
+-m ${HERRO_MODEL} \
+-b ${NUM_JOBS} \
+${RAW_READS} \
+${HERRO_OUT_DIR}"
 
-# Load necessary modules (if your environment requires them)
-# Example: If Herro or its dependencies are in a specific conda environment
-# module load miniconda3/4.10.3 # Or whatever module loads your conda base
-# source activate herro_env # Activate your Herro conda environment if it's not the default
-# Or simply:
-# conda activate herro # If 'conda' is already in your PATH
 
-# --- Construct Paths Based on Arguments ---
-INPUT_FASTQ="${root_dir}/data/raw/${DATASET_TYPE}/${DATASET_TYPE}_raw.fastq"
-OUTPUT_BASE_DIR="${root_dir}/data/raw/${DATASET_TYPE}/raw/${TEST_NUMBER}/"
-HERRO_SCRIPT="${root_dir}/tools/herro/scripts/preprocess.sh"
-NUM_CP
+
+### ~~~~~~~~
+
+## Ensure in directory
+cd tools/herro/
+
+
+conda run -n herro bash -c "${HERRO_PREPROCESS_SCRIPT}" \
+  "${RAW_READS}" \
+  "${HERRO_OUT_DIR}" \
+  "${NUM_THREADS}" \
+  "${NUM_JOBS}"
+
+gunzip -c "${PRE_PROCESSED_READS_PATH}" | grep "^@" | cut -d' ' -f1 > "${READ_ID_PATH}"
+
+
+conda run -n herro bash -c "${HERRO_BATCH_ALIGN_SCRIPT}" \
+  "${PRE_PROCESSED_READS_PATH}" \
+  "${READ_ID_PATH}" \
+  "${NUM_THREADS}" \
+  "${BATCHED_ALIGNMENT_PATH}"
+
+conda run -n herro bash -c "${HERRO_COMMAND}"

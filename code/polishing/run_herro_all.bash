@@ -1,35 +1,151 @@
 
+sbatch << EOF
+#!/bin/bash
+#SBATCH --partition=t1small        # Adjust as needed (e.g., highmem, if you have it)
+#SBATCH --ntasks=1                 # Total number of tasks
+#SBATCH --cpus-per-task=24         # Number of CPU cores for Herro (corresponds to -t in Herro)
+#SBATCH --mem=64G                  # Total memory for the job (Herro can be memory intensive for large metagenomes)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="herro_single" # Default job name if not overridden by command line
+#SBATCH --output=logs/slurm_herro_single_%j.log # Default stdout log if not overridden
+#SBATCH --error=logs/slurm_herro_single_err_%j.log # Default stderr log if not overridden
 
-
-# declare -r DATASET_ID="$1"          # e.g., lr-even
-# declare -r ASSEMBLER_ID="$2"         # e.g., flye
-# declare -r RAW_READS_FULLPATH="$3"   # e.g., data/raw/lr-even/lr-even_raw.fastq
+declare -r DATASET_ID="lr-even"          # e.g., lr-even
+declare -r RAW_READS_PATH="data/raw/lr-even/lr-even_raw.fastq"   # e.g., data/raw/lr-even/lr-even_raw.fastq
+declare -r TEST_ID="1" # e.g., 1-5
 # declare -r DRAFT_ASSEMBLY_FULLPATH="$4" # e.g., data/flye/lr-even/assembly.fasta
 
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+declare -r ROOT_DIR=$(pwd)
+declare -r RAW_READS="${ROOT_DIR}/${RAW_READS_PATH}"
+declare -r HERRO_OUT_DIR="${ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/"
+declare -r READ_ID_PATH="${ROOT_DIR}data/raw/${DATASET_ID}/test${TEST_ID}/${DATASET_ID}_test${TEST_ID}_read_id.txt"
+declare -r PRE_PROCESSED_READS_PATH="${HERRO_OUT_DIR}/duplex_tools_output_dir/porechopped_split.fastq.gz"
+declare -r BATCHED_ALIGNMENT_PATH="${HERRO_OUT_DIR}/batched/"
+declare -r NUM_THREADS="24"
+declare -r NUM_JOBS=2
 
 
-root_dir=$(pwd)
 
+declare -r HERRO_REPO_DIR="${ROOT_DIR}/tools/herro/"
+declare -r HERRO_PREPROCESS_SCRIPT="${HERRO_REPO_DIR}/scripts/preprocess.sh"
+declare -r HERRO_BATCH_ALIGN_SCRIPT="${HERRO_REPO_DIR}/scripts/create_batched_alignments.sh"
+
+
+## Ensure in directory
 cd tools/herro/
 
+conda run -n herro bash "${HERRO_BATCH_ALIGN_SCRIPT}" \
+  "${PRE_PROCESSED_READS_PATH}" \
+  "${READ_ID_PATH}" \
+  "${NUM_THREADS}" \
+  "${BATCHED_ALIGNMENT_PATH}"
 
-mkdir -p "${root_dir}/data/raw/lr-even/raw/test1/"
-
-
-"${root_dir}/tools/herro/scripts/preprocess.sh" \
-  "${root_dir}/data/raw/lr-even/lr-even_raw.fastq" \
-  "${root_dir}/data/raw/lr-even/raw/test1/" \ 
-  24 \
-  2
-
-./tools/herro/scripts/create_batched_alignments.sh \
-  <output_from_reads_preprocessing>  \  
-  <read_ids> \ 
-  24 \ 
-  <directory_for_batches_of_alignments> 
+EOF
 
 
-singularity run --nv herro.sif \
+
+
+
+
+
+
+
+#!/bin/bash
+#SBATCH --partition=t1small        # Adjust as needed (e.g., highmem, if you have it)
+#SBATCH --ntasks=1                 # Total number of tasks
+#SBATCH --cpus-per-task=24         # Number of CPU cores for Herro (corresponds to -t in Herro)
+#SBATCH --mem=64G                  # Total memory for the job (Herro can be memory intensive for large metagenomes)
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="herro_single" # Default job name if not overridden by command line
+#SBATCH --output=logs/slurm_herro_single_%j.log # Default stdout log if not overridden
+#SBATCH --error=logs/slurm_herro_single_err_%j.log # Default stderr log if not overridden
+
+declare -r DATASET_ID="lr-even"          # e.g., lr-even
+declare -r RAW_READS_PATH="data/raw/lr-even/lr-even_raw.fastq"   # e.g., data/raw/lr-even/lr-even_raw.fastq
+declare -r TEST_ID="1" # e.g., 1-5
+# declare -r DRAFT_ASSEMBLY_FULLPATH="$4" # e.g., data/flye/lr-even/assembly.fasta
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+declare -r ROOT_DIR=$(pwd)
+declare -r RAW_READS="${ROOT_DIR}/${RAW_READS_PATH}"
+declare -r HERRO_OUT_DIR="${ROOT_DIR}/data/raw/${DATASET_ID}/test${TEST_ID}/"
+declare -r READ_ID_PATH="${ROOT_DIR}data/raw/${DATASET_ID}/test${TEST_ID}/${DATASET_ID}_test${TEST_ID}_read_id.txt"
+declare -r PRE_PROCESSED_READS_PATH="${HERRO_OUT_DIR}/duplex_tools_output_dir/porechopped_split.fastq.gz"
+declare -r BATCHED_ALIGNMENT_PATH="${HERRO_OUT_DIR}/batched/"
+declare -r NUM_THREADS="24"
+declare -r NUM_JOBS=2
+
+declare -r HERRO_MODEL="${HERRO_REPO_DIR}/model_R9_v0.1.pt"
+
+declare -r HERRO_REPO_DIR="${ROOT_DIR}/tools/herro/"
+declare -r HERRO_PREPROCESS_SCRIPT="${HERRO_REPO_DIR}/scripts/preprocess.sh"
+declare -r HERRO_BATCH_ALIGN_SCRIPT="${HERRO_REPO_DIR}/scripts/create_batched_alignments.sh"
+
+
+declare -r HERRO_SIG_BUILD="${HERRO_REPO_DIR}/herro.sif"
+
+
+## Ensure in directory
+cd tools/herro/
+
+conda run -n herro bash "${HERRO_BATCH_ALIGN_SCRIPT}" \
+  "${PRE_PROCESSED_READS_PATH}" \
+  "${READ_ID_PATH}" \
+  "${NUM_THREADS}" \
+  "${BATCHED_ALIGNMENT_PATH}"
+
+
+
+
+conda run herro "${HERRO_PREPROCESS_SCRIPT}" \
+  "${RAW_READS}" \
+  "${HERRO_OUT_DIR}" \
+  "${NUM_THREADS}" \
+  "${NUM_JOBS}"
+
+gunzip -c "${PRE_PROCESSED_READS_PATH}" | grep "^@" | cut -d' ' -f1 > "${READ_ID_PATH}"
+
+
+"singularity run --nv ${HERRO_SIG_BUILD} inference --help" \
+-m "${HERRO_MODEL}" \
+-b "${NUM_JOBS}" \
+"${RAW_READS}" \
+"${HERRO_OUT_DIR}"
+
+
+HERRO_COMMAND="singularity run --nv ${HERRO_SIG_BUILD} inference \
+-m ${HERRO_MODEL} \
+-b ${NUM_JOBS} \
+${RAW_READS} \
+${HERRO_OUT_DIR}"
+
+conda run -n herro bash "${HERRO_COMMAND}"
+
+
+
   
 
 
