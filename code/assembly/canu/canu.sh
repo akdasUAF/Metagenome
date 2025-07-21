@@ -35,14 +35,16 @@ PROJECT_NAME=$(basename "${PATH_OUTPUT}")
 
 # --- DEBUGGING COMMAND ECHO ---
 echo "DEBUG: Canu command will be:"
-echo "canu -p ${PROJECT_NAME} -d ${PATH_OUTPUT} genomeSize=${GENOME_SIZE} ${CANU_READ_TYPE_FLAG} ${READ_PATHS} threads=${NUM_THREADS} maxMemory=${MEMORY_GB_FOR_CANU}g useGrid=false 2>&1 | tee \"${PATH_OUTPUT}/canu_run.log\""
+echo "./tools/assemblers/canu-2.2/bin/canu -p ${PROJECT_NAME} -d ${PATH_OUTPUT} genomeSize=${GENOME_SIZE} ${CANU_READ_TYPE_FLAG} ${READ_PATHS} threads=${NUM_THREADS} maxMemory=${MEMORY_GB_FOR_CANU}g useGrid=false 2>&1 | tee \"${PATH_OUTPUT}/canu_run.log\""
 echo "******************************************************************"
 # ------------------------------
 
 # Construct and execute the Canu command
 # Canu writes its main log file and assembly output to the specified -d directory.
 # We'll tee stdout/stderr to a general log file within the output directory for capturing all console output.
-canu -p "${PROJECT_NAME}" \
+
+./tools/assemblers/canu-2.2/bin/canu \
+     -p "${PROJECT_NAME}" \
      -d "${PATH_OUTPUT}" \
      genomeSize="${GENOME_SIZE}" \
      "${CANU_READ_TYPE_FLAG}" "${READ_PATHS}" \
