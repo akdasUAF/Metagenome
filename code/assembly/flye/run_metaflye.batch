@@ -1,0 +1,147 @@
+#!/bin/bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="metaflye_bench"  # Changed job name
+#SBATCH --output=logs/slurm_metaflye_bench_%j.log  # Changed output log
+#SBATCH --error=logs/slurm_metaflye_bench_err_%j.log # Changed error log
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+# --- 1. User Configuration & Argument Parsing ---
+# Arguments expected when submitting this Slurm script:
+# $1: <dataset_name>             (e.g., "lr-hifi")
+# $2: <fastq_input_directory>    (e.g., "data/raw/lr-hifi/test1/")
+# $3: <assembly_output_subfolder_name> (e.g., "metaflye_assembly_run1")
+# $4: <benchmarking_task_name>   (e.g., "metaflye_assembly_full_lr-hifi")
+# $5: <read_type_flag>           (e.g., "--nano-raw", "--pacbio-raw", "--pacbio-hifi")
+
+if [ "$#" -ne 5 ]; then # Now expects 5 arguments
+    echo "Usage: sbatch $0 <dataset_name> <fastq_input_directory> <assembly_output_subfolder_name> <benchmarking_task_name> <read_type_flag>"
+    echo "Example: sbatch $0 lr-even data/raw/lr-even/test1/ test1 metaflye_bench_lr-even_run1 --nano-raw"
+    exit 1
+fi
+
+declare -r DATASET_NAME="$1"
+declare -r FASTQ_INPUT_DIR="$2"
+declare -r ASSEMBLY_OUTPUT_SUBFOLDER_NAME="$3"
+declare -r BENCHMARKING_TASK_NAME="$4"
+declare -r READ_TYPE_FLAG="$5" # Re-introduced for MetaFlye
+
+# --- 2. Define Paths to other scripts and derived output locations ---
+declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash"
+declare -r METAFLYE_RUN_SCRIPT="code/assembly/metaflye/metaflye.sh" # Changed script path
+
+# Base directory for all assembly outputs
+declare -r ASSEMBLY_BASE_DIR="data/metaflye" # Changed base output directory
+
+# The full path to the specific output directory for *this* assembly run
+declare -r CURRENT_ASSEMBLY_OUTPUT_DIR="${ASSEMBLY_BASE_DIR}/${DATASET_NAME}/${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
+
+# The benchmarking script will handle creating its own log directory structure:
+declare -r BENCHMARKING_LOG_DIR="data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}"
+
+# --- 3. Input Validation ---
+if [ ! -d "${FASTQ_INPUT_DIR}" ]; then
+    echo "ERROR: FASTQ input directory not found: ${FASTQ_INPUT_DIR}"
+    echo "Please ensure the directory exists and contains your FASTQ files."
+    exit 1
+fi
+if [ ! -f "${BENCHMARKING_SCRIPT}" ]; then
+    echo "ERROR: Benchmarking script not found: ${BENCHMARKING_SCRIPT}"
+    echo "Expected at: ${BENCHMARKING_SCRIPT}"
+    exit 1
+fi
+if [ ! -f "${METAFLYE_RUN_SCRIPT}" ]; then # Changed script validation
+    echo "ERROR: MetaFlye run script not found: ${METAFLYE_RUN_SCRIPT}"
+    echo "Expected at: ${METAFLYE_RUN_SCRIPT}"
+    exit 1
+fi
+
+# Validation for READ_TYPE_FLAG (specific to Flye)
+if [[ ! "$READ_TYPE_FLAG" =~ ^(--nano-raw|--pacbio-raw|--pacbio-hifi)$ ]]; then
+    echo "ERROR: Invalid read type flag: ${READ_TYPE_FLAG}"
+    echo "Accepted flags for MetaFlye are: --nano-raw, --pacbio-raw, --pacbio-hifi"
+    exit 1
+fi
+
+
+echo "Script started at $(date)"
+echo "Configuration:"
+echo "  Dataset Name: ${DATASET_NAME}"
+echo "  FASTQ Input Directory: ${FASTQ_INPUT_DIR}"
+echo "  Assembly Output Subfolder Name: ${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
+echo "  Benchmarking Task Name: ${BENCHMARKING_TASK_NAME}"
+echo "  Full Assembly Output Directory: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
+echo "  Benchmarking Log Directory: ${BENCHMARKING_LOG_DIR}"
+echo "  MetaFlye Read Type Flag: ${READ_TYPE_FLAG}" # Added for MetaFlye
+echo ""
+
+echo "Current memory usage before assembly job submission:"
+free -h
+
+# --- 4. Prepare base output directory for assembly ---
+mkdir -p "${ASSEMBLY_BASE_DIR}/${DATASET_NAME}" || { echo "ERROR: Could not create base assembly directory ${ASSEMBLY_BASE_DIR}/${DATASET_NAME}"; exit 1; }
+mkdir -p "${CURRENT_ASSEMBLY_OUTPUT_DIR}" || { echo "ERROR: Could not create assembly output directory ${CURRENT_ASSEMBLY_OUTPUT_DIR}"; exit 1; }
+
+
+# --- 5. Find FASTQ files and construct MetaFlye arguments ---
+echo "--- Discovering FASTQ files in ${FASTQ_INPUT_DIR} ---"
+
+# Flye takes space-separated file paths for input reads, not comma-separated.
+# long_reads_list will contain the space-separated paths.
+# We'll use tr to replace newlines with spaces.
+long_reads_list=$(find "${FASTQ_INPUT_DIR}" -maxdepth 1 \( -name "*.fastq" -o -name "*.fastq.gz" -o -name "*.fasta" -o -name "*.fasta.gz" \) | sort | tr '\n' ' ')
+
+# Remove any trailing space from tr output
+long_reads_list="${long_reads_list%" "}"
+
+if [ -z "$long_reads_list" ]; then
+    echo "Error: No long-read FASTQ/FASTA files found in ${FASTQ_INPUT_DIR}."
+    echo "Expected patterns: *.fastq, *.fastq.gz, *.fasta, *.fasta.gz"
+    exit 1
+fi
+
+# MetaFlye arguments will include the read type flag and the space-separated list of files
+# We enclose long_reads_list in a single set of quotes to pass it as one argument to the nested script,
+# which will then expand it into multiple arguments for Flye.
+metaflye_args="${READ_TYPE_FLAG} \"${long_reads_list}\""
+
+echo "MetaFlye Read Arguments: ${metaflye_args}"
+echo ""
+
+# --- 6. Construct the command to be passed to the benchmarking script ---
+# Note: The read_type_flag and long_reads_list are passed as one quoted argument to metaflye.sh
+METAFLYE_COMMAND_TO_RUN_STRING="conda run -n asm_metaflye bash ${METAFLYE_RUN_SCRIPT} ${READ_TYPE_FLAG} \"${long_reads_list}\" \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\""
+
+echo "Command that will be passed to benchmarking script for execution:"
+echo "${BENCHMARKING_SCRIPT} \"${METAFLYE_COMMAND_TO_RUN_STRING}\" \"${DATASET_NAME}\" \"${BENCHMARKING_TASK_NAME}\""
+echo ""
+
+# --- 7. Execute the benchmarking script ---
+set -x
+"${BENCHMARKING_SCRIPT}" "${METAFLYE_COMMAND_TO_RUN_STRING}" "${DATASET_NAME}" "${BENCHMARKING_TASK_NAME}"
+set +x
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: The benchmarking/MetaFlye assembly process failed. Exit status: $?."
+    echo "Check logs in data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}/ for more details, especially log_full_<task>_<dataset>.log."
+    exit 1
+fi
+
+echo "MetaFlye assembly with benchmarking completed successfully."
+echo "Assembly output located in: ${CURRENT_ASSEMBLY_OUTPUT_DIR}"
+echo "Benchmarking logs (dool, full console output) in: data/logs/${DATASET_NAME}/${BENCHMARKING_TASK_NAME}/"
+echo "Script finished at $(date)"
