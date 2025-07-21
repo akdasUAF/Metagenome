@@ -3,6 +3,7 @@
 ### Install Dependencies
 conda install cmake zlib bz2file conda-forge::m2-libbz2 python=3.11
 
+mkdir -p tools/assemblers/
 cd tools/assemblers/ || exit
 
 ## Change directory to user input

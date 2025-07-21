@@ -37,7 +37,7 @@ scripts/preprocess.sh ${root_dir}/data/raw/lr-even/lr-even_raw.fastq ${root_dir}
 scripts/preprocess.sh ${root_dir}/data/raw/lr-ms/lr-ms_raw.fastq ${root_dir}/temp_out/ 24 1
 
 
-
+sbatch your_herro_script.sh lr-even data/raw/lr-even/lr-even_raw.fastq /path/to/herro/herro.ckpt
 
 
 
