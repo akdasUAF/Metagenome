@@ -42,7 +42,7 @@ declare -r READ_TYPE_FLAG="$5" # Re-introduced for MetaFlye
 
 # --- 2. Define Paths to other scripts and derived output locations ---
 declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash"
-declare -r METAFLYE_RUN_SCRIPT="code/assembly/metaflye/metaflye.sh" # Changed script path
+declare -r METAFLYE_RUN_SCRIPT="code/assembly/flye/metaflye.sh" # Changed script path
 
 # Base directory for all assembly outputs
 declare -r ASSEMBLY_BASE_DIR="data/metaflye" # Changed base output directory
@@ -124,7 +124,7 @@ echo ""
 
 # --- 6. Construct the command to be passed to the benchmarking script ---
 # Note: The read_type_flag and long_reads_list are passed as one quoted argument to metaflye.sh
-METAFLYE_COMMAND_TO_RUN_STRING="conda run -n asm_metaflye bash ${METAFLYE_RUN_SCRIPT} ${READ_TYPE_FLAG} \"${long_reads_list}\" \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\""
+METAFLYE_COMMAND_TO_RUN_STRING="conda run -n asm_flye bash ${METAFLYE_RUN_SCRIPT} ${READ_TYPE_FLAG} \"${long_reads_list}\" \"${CURRENT_ASSEMBLY_OUTPUT_DIR}\""
 
 echo "Command that will be passed to benchmarking script for execution:"
 echo "${BENCHMARKING_SCRIPT} \"${METAFLYE_COMMAND_TO_RUN_STRING}\" \"${DATASET_NAME}\" \"${BENCHMARKING_TASK_NAME}\""
