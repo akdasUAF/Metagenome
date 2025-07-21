@@ -224,3 +224,47 @@ sbatch code/processing/fastp/run_fastp.batch \
 
 
 
+### For the sr-log reads
+
+## Test 1
+cat data/raw/sr-log/raw/test1/*R1_trimmed.fastq.gz > data/raw/sr-log/raw/test1/sr-log_test1_trimmed_R1.fastq.gz
+cat data/raw/sr-log/raw/test1/*R2_trimmed.fastq.gz > data/raw/sr-log/raw/test1/sr-log_test1_trimmed_R2.fastq.gz
+mkdir data/raw/sr-log/raw/test1/trimmed/
+mv data/raw/sr-log/raw/test1/*_trimmed.fastq.gz data/raw/sr-log/raw/test1/trimmed/
+
+
+
+
+## Test 2
+cat data/raw/sr-log/raw/test2/*R1_trimmed.fastq.gz > data/raw/sr-log/raw/test2/sr-log_test2_trimmed_R1.fastq.gz
+cat data/raw/sr-log/raw/test2/*R2_trimmed.fastq.gz > data/raw/sr-log/raw/test2/sr-log_test2_trimmed_R2.fastq.gz
+mkdir data/raw/sr-log/raw/test2/trimmed/
+mv data/raw/sr-log/raw/test2/*_trimmed.fastq.gz data/raw/sr-log/raw/test2/trimmed/
+
+
+
+## Test 3
+cat data/raw/sr-log/raw/test3/*R1_trimmed.fastq.gz > data/raw/sr-log/raw/test3/sr-log_test3_trimmed_R1.fastq.gz
+cat data/raw/sr-log/raw/test3/*R2_trimmed.fastq.gz > data/raw/sr-log/raw/test3/sr-log_test3_trimmed_R2.fastq.gz
+mkdir data/raw/sr-log/raw/test3/trimmed/
+mv data/raw/sr-log/raw/test3/*_trimmed.fastq.gz data/raw/sr-log/raw/test3/trimmed/
+
+
+
+
+
+## Test 4
+cat data/raw/sr-log/raw/test4/*R1_trimmed.fastq.gz > data/raw/sr-log/raw/test4/sr-log_test4_trimmed_R1.fastq.gz
+cat data/raw/sr-log/raw/test4/*R2_trimmed.fastq.gz > data/raw/sr-log/raw/test4/sr-log_test4_trimmed_R2.fastq.gz
+mkdir data/raw/sr-log/raw/test4/trimmed/
+mv data/raw/sr-log/raw/test4/*_trimmed.fastq.gz data/raw/sr-log/raw/test4/trimmed/
+
+
+
+
+
+## Test 5
+cat data/raw/sr-log/raw/test5/*R1_trimmed.fastq.gz > data/raw/sr-log/raw/test5/sr-log_test5_trimmed_R1.fastq.gz
+cat data/raw/sr-log/raw/test5/*R2_trimmed.fastq.gz > data/raw/sr-log/raw/test5/sr-log_test5_trimmed_R2.fastq.gz
+mkdir data/raw/sr-log/raw/test5/trimmed/
+mv data/raw/sr-log/raw/test5/*_trimmed.fastq.gz data/raw/sr-log/raw/test5/trimmed/

@@ -37,15 +37,15 @@ FWD_FILES=()
 REV_FILES=()
 SINGLE_FILES=()
 
-# Collect all forward reads (_1.fastq.gz or _1.fastq)
+# Collect all forward reads (_R1.fastq.gz or _R1.fastq)
 while IFS= read -r -d $'\0' f; do
     FWD_FILES+=("$f");
-done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_1.fastq" -o -name "*_1.fastq.gz" \) -print0 | sort -z)
+done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_R1.fastq" -o -name "*_R1.fastq.gz" \) -print0 | sort -z)
 
-# Collect all reverse reads (_2.fastq.gz or _2.fastq)
+# Collect all reverse reads (_R2.fastq.gz or _R2.fastq)
 while IFS= read -r -d $'\0' f; do
     REV_FILES+=("$f");
-done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_2.fastq" -o -name "*_2.fastq.gz" \) -print0 | sort -z)
+done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_R2.fastq" -o -name "*_R2.fastq.gz" \) -print0 | sort -z)
 
 READ_TYPE_DETECTED=""
 
@@ -58,12 +58,12 @@ if [ ${#FWD_FILES[@]} -gt 0 ] && [ ${#REV_FILES[@]} -gt 0 ]; then
     for fwd_file in "${FWD_FILES[@]}"; do
         # Extract base name (e.g., Set1)
         base_name=$(basename "$fwd_file")
-        if [[ "$base_name" == *_1.fastq.gz ]]; then
-            base_prefix="${base_name%_1.fastq.gz}"
-            suffix="_2.fastq.gz"
-        elif [[ "$base_name" == *_1.fastq ]]; then
-            base_prefix="${base_name%_1.fastq}"
-            suffix="_2.fastq"
+        if [[ "$base_name" == *_R1.fastq.gz ]]; then 
+            base_prefix="${base_name%_R1.fastq.gz}"  
+            suffix="_R2.fastq.gz"   
+        elif [[ "$base_name" == *_R1.fastq ]]; then
+            base_prefix="${base_name%_R1.fastq}"
+            suffix="_R2.fastq"
         else
             # This case should ideally not be hit if `find` patterns are correct
             echo "Warning: Unrecognized forward read pattern for pairing: $fwd_file. Skipping." >&2
@@ -93,7 +93,8 @@ elif [ ${#FWD_FILES[@]} -eq 0 ] && [ ${#REV_FILES[@]} -eq 0 ]; then
         SINGLE_FILES+=("$f");
     done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \
         \( -name "*.fastq" -o -name "*.fastq.gz" -o -name "*.fasta" -o -name "*.fasta.gz" \) \
-        ! -name "*_1.*" ! -name "*_2.*" -print0 | sort -z)
+        ! -name "*_1.*" ! -name "*_2.*" \
+        ! -name "*_R1.*" ! -name "*_R2.*" -print0 | sort -z)
 
     if [ ${#SINGLE_FILES[@]} -gt 0 ]; then
         echo "Detected single-end reads. Processing individual files."

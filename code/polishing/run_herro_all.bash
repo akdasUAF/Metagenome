@@ -7,6 +7,23 @@
 # declare -r DRAFT_ASSEMBLY_FULLPATH="$4" # e.g., data/flye/lr-even/assembly.fasta
 
 
+
+root_dir=$(pwd)
+cd tools/herro/
+
+
+mkdir -p "${root_dir}/data/raw/lr-even/raw/test1/"
+
+
+scripts/preprocess.sh \
+  "${root_dir}/data/raw/lr-even/lr-even_raw.fastq" \
+  "${root_dir}/data/raw/lr-even/raw/test1/" \
+  24 \
+  2
+
+
+ <output_prefix> <number_of_threads> <parts_to_split_job_into>
+
 ### Raw reads
 # lr-even: data/raw/lr-even/lr-even_raw.fastq
 # lr-log: data/raw/lr-log/Zymo-GridION-LOG-BB-SN.fq
@@ -30,7 +47,7 @@
 # lr-log: data/raven/lr-log/assembly_raven_lr-log.fasta
 # lr-ms: data/raven/lr-ms/assembly_raven_lr-ms.fasta
 root_dir=$(pwd)
-cd tools/polishing/herro/
+cd tools/herro/
 
 
 scripts/preprocess.sh ${root_dir}/data/raw/lr-even/lr-even_raw.fastq ${root_dir}/temp_out/ 24 1
