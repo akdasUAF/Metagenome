@@ -37,15 +37,15 @@ FWD_FILES=()
 REV_FILES=()
 SINGLE_FILES=()
 
-# Collect all forward reads (_R1_trimmed.fastq.gz or .fastq)
+# Collect all forward reads (_1.fastq.gz or _1.fastq)
 while IFS= read -r -d $'\0' f; do
     FWD_FILES+=("$f");
-done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_R1_trimmed.fastq" -o -name "*_R1_trimmed.fastq.gz" \) -print0 | sort -z)
+done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_1.fastq" -o -name "*_1.fastq.gz" \) -print0 | sort -z)
 
-# Collect all reverse reads (_R2_trimmed.fastq.gz or .fastq)
+# Collect all reverse reads (_2.fastq.gz or _2.fastq)
 while IFS= read -r -d $'\0' f; do
     REV_FILES+=("$f");
-done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_R2_trimmed.fastq" -o -name "*_R2_trimmed.fastq.gz" \) -print0 | sort -z)
+done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \( -name "*_2.fastq" -o -name "*_2.fastq.gz" \) -print0 | sort -z)
 
 READ_TYPE_DETECTED=""
 
@@ -56,14 +56,14 @@ if [ ${#FWD_FILES[@]} -gt 0 ] && [ ${#REV_FILES[@]} -gt 0 ]; then
     
     # Iterate through forward files to find matching reverse files
     for fwd_file in "${FWD_FILES[@]}"; do
-        # Extract base name (e.g., sr-even_R1_trimmed.fastq.gz)
+        # Extract base name (e.g., Set1)
         base_name=$(basename "$fwd_file")
-        if [[ "$base_name" == *_R1_trimmed.fastq.gz ]]; then
-            base_prefix="${base_name%_R1_trimmed.fastq.gz}"
-            suffix="_R2_trimmed.fastq.gz"
-        elif [[ "$base_name" == *_R1_trimmed.fastq ]]; then
-            base_prefix="${base_name%_R1_trimmed.fastq}"
-            suffix="_R2_trimmed.fastq"
+        if [[ "$base_name" == *_1.fastq.gz ]]; then
+            base_prefix="${base_name%_1.fastq.gz}"
+            suffix="_2.fastq.gz"
+        elif [[ "$base_name" == *_1.fastq ]]; then
+            base_prefix="${base_name%_1.fastq}"
+            suffix="_2.fastq"
         else
             # This case should ideally not be hit if `find` patterns are correct
             echo "Warning: Unrecognized forward read pattern for pairing: $fwd_file. Skipping." >&2
@@ -86,14 +86,14 @@ if [ ${#FWD_FILES[@]} -gt 0 ] && [ ${#REV_FILES[@]} -gt 0 ]; then
         fi
     done
 
-# 2. If no paired-end reads, look for single-end reads (files not ending in _R1_trimmed or _R2_trimmed)
+# 2. If no paired-end reads, look for single-end reads (files not ending in _1 or _2)
 elif [ ${#FWD_FILES[@]} -eq 0 ] && [ ${#REV_FILES[@]} -eq 0 ]; then
     # Populate SINGLE_FILES 
     while IFS= read -r -d $'\0' f; do
         SINGLE_FILES+=("$f");
     done < <(find "$ABS_FASTQ_DIR" -maxdepth 1 \
         \( -name "*.fastq" -o -name "*.fastq.gz" -o -name "*.fasta" -o -name "*.fasta.gz" \) \
-        ! -name "*_R1_trimmed.*" ! -name "*_R2_trimmed.*" -print0 | sort -z)
+        ! -name "*_1.*" ! -name "*_2.*" -print0 | sort -z)
 
     if [ ${#SINGLE_FILES[@]} -gt 0 ]; then
         echo "Detected single-end reads. Processing individual files."
@@ -103,16 +103,16 @@ elif [ ${#FWD_FILES[@]} -eq 0 ] && [ ${#REV_FILES[@]} -eq 0 ]; then
         done
     fi
 else
-    # This block handles cases where only _R1_trimmed or only _R2_trimmed files are found, but not complete pairs.
-    echo "Error: Found partial paired-end reads (e.g., only _R1_trimmed but not _R2_trimmed). Please check your input files in $fastq_dir." >&2
+    # This block handles cases where only _1 or only _2 files are found, but not complete pairs.
+    echo "Error: Found partial paired-end reads (e.g., only _1 but not _2). Please check your input files in $fastq_dir." >&2
     exit 1
 fi
 
 # Final check if any valid input arguments were gathered
 if [ ${#METASPADES_INPUT_ARGS_ARRAY[@]} -eq 0 ]; then
     echo "Error: No suitable FASTQ/FASTA files found in '$fastq_dir' after attempting to match pairs/single-ends." >&2
-    echo "Expected patterns for paired-end: *_R1_trimmed.fastq/gz and *_R2_trimmed.fastq/gz" >&2
-    echo "Expected patterns for single-end: *.fastq/gz or *.fasta/gz (without _R1_trimmed or _R2_trimmed)" >&2
+    echo "Expected patterns for paired-end: *_1.fastq/gz and *_2.fastq/gz" >&2
+    echo "Expected patterns for single-end: *.fastq/gz or *.fasta/gz (without _1 or _2 suffixes)" >&2
     exit 1
 fi
 

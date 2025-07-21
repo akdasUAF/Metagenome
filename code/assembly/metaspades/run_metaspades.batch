@@ -54,7 +54,7 @@ declare -r BENCHMARKING_SCRIPT="code/benchmarking/benchmark.bash" # Path to your
 declare -r METASPADES_RUN_SCRIPT="code/assembly/metaspades/metaspades.sh" # Your core metaspades.sh script
 
 # Base directory for all assembly outputs
-declare -r ASSEMBLY_BASE_DIR="data/metaspades" # Changed for MetaSPAdes
+declare -r ASSEMBLY_BASE_DIR="data/metaspades"
 
 # The full path to the specific output directory for *this* assembly run
 declare -r CURRENT_ASSEMBLY_OUTPUT_DIR="${ASSEMBLY_BASE_DIR}/${DATASET_NAME}/${ASSEMBLY_OUTPUT_SUBFOLDER_NAME}"
