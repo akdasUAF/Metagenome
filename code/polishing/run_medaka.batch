@@ -149,6 +149,8 @@ fi
 
 echo "Minimap2 alignment and indexing completed. Aligned BAM: ${ALIGNED_BAM}"
 
+
+
 # --- 4. Medaka Polishing using 'medaka consensus' ---
 echo "########## Running Medaka Polishing Stage (using 'medaka consensus') ##########"
 
@@ -158,7 +160,8 @@ echo "--- Running Medaka consensus for polishing ---"
 echo "Command: medaka consensus -i ${ALIGNED_BAM} -d ${DRAFT_ASSEMBLY_FULLPATH} -o ${POLISHED_ASSEMBLY_DIR} -m ${MEDAKA_MODEL} -t ${SLURM_CPUS_PER_TASK}"
 
 set -x
-medaka consensus \
+# REMOVE 'conda run -n "${MEDAKA_ENV_NAME}"' from this line:
+medaka_consensus \
     -i "${ALIGNED_BAM}" \
     -d "${DRAFT_ASSEMBLY_FULLPATH}" \
     -o "${POLISHED_ASSEMBLY_DIR}" \
