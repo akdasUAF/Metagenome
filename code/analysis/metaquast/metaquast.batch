@@ -13,7 +13,7 @@
 
 # --- Conda Environment Setup ---
 # Define the name of your Conda environment
-CONDA_ENV_NAME="ana_metaquast" # <--- IMPORTANT: Replace with the actual name of your Conda environment
+CONDA_ENV_NAME="ana_metaquast"
 
 # Path to your Miniconda/Anaconda installation if not in default PATH
 # If `conda` command is not found, uncomment and adjust this line.
@@ -34,54 +34,70 @@ conda activate "$CONDA_ENV_NAME" || { echo "Error: Failed to activate Conda envi
 
 # Define variables for input arguments
 # When submitting the job, you will provide these as arguments to sbatch:
-# sbatch your_slurm_script.sh <contigs_path> <output_path> <reference_list_file>
+# s sbatch your_slurm_script.sh <contigs_path> <output_path> <reference_list_file_or_NO_REFERENCE>
 path_contigs=$1
 path_output=$2
-reference_list_file=$3 # This will now be the path to your text file
+reference_identifier=$3 # This can now be a file path OR "NO_REFERENCE"
 
-# Check if the correct number of arguments are provided
+# Check if the correct number of arguments are provided (still 3)
 if [ $# -ne 3 ]; then
-  echo "Usage: sbatch $0 <contigs_path> <output_path> <reference_list_file>"
+  echo "Usage: sbatch $0 <contigs_path> <output_path> <reference_list_file_or_NO_REFERENCE>"
+  echo "  <reference_list_file_or_NO_REFERENCE>: Provide a path to a file containing reference paths (one per line),"
+  echo "                                          OR type 'NO_REFERENCE' (case-sensitive) to run without a specified reference."
   exit 1
 fi
 
 # Construct the reference string for MetaQuast
 reference_args=""
-if [ -f "$reference_list_file" ]; then
+run_with_reference=true # Flag to track if we're using a reference
+
+if [ "$reference_identifier" == "NO_REFERENCE" ]; then
+    echo "Running MetaQuast without a user-provided reference."
+    run_with_reference=false
+elif [ -f "$reference_identifier" ]; then
+    echo "Reference list file '$reference_identifier' found. Reading references..."
     while IFS= read -r line; do
         trimmed_line=$(echo "$line" | xargs)
         if [ -n "$trimmed_line" ]; then
             reference_args+=" -r $trimmed_line"
         fi
-    done < "$reference_list_file"
+    done < "$reference_identifier"
+
+    # Check if any references were actually found in the file
+    if [ -z "$reference_args" ]; then
+        echo "Warning: Reference list file '$reference_identifier' was provided but contains no valid reference paths. Running without a user-provided reference."
+        run_with_reference=false
+    fi
 else
-    echo "Error: Reference list file '$reference_list_file' not found."
+    echo "Error: The third argument ('$reference_identifier') is neither 'NO_REFERENCE' nor a valid file path."
     exit 1
 fi
-
-# Check if any references were actually found
-if [ -z "$reference_args" ]; then
-    echo "Error: No valid reference paths found in '$reference_list_file'."
-    exit 1
-fi
-
 
 echo "Starting MetaQuast analysis..."
 echo "Conda environment activated: $(conda env list | grep '*' | awk '{print $1}')"
 echo "Contigs path: $path_contigs"
 echo "Output path: $path_output"
-echo "Reference list file: $reference_list_file"
-echo "References to be used: $reference_args"
+if [ "$run_with_reference" = true ]; then
+    echo "Reference mode: With user-provided references from: $reference_identifier"
+    echo "References to be used: $reference_args"
+else
+    echo "Reference mode: Without user-provided references (MetaQuast will attempt auto-detection)."
+fi
 echo "Running on host: $(hostname)"
 echo "Current directory: $(pwd)"
 echo "SLURM Job ID: $SLURM_JOB_ID"
 
 # Execute the MetaQuast command
 # The python3 command will now point to the one inside your activated Conda environment
-eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\" --glimmer $reference_args"
+# Removed --glimmer as it's not a standard MetaQUAST option and might cause errors.
+# If you intended gene prediction, MetaQUAST does it automatically or via --gene-finding.
+if [ "$run_with_reference" = true ]; then
+    eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\" $reference_args"
+else
+    eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\""
+fi
 
 # Deactivate the Conda environment (optional, but good practice if you don't need it later in the script)
 conda deactivate
 
 echo "MetaQuast analysis completed!"
-

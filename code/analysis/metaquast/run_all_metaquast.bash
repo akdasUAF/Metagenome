@@ -193,44 +193,52 @@ sbatch code/analysis/metaquast/metaquast.batch \
 
 
 ##### Sr-log
-## 431663
+## 
 ## Test 1
+## 432039
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test1/final.contigs.fa" \
-    "results/megahit/sr-log/test1/" \
+    "data/metaspades/sr-log/test1/contigs.fasta" \
+	"results/metaspades/sr-log/test1/" \
     "data/reference/sr-log/sr-log_references.txt"
 
 
 ## Test 2
-## 431673
+## 432040
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test2/final.contigs.fa" \
-    "results/megahit/sr-log/test2/" \
+    "data/metaspades/sr-log/test2/contigs.fasta" \
+    "results/metaspades/sr-log/test2/" \
     "data/reference/sr-log/sr-log_references.txt"
 
 
 ## Test 3
-## 431674
+## 432041
 sbatch code/analysis/metaquast/metaquast.batch \
     "data/megahit/sr-log/test3/final.contigs.fa" \
-    "results/megahit/sr-log/test3/" \
+	"results/metaspades/sr-log/test3/" \
     "data/reference/sr-log/sr-log_references.txt"
 
 
 ## Test 4
-## 431675
+## 432042
 sbatch code/analysis/metaquast/metaquast.batch \
     "data/megahit/sr-log/test4/final.contigs.fa" \
-    "results/megahit/sr-log/test4/" \
+	"results/metaspades/sr-log/test4/" \
     "data/reference/sr-log/sr-log_references.txt"
 
 
 ## Test 5
-## 431676
+## 432043
 sbatch code/analysis/metaquast/metaquast.batch \
     "data/megahit/sr-log/test5/final.contigs.fa" \
-    "results/megahit/sr-log/test5/" \
+	"results/metaspades/sr-log/test5/" \
     "data/reference/sr-log/sr-log_references.txt"
+
+
+
+
+
+
+
 
 
 ##### sr-ms
