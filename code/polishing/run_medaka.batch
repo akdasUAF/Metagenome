@@ -40,23 +40,27 @@ fi
 
 declare -r DATASET_NAME="$1"
 declare -r ASSEMBLER_NAME="$2"
-declare -r RAW_READS_FASTQ_FULLPATH="$3" # Now requires raw FASTQ, not aligned BAM
+declare -r RAW_READS_FASTQ_FULLPATH="$3"
 declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
 
 # Conda Environment Name (updated for 1.11.3 install)
-declare -r MEDAKA_ENV_NAME="medaka_1.11.3"
+declare -r MEDAKA_ENV_NAME="medaka_1.11.3" # Assuming minimap2 and samtools are also in this env or generally available
+# If minimap2/samtools are in separate envs, you'll need to activate/deactivate them.
+# A common practice is to have a "bioinformatics" env with common tools or install them in the medaka env.
 
 # Medaka Model to use (keep the one you chose)
 declare -r MEDAKA_MODEL="r941_min_hac_g507"
 
 # --- 2. Derived Paths & Logging Setup ---
-declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_consensus_command" # New output directory name
+declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_consensus_command"
 
 declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
-declare -r POLISHED_ASSEMBLY_DIR="${OUTPUT_BASE_DIR}/polished_assembly" # For final consensus.fasta
+declare -r ALIGNMENT_DIR="${OUTPUT_BASE_DIR}/alignment" # New directory for alignment files
+declare -r POLISHED_ASSEMBLY_DIR="${OUTPUT_BASE_DIR}/polished_assembly"
 
 # Create necessary directories
 mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
+mkdir -p "${ALIGNMENT_DIR}" || { echo "ERROR: Could not create alignment directory ${ALIGNMENT_DIR}"; exit 1; } # Create new dir
 mkdir -p "${POLISHED_ASSEMBLY_DIR}" || { echo "ERROR: Could not create polished assembly directory ${POLISHED_ASSEMBLY_DIR}"; exit 1; }
 
 
@@ -87,27 +91,75 @@ fi
 echo "Current memory usage before Medaka:"
 free -h
 
-# --- 3. Medaka Polishing using 'medaka consensus' ---
-echo "########## Running Medaka Polishing Stage (using 'medaka consensus') ##########"
-
+# --- Activate Medaka environment (which should also have minimap2 and samtools) ---
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
 
-echo "Medaka version:"
-conda run -n "${MEDAKA_ENV_NAME}" medaka --version
-
+# Verify essential tools
+if ! command -v minimap2 &> /dev/null; then
+    echo "ERROR: 'minimap2' command not found after activating environment. Please ensure minimap2 is installed correctly in '${MEDAKA_ENV_NAME}'."
+    exit 1
+fi
+if ! command -v samtools &> /dev/null; then
+    echo "ERROR: 'samtools' command not found after activating environment. Please ensure samtools is installed correctly in '${MEDAKA_ENV_NAME}'."
+    exit 1
+fi
 if ! command -v medaka &> /dev/null; then
     echo "ERROR: 'medaka' command not found after activating environment. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}'."
     exit 1
 fi
 
-echo "--- Running Medaka consensus for polishing ---"
-# medaka consensus takes: -i <input_reads>, -d <draft_assembly>, -o <output_directory>
-echo "Command: medaka consensus -i ${RAW_READS_FASTQ_FULLPATH} -d ${DRAFT_ASSEMBLY_FULLPATH} -o ${POLISHED_ASSEMBLY_DIR} -m ${MEDAKA_MODEL} -t ${SLURM_CPUS_PER_TASK}"
+echo "Medaka version:"
+medaka --version
+echo "Minimap2 version:"
+minimap2 --version
+echo "Samtools version:"
+samtools --version
+
+# --- 3. Align Reads to Draft Assembly (Minimap2) ---
+echo "########## Running Minimap2 Alignment ##########"
+
+declare -r ALIGNED_BAM="${ALIGNMENT_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_aligned_reads.bam"
+
+echo "--- Running minimap2 for alignment ---"
+echo "Command: minimap2 -ax map-ont -t ${SLURM_CPUS_PER_TASK} ${DRAFT_ASSEMBLY_FULLPATH} ${RAW_READS_FASTQ_FULLPATH} | samtools view -F 0x4 -b - | samtools sort -o ${ALIGNED_BAM} -"
 
 set -x
-conda run -n "${MEDAKA_ENV_NAME}" medaka consensus \
-    -i "${RAW_READS_FASTQ_FULLPATH}" \
+minimap2 -ax map-ont -t "${SLURM_CPUS_PER_TASK}" "${DRAFT_ASSEMBLY_FULLPATH}" "${RAW_READS_FASTQ_FULLPATH}" | \
+    samtools view -F 0x4 -b - | \
+    samtools sort -o "${ALIGNED_BAM}" -
+set +x
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Minimap2 alignment step failed. Exit status: $?."
+    exit 1
+fi
+
+echo "--- Indexing BAM file ---"
+echo "Command: samtools index ${ALIGNED_BAM}"
+
+set -x
+samtools index "${ALIGNED_BAM}"
+set +x
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Samtools indexing step failed. Exit status: $?."
+    exit 1
+fi
+
+echo "Minimap2 alignment and indexing completed. Aligned BAM: ${ALIGNED_BAM}"
+
+# --- 4. Medaka Polishing using 'medaka consensus' ---
+echo "########## Running Medaka Polishing Stage (using 'medaka consensus') ##########"
+
+echo "--- Running Medaka consensus for polishing ---"
+# medaka consensus takes: -i <input_reads>, -d <draft_assembly>, -o <output_directory>
+# Now, -i will be the aligned BAM file
+echo "Command: medaka consensus -i ${ALIGNED_BAM} -d ${DRAFT_ASSEMBLY_FULLPATH} -o ${POLISHED_ASSEMBLY_DIR} -m ${MEDAKA_MODEL} -t ${SLURM_CPUS_PER_TASK}"
+
+set -x
+medaka consensus \
+    -i "${ALIGNED_BAM}" \
     -d "${DRAFT_ASSEMBLY_FULLPATH}" \
     -o "${POLISHED_ASSEMBLY_DIR}" \
     -m "${MEDAKA_MODEL}" \
