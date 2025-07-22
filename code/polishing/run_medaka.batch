@@ -30,18 +30,20 @@ fi
 # Input arguments for this script:
 # $1: <dataset_name> (e.g., "lr-even")
 # $2: <assembler_name> (e.g., "raven")
-# $3: <raw_reads_fastq_path> (Full path to your raw long reads FASTQ file)
-# $4: <draft_assembly_fasta_path> (Full path to draft assembly file)
-if [ "$#" -ne 4 ]; then
-    echo "Usage: sbatch $0 <dataset_name> <assembler_name> <raw_reads_fastq_path> <draft_assembly_fasta_path>"
-    echo "Example: sbatch $0 lr-even raven data/lr-even_raw_reads.fastq data/raven/lr-even/assembly_raven_lr-even.fasta"
+# $3: <test_number> (e.g., "test5") # NEW ARGUMENT
+# $4: <raw_reads_fastq_path> (Full path to your raw long reads FASTQ file)
+# $5: <draft_assembly_fasta_path> (Full path to draft assembly file)
+if [ "$#" -ne 5 ]; then # Changed to 5 arguments
+    echo "Usage: sbatch $0 <dataset_name> <assembler_name> <test_number> <raw_reads_fastq_path> <draft_assembly_fasta_path>"
+    echo "Example: sbatch $0 lr-even raven test5 data/lr-even_raw_reads.fastq data/raven/lr-even/assembly_raven_lr-even.fasta"
     exit 1
 fi
 
 declare -r DATASET_NAME="$1"
 declare -r ASSEMBLER_NAME="$2"
-declare -r RAW_READS_FASTQ_FULLPATH="$3" # This will be the -i input
-declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
+declare -r TEST_NUMBER="$3" # Capture the new argument
+declare -r RAW_READS_FASTQ_FULLPATH="$4" # This will be the -i input
+declare -r DRAFT_ASSEMBLY_FULLPATH="$5"
 
 # Conda Environment Name
 declare -r MEDAKA_ENV_NAME="medaka_1.11.3"
@@ -50,7 +52,8 @@ declare -r MEDAKA_ENV_NAME="medaka_1.11.3"
 declare -r MEDAKA_MODEL="r941_min_hac_g507"
 
 # --- 2. Derived Paths & Logging Setup ---
-declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_consensus_simple_run" # New output directory name
+# Modified OUTPUT_BASE_DIR to include TEST_NUMBER
+declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/${TEST_NUMBER}/medaka_consensus_simple_run"
 
 declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
 declare -r POLISHED_ASSEMBLY_FINAL_OUTPUT="${OUTPUT_BASE_DIR}" # Medaka consensus outputs directly to this dir
@@ -60,7 +63,7 @@ mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR
 mkdir -p "${POLISHED_ASSEMBLY_FINAL_OUTPUT}" || { echo "ERROR: Could not create output directory ${POLISHED_ASSEMBLY_FINAL_OUTPUT}"; exit 1; }
 
 
-declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_consensus_simple.log"
+declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_${TEST_NUMBER}_medaka_consensus_simple.log" # Added TEST_NUMBER to log name for clarity
 > "${path_log}"
 exec &> >(tee -a "${path_log}")
 
@@ -68,6 +71,7 @@ echo "Script started at $(date)"
 echo "Configuration:"
 echo "  Dataset Name: ${DATASET_NAME}"
 echo "  Assembler Name: ${ASSEMBLER_NAME}"
+echo "  Test Number: ${TEST_NUMBER}" # Echo the new variable
 echo "  Raw Reads FASTQ: ${RAW_READS_FASTQ_FULLPATH}"
 echo "  Draft Assembly: ${DRAFT_ASSEMBLY_FULLPATH}"
 echo "  Medaka Env: ${MEDAKA_ENV_NAME}"
