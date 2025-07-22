@@ -5,9 +5,9 @@
 #SBATCH --mem=64G                 # Total memory for the job (adjust based on assembly/read size)
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name="medaka_polish_consensus" # Changed job name
-#SBATCH --output=logs/slurm_medaka_consensus_%j.log # Changed log file name
-#SBATCH --error=logs/slurm_medaka_consensus_err_%j.log # Changed log file name
+#SBATCH --job-name="medaka_consensus_simple" # Simplified job name
+#SBATCH --output=logs/slurm_medaka_consensus_simple_%j.log # Simplified log file name
+#SBATCH --error=logs/slurm_medaka_consensus_simple_err_%j.log # Simplified log file name
 
 # Set unlimited locked memory for processes (good for large jobs)
 ulimit -l unlimited
@@ -40,31 +40,27 @@ fi
 
 declare -r DATASET_NAME="$1"
 declare -r ASSEMBLER_NAME="$2"
-declare -r RAW_READS_FASTQ_FULLPATH="$3"
+declare -r RAW_READS_FASTQ_FULLPATH="$3" # This will be the -i input
 declare -r DRAFT_ASSEMBLY_FULLPATH="$4"
 
-# Conda Environment Name (updated for 1.11.3 install)
+# Conda Environment Name
 declare -r MEDAKA_ENV_NAME="medaka_1.11.3"
 
-# Medaka Model to use (keep the one you chose)
+# Medaka Model to use
 declare -r MEDAKA_MODEL="r941_min_hac_g507"
 
 # --- 2. Derived Paths & Logging Setup ---
-declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_polish_results_consensus_command"
+declare -r OUTPUT_BASE_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/medaka_consensus_simple_run" # New output directory name
 
 declare -r LOG_DIR="${OUTPUT_BASE_DIR}/logs"
-declare -r ALIGNMENT_DIR="${OUTPUT_BASE_DIR}/alignment"
-declare -r VARIANTS_DIR="${OUTPUT_BASE_DIR}/variants" # New directory for variant files
-declare -r POLISHED_ASSEMBLY_DIR="${OUTPUT_BASE_DIR}/polished_assembly"
+declare -r POLISHED_ASSEMBLY_FINAL_OUTPUT="${OUTPUT_BASE_DIR}" # Medaka consensus outputs directly to this dir
 
 # Create necessary directories
 mkdir -p "${LOG_DIR}" || { echo "ERROR: Could not create log directory ${LOG_DIR}"; exit 1; }
-mkdir -p "${ALIGNMENT_DIR}" || { echo "ERROR: Could not create alignment directory ${ALIGNMENT_DIR}"; exit 1; }
-mkdir -p "${VARIANTS_DIR}" || { echo "ERROR: Could not create variants directory ${VARIANTS_DIR}"; exit 1; } # Create new dir
-mkdir -p "${POLISHED_ASSEMBLY_DIR}" || { echo "ERROR: Could not create polished assembly directory ${POLISHED_ASSEMBLY_DIR}"; exit 1; }
+mkdir -p "${POLISHED_ASSEMBLY_FINAL_OUTPUT}" || { echo "ERROR: Could not create output directory ${POLISHED_ASSEMBLY_FINAL_OUTPUT}"; exit 1; }
 
 
-declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_workflow.log" # Renamed log file to reflect multi-step
+declare -r path_log="${LOG_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_medaka_consensus_simple.log"
 > "${path_log}"
 exec &> >(tee -a "${path_log}")
 
@@ -91,104 +87,42 @@ fi
 echo "Current memory usage before Medaka:"
 free -h
 
-# --- Activate Medaka environment (which should also have minimap2 and samtools) ---
+# --- Activate Medaka environment ---
 echo "Activating Medaka environment: ${MEDAKA_ENV_NAME}"
 conda activate "${MEDAKA_ENV_NAME}"
 
-# Verify essential tools
-if ! command -v minimap2 &> /dev/null; then
-    echo "ERROR: 'minimap2' command not found after activating environment. Please ensure minimap2 is installed correctly in '${MEDAKA_ENV_NAME}'."
+# Verify Medaka and its internal dependencies (minimap2, samtools) are available
+if ! command -v medaka_consensus &> /dev/null; then # Explicitly check for medaka_consensus
+    echo "ERROR: 'medaka_consensus' command not found after activating environment. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}'."
     exit 1
 fi
-if ! command -v samtools &> /dev/null; then
-    echo "ERROR: 'samtools' command not found after activating environment. Please ensure samtools is installed correctly in '${MEDAKA_ENV_NAME}'."
-    exit 1
-fi
-if ! command -v medaka &> /dev/null; then
-    echo "ERROR: 'medaka' command not found after activating environment. Please ensure Medaka is installed correctly in '${MEDAKA_ENV_NAME}'."
-    exit 1
-fi
+# Medaka should handle minimap2/samtools internally, no need for separate checks here.
 
 echo "Medaka version:"
-medaka --version
-echo "Minimap2 version:"
-minimap2 --version
-echo "Samtools version:"
-samtools --version
+medaka --version # Or medaka_version_report
 
-# --- 3. Align Reads to Draft Assembly (Minimap2) ---
-echo "########## Running Minimap2 Alignment ##########"
+# --- 3. Run Medaka Consensus (single step) ---
+echo "########## Running Medaka Consensus (Single Step) ##########"
 
-declare -r ALIGNED_BAM="${ALIGNMENT_DIR}/${DATASET_NAME}_${ASSEMBLER_NAME}_aligned_reads.bam"
-
-echo "--- Running minimap2 for alignment ---"
-echo "Command: minimap2 -ax map-ont -t ${SLURM_CPUS_PER_TASK} ${DRAFT_ASSEMBLY_FULLPATH} ${RAW_READS_FASTQ_FULLPATH} | samtools view -F 0x4 -b - | samtools sort -o ${ALIGNED_BAM} -"
+# Based on your medaka_consensus help and observed behavior,
+# it expects FASTQ for -i, FASTA for -d, and will do internal alignment.
+echo "Command: medaka_consensus -i ${RAW_READS_FASTQ_FULLPATH} -d ${DRAFT_ASSEMBLY_FULLPATH} -o ${POLISHED_ASSEMBLY_FINAL_OUTPUT} -m ${MEDAKA_MODEL} -t ${SLURM_CPUS_PER_TASK}"
 
 set -x
-minimap2 -ax map-ont -t "${SLURM_CPUS_PER_TASK}" "${DRAFT_ASSEMBLY_FULLPATH}" "${RAW_READS_FASTQ_FULLPATH}" | \
-    samtools view -F 0x4 -b - | \
-    samtools sort -o "${ALIGNED_BAM}" -
-set +x
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Minimap2 alignment step failed. Exit status: $?."
-    exit 1
-fi
-
-echo "--- Indexing BAM file ---"
-echo "Command: samtools index ${ALIGNED_BAM}"
-
-set -x
-samtools index "${ALIGNED_BAM}"
-set +x
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Samtools indexing step failed. Exit status: $?."
-    exit 1
-fi
-
-echo "Minimap2 alignment and indexing completed. Aligned BAM: ${ALIGNED_BAM}"
-
-# --- 4. Medaka Variant Calling (generates features) ---
-echo "########## Running Medaka Variant Calling ##########"
-
-# medaka variant takes aligned BAM and draft assembly
-echo "Command: medaka variant -i ${ALIGNED_BAM} -d ${DRAFT_ASSEMBLY_FULLPATH} -o ${VARIANTS_DIR} -m ${MEDAKA_MODEL} -t ${SLURM_CPUS_PER_TASK}"
-
-set -x
-medaka variant \
-    -i "${ALIGNED_BAM}" \
+medaka_consensus \
+    -i "${RAW_READS_FASTQ_FULLPATH}" \
     -d "${DRAFT_ASSEMBLY_FULLPATH}" \
-    -o "${VARIANTS_DIR}" \
+    -o "${POLISHED_ASSEMBLY_FINAL_OUTPUT}" \
     -m "${MEDAKA_MODEL}" \
     -t "${SLURM_CPUS_PER_TASK}"
 set +x
 
 if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka variant calling step failed. Exit status: $?."
+    echo "ERROR: Medaka consensus step failed. Exit status: $?."
     exit 1
 fi
 
-echo "Medaka variant calling completed. Variant files in: ${VARIANTS_DIR}"
-
-# --- 5. Medaka Consensus from Variants (produces polished assembly) ---
-echo "########## Running Medaka Consensus from Variants ##########"
-
-# medaka consensus now takes the variant features generated by medaka variant
-echo "Command: medaka consensus ${VARIANTS_DIR} ${POLISHED_ASSEMBLY_DIR}"
-
-set -x
-medaka_consensus \
-    "${VARIANTS_DIR}" \
-    "${POLISHED_ASSEMBLY_DIR}"
-set +x
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Medaka consensus from variants step failed. Exit status: $?."
-    exit 1
-fi
-
-echo "Medaka polishing completed. Final polished assembly should be in: ${POLISHED_ASSEMBLY_DIR}/consensus.fasta"
+echo "Medaka polishing completed. Final polished assembly should be in: ${POLISHED_ASSEMBLY_FINAL_OUTPUT}/consensus.fasta"
 echo "Script finished at $(date)"
 
 # Deactivate conda environment
