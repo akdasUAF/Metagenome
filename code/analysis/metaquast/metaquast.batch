@@ -92,9 +92,9 @@ echo "SLURM Job ID: $SLURM_JOB_ID"
 # Removed --glimmer as it's not a standard MetaQUAST option and might cause errors.
 # If you intended gene prediction, MetaQUAST does it automatically or via --gene-finding.
 if [ "$run_with_reference" = true ]; then
-    eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\" $reference_args"
+    eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\" $reference_args --glimmer"
 else
-    eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\""
+    eval "python3 tools/analysis/quast/metaquast.py -t 24 -o \"$path_output\" \"$path_contigs\" --glimmer "
 fi
 
 # Deactivate the Conda environment (optional, but good practice if you don't need it later in the script)

@@ -245,38 +245,37 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## 
 ## Test 1
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test1/final.contigs.fa" \
-    "results/megahit/sr-log/test1/" \
-    ""
+    "data/megahit/sr-ms/test5/final.contigs.fa" \
+    "results/megahit/sr-ms/test5/" \
+    "NO_REFERENCE"
 
 
 ## Test 2
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test2/final.contigs.fa" \
-    "results/megahit/sr-log/test2/" \
-    "data/reference/sr-log/sr-log_references.txt"
-
+    "data/megahit/sr-ms/test5/final.contigs.fa" \
+    "results/megahit/sr-ms/test5/" \
+    "NO_REFERENCE"
 
 ## Test 3
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test3/final.contigs.fa" \
-    "results/megahit/sr-log/test3/" \
-    "data/reference/sr-log/sr-log_references.txt"
+    "data/megahit/sr-ms/test5/final.contigs.fa" \
+    "results/megahit/sr-ms/test5/" \
+    "NO_REFERENCE"
 
 
 ## Test 4
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test4/final.contigs.fa" \
-    "results/megahit/sr-log/test4/" \
-    "data/reference/sr-log/sr-log_references.txt"
+    "data/megahit/sr-ms/test5/final.contigs.fa" \
+    "results/megahit/sr-ms/test5/" \
+    "NO_REFERENCE"
 
 
 ## Test 5
-## s
+## 432069
 sbatch code/analysis/metaquast/metaquast.batch \
-    "data/megahit/sr-log/test5/final.contigs.fa" \
-    "results/megahit/sr-log/test5/" \
-    "data/reference/sr-log/sr-log_references.txt"
+    "data/megahit/sr-ms/test5/final.contigs.fa" \
+    "results/megahit/sr-ms/test5/" \
+    "NO_REFERENCE"

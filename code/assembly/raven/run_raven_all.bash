@@ -37,10 +37,41 @@ sbatch code/assembly/raven/run_raven.batch \
 
 
 ### lr-log
+
+## Test 1
+## 
+sbatch code/assembly/raven/run_raven.batch \
+    lr-log \
+    data/raw/lr-log/test1/ \
+    test1 \
+    raven_bench_lr-log_run5
+
 ## Test 5
-## 431701
+## 
 sbatch code/assembly/raven/run_raven.batch \
     lr-log \
     data/raw/lr-log/test5/ \
     test5 \
     raven_bench_lr-log_run5
+
+
+
+
+
+
+
+### lr-ms
+## Test 1
+sbatch code/assembly/raven/run_raven.batch \
+    lr-ms \
+    data/raw/lr-ms/test1/ \
+    test1 \
+    raven_bench_lr-ms_run1
+
+## Test 5
+## 
+sbatch code/assembly/raven/run_raven.batch \
+    lr-ms \
+    data/raw/lr-ms/test5/ \
+    test5 \
+    raven_bench_lr-ms_run5
