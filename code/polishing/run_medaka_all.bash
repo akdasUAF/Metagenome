@@ -20,7 +20,7 @@ sbatch code/polishing/run_medaka.batch \
 
 
 #### lr-log
-### Test 1 - 431847
+### Test 1 - 432221
 sbatch code/polishing/run_medaka.batch \
     lr-log \
     metaflye \
