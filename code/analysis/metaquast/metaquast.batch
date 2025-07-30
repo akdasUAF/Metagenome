@@ -9,7 +9,7 @@
 #SBATCH --error=metaquast_%j.err     # Standard error file (will be named metaquast_JOBID.err)
 #SBATCH --output=metaquast_%j.out    # Standard output file (will be named metaquast_JOBID.out)
 #SBATCH --mail-type=END,FAIL         # Email notifications for job completion or failure
-#SBATCH --mail-user=your_email@example.com # Replace with your actual email address
+#SBATCH --mail-user=your_email@example.com
 
 # --- Conda Environment Setup ---
 # Define the name of your Conda environment

@@ -1,10 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=busco_analysis      # Job name
-#SBATCH --output=busco_output_%j.log    # Standard output and error log
-#SBATCH --ntasks=1                      # Run on a single task
-#SBATCH --cpus-per-task=24              # Number of CPU cores
-#SBATCH --time=02:00:00                  # Time limit hrs:min:sec
-#SBATCH --mem=16G                        # Memory limit
+#SBATCH --job-name=Busco   # A name for your job (changed to reflect Conda)
+#SBATCH --partition=t1small           # Specify the partition/queue you want to use (e.g., debug, standard, highmem)
+#SBATCH --nodes=1                    # Request 1 node
+#SBATCH --ntasks-per-node=1          # Request 1 task per node (your script runs as a single process)
+#SBATCH --cpus-per-task=24           # Request 24 CPUs (cores) for your task
+#SBATCH --mem=64G                    # Request 64GB of memory. Adjust based on your expected memory usage.
+#SBATCH --error=busco_%j.err     # Standard error file (will be named metaquast_JOBID.err)
+#SBATCH --output=busco_%j.out    # Standard output file (will be named metaquast_JOBID.out)
+#SBATCH --mail-type=END,FAIL         # Email notifications for job completion or failure
+#SBATCH --mail-user=wwinnett@alaska.edu
 
 # Load necessary modules (if required)
 
@@ -53,7 +57,7 @@ fi
 
 # Check for the correct number of arguments
 if [ $# -ne 3 ]; then
-  echo "Usage: $0 <raw_path> <MAG_path> "
+  echo "Usage: $0 <raw_path> <MAG_path> <path_log>"
   exit 1
 fi
 

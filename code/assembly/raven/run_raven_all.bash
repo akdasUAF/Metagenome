@@ -62,6 +62,16 @@ sbatch code/assembly/raven/run_raven.batch \
     test1 \
     raven_bench_lr-log_run5
 
+
+## Test 2
+## 
+sbatch code/assembly/raven/run_raven.batch \
+    lr-log \
+    data/raw/lr-log/test2/ \
+    test2 \
+    raven_bench_lr-log_run2
+
+
 ## Test 5
 ## 
 sbatch code/assembly/raven/run_raven.batch \
