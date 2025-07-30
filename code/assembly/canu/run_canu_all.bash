@@ -1,4 +1,34 @@
-###### lr-log
+###### lr-even
+
+### Test 1
+## 
+sbatch code/assembly/canu/run_canu.batch \
+    lr-even \
+    data/raw/lr-even/test1/ \
+    test1 \
+    canu_bench_lr-even_run1 \
+    42m \
+    -nanopore
+
+### Test 2
+## 
+sbatch code/assembly/canu/run_canu.batch \
+    lr-even \
+    data/raw/lr-even/test2/ \
+    test2 \
+    canu_bench_lr-even_run2 \
+    42m \
+    -nanopore
+
+### Test 3
+## 
+sbatch code/assembly/canu/run_canu.batch \
+    lr-even \
+    data/raw/lr-even/test3/ \
+    test3 \
+    canu_bench_lr-even_run3 \
+    42m \
+    -nanopore
 
 
 ### Test 4
@@ -23,9 +53,33 @@ sbatch code/assembly/canu/run_canu.batch \
     -nanopore
 
 
+
+
+
+
 ###### lr-log
+### Test 1
+## 
+sbatch code/assembly/canu/run_canu.batch \
+    lr-log \
+    data/raw/lr-log/test1/ \
+    test1 \
+    canu_bench_lr-log_run1 \
+    42m \
+    -nanopore
+
+### Test 2
+## 
+sbatch code/assembly/canu/run_canu.batch \
+    lr-log \
+    data/raw/lr-log/test2/ \
+    test2 \
+    canu_bench_lr-log_run2 \
+    42m \
+    -nanopore
+
 ### Test 5
-## 4431731
+## 
 sbatch code/assembly/canu/run_canu.batch \
     lr-log \
     data/raw/lr-log/test5/ \

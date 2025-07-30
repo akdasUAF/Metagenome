@@ -1,0 +1,62 @@
+#!/bin/bash
+#SBATCH --job-name=busco_analysis      # Job name
+#SBATCH --output=busco_output_%j.log    # Standard output and error log
+#SBATCH --ntasks=1                      # Run on a single task
+#SBATCH --cpus-per-task=24              # Number of CPU cores
+#SBATCH --time=02:00:00                  # Time limit hrs:min:sec
+#SBATCH --mem=16G                        # Memory limit
+
+# Load necessary modules (if required)
+
+
+# --- Conda Environment Setup ---
+# Define the name of your Conda environment
+CONDA_ENV_NAME="ana_busco"
+
+# Path to your Miniconda/Anaconda installation if not in default PATH
+# If `conda` command is not found, uncomment and adjust this line.
+# export PATH="/path/to/your/miniconda3/bin:$PATH"
+
+# Initialize Conda for the current shell session
+# This is crucial for `conda activate` to work in a non-interactive script.
+# Option 1: eval "$(conda shell.bash hook)" (Recommended for modern Conda)
+eval "$(conda shell.bash hook)"
+# Option 2: source your conda.sh (Alternative, if Option 1 doesn't work or for older Conda)
+# source /path/to/your/miniconda3/etc/profile.d/conda.sh # <--- Adjust this path if needed
+
+# Activate the Conda environment
+conda activate "$CONDA_ENV_NAME" || { echo "Error: Failed to activate Conda environment '$CONDA_ENV_NAME'. Exiting."; exit 1; }
+
+# --- End Conda Environment Setup ---
+
+
+
+
+
+module load slurm
+
+
+# Define variables for input arguments
+# When submitting the job, you will provide these as arguments to sbatch:
+# s sbatch your_slurm_script.sh <contigs_path> <output_path> <reference_list_file_or_NO_REFERENCE>
+path_contigs=$1
+path_output=$2
+path_log=$3
+
+# Check if the correct number of arguments are provided (still 3)
+if [ $# -ne 3 ]; then
+  echo "Usage: sbatch $0 <contigs_path> <output_path> <log_path>"
+  exit 1
+fi
+
+
+
+# Check for the correct number of arguments
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 <raw_path> <MAG_path> "
+  exit 1
+fi
+
+
+# Run the BUSCO command
+busco -m genome --auto-lineage-prok -c 24 -i $path_contigs -o $path_output | tee $path_log

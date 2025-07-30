@@ -2,6 +2,14 @@
 
 ### lr-even
 
+## Test 1
+## 443869
+sbatch code/assembly/raven/run_raven.batch \
+    lr-even \
+    data/raw/lr-even/test1/ \
+    test1 \
+    raven_bench_lr-even_run1
+
 ## Test 2
 ## 
 sbatch code/assembly/raven/run_raven.batch \
@@ -9,6 +17,14 @@ sbatch code/assembly/raven/run_raven.batch \
     data/raw/lr-even/test2/ \
     test2 \
     raven_bench_lr-even_run2
+
+## Test 3
+## 443870
+sbatch code/assembly/raven/run_raven.batch \
+    lr-even \
+    data/raw/lr-even/test3/ \
+    test3 \
+    raven_bench_lr-even_run3
 
 ## Test 4
 ## 
