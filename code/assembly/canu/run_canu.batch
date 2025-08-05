@@ -5,9 +5,9 @@
 #SBATCH --mem=64G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name="canu_bench"  # Changed job name
-#SBATCH --output=logs/slurm_canu_bench_%j.log  # Changed output log
-#SBATCH --error=logs/slurm_canu_bench_err_%j.log # Changed error log
+#SBATCH --job-name="canu_bench"
+#SBATCH --output=logs/slurm_canu_bench_%j.log
+#SBATCH --error=logs/slurm_canu_bench_err_%j.log
 
 # --- Conda Initialization ---
 CONDA_BASE=$(conda info --base)

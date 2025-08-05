@@ -1,7 +1,6 @@
 
 
 ### lr-even
-
 ## Test 1
 ## 443869
 sbatch code/assembly/raven/run_raven.batch \
@@ -72,6 +71,23 @@ sbatch code/assembly/raven/run_raven.batch \
     raven_bench_lr-log_run2
 
 
+## Test 3
+## 447182
+sbatch code/assembly/raven/run_raven.batch \
+    lr-log \
+    data/raw/lr-log/test3/ \
+    test3 \
+    raven_bench_lr-log_run3
+
+## Test 4
+## 
+sbatch code/assembly/raven/run_raven.batch \
+    lr-log \
+    data/raw/lr-log/test4/ \
+    test4 \
+    raven_bench_lr-log_run4
+
+
 ## Test 5
 ## 
 sbatch code/assembly/raven/run_raven.batch \
@@ -93,6 +109,32 @@ sbatch code/assembly/raven/run_raven.batch \
     data/raw/lr-ms/test1/ \
     test1 \
     raven_bench_lr-ms_run1
+
+
+## Test 2
+sbatch code/assembly/raven/run_raven.batch \
+    lr-ms \
+    data/raw/lr-ms/test2/ \
+    test2 \
+    raven_bench_lr-ms_run2
+
+
+
+## Test 1
+sbatch code/assembly/raven/run_raven.batch \
+    lr-ms \
+    data/raw/lr-ms/test3/ \
+    test3 \
+    raven_bench_lr-ms_run3
+
+
+
+## Test 1
+sbatch code/assembly/raven/run_raven.batch \
+    lr-ms \
+    data/raw/lr-ms/test4/ \
+    test4 \
+    raven_bench_lr-ms_run4
 
 ## Test 5
 ## 

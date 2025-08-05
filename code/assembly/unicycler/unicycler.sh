@@ -8,7 +8,6 @@
 # $2: <path_output_dir> (e.g., "data/unicycler/sr-log/unicycler_assembly_run1")
 # $3: <num_threads> (e.g., 24, typically from $SLURM_CPUS_PER_TASK)
 
-# CHANGED: Only 3 arguments now
 if [ $# -ne 3 ]; then
   echo "Usage: $0 <path_to_fastq_dir> <path_output_dir> <num_threads>" >&2
   exit 1

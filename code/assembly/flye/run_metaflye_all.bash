@@ -9,7 +9,7 @@ sbatch code/assembly/flye/run_metaflye.batch \
     --nano-raw
 
 ## Test 2
-## 
+## 447174
 sbatch code/assembly/flye/run_metaflye.batch \
     lr-even \
     data/raw/lr-even/test2/ \
@@ -18,7 +18,7 @@ sbatch code/assembly/flye/run_metaflye.batch \
     --nano-raw
 
 ## Test 3
-## 443871
+## 
 sbatch code/assembly/flye/run_metaflye.batch \
     lr-even \
     data/raw/lr-even/test3/ \
@@ -27,7 +27,7 @@ sbatch code/assembly/flye/run_metaflye.batch \
     --nano-raw
 
 ## Test 4
-## 
+## 447175
 sbatch code/assembly/flye/run_metaflye.batch \
     lr-even \
     data/raw/lr-even/test4/ \
@@ -36,7 +36,7 @@ sbatch code/assembly/flye/run_metaflye.batch \
     --nano-raw
 
 ## Test 5
-## 431699
+## 447176
 sbatch code/assembly/flye/run_metaflye.batch \
     lr-even \
     data/raw/lr-even/test5/ \
@@ -107,6 +107,39 @@ sbatch code/assembly/flye/run_metaflye.batch \
     test1 \
     metaflye_bench_lr-ms_run1 \
     --nano-raw
+
+
+## Test 2
+## 447179
+sbatch code/assembly/flye/run_metaflye.batch \
+    lr-ms \
+    data/raw/lr-ms/test2/ \
+    test2 \
+    metaflye_bench_lr-ms_run2 \
+    --nano-raw
+
+
+
+## Test 3
+## 447180
+sbatch code/assembly/flye/run_metaflye.batch \
+    lr-ms \
+    data/raw/lr-ms/test3/ \
+    test3 \
+    metaflye_bench_lr-ms_run3 \
+    --nano-raw
+
+
+
+## Test 4
+## 447181
+sbatch code/assembly/flye/run_metaflye.batch \
+    lr-ms \
+    data/raw/lr-ms/test4/ \
+    test4 \
+    metaflye_bench_lr-ms_run5 \
+    --nano-raw
+
 
 ## Test 5
 ## 

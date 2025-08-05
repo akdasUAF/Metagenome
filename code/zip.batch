@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="canu_bench"
+#SBATCH --output=logs/slurm_canu_bench_%j.log
+#SBATCH --error=logs/slurm_canu_bench_err_%j.log
+
+module load slurm
+
+tar -czvf Metagenome.results.tar.gz results/
