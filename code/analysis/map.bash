@@ -18,5 +18,5 @@ sbatch code/analysis/map.batch \
 	lr-even \
 	canu \
 	test2 \
-	data/raw/lr-even/test2/lr-even_raw.fastq \
-	data/raven/lr-even/test5/medaka_consensus_simple_run/consensus.fasta
+	data/raw/lr-even/lr-even_raw.fastq \
+	data/raven/lr-even/test2/medaka_consensus_simple_run/consensus.fasta
