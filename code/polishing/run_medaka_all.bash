@@ -384,7 +384,7 @@ sbatch code/polishing/run_medaka.batch \
     canu \
     test3 \
     data/raw/lr-log/test3/lr-log_raw.fastq \
-    data/canu/lr-log/test3/test1.contigs.fasta
+    data/canu/lr-log/test3/test3.contigs.fasta
 
 ### Test 4 - 
 sbatch code/polishing/run_medaka.batch \

@@ -5,9 +5,9 @@
 #SBATCH --mem=64G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name="canu_bench"
-#SBATCH --output=logs/slurm_canu_bench_%j.log
-#SBATCH --error=logs/slurm_canu_bench_err_%j.log
+#SBATCH --job-name="zip"
+#SBATCH --output=zip_%j.log
+#SBATCH --error=zip_err_%j.log
 
 module load slurm
 

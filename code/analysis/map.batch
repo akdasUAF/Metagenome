@@ -1,0 +1,45 @@
+#!/bin/bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G 
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="map_quality_scores" # Job name
+#SBATCH --output=logs/slurm_map_quality_scores_%j.log # Log file name
+#SBATCH --error=logs/slurm_map_quality_scores_err_%j.log # Error log file name
+
+# --- User Configuration & Argument Parsing ---
+if [ "$#" -ne 5 ]; then
+    echo "Usage: sbatch $0 <dataset_name> <assembler_name> <test_number> <raw_reads_fastq_path> <draft_assembly_fasta_path>"
+    exit 1
+fi
+
+DATASET_NAME="$1"
+ASSEMBLER_NAME="$2"
+TEST_NUMBER="$3"
+RAW_READS_FASTQ_PATH="$4"
+DRAFT_ASSEMBLY_FASTA_PATH="$5"
+
+# Create output directory
+OUTPUT_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/${TEST_NUMBER}/map/"
+mkdir -p "${OUTPUT_DIR}"
+
+# Step 1: Map raw reads to the polished assembly using minimap2
+minimap2 -ax map-ont "${DRAFT_ASSEMBLY_FASTA_PATH}" "${RAW_READS_FASTQ_PATH}" > "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.sam"
+
+# Step 2: Convert SAM to BAM
+samtools view -bS "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.sam" > "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.bam"
+
+# Step 3: Sort the BAM file
+samtools sort "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.bam" -o "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped_sorted.bam"
+
+# Step 4: Index the sorted BAM file
+samtools index "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped_sorted.bam"
+
+# Step 5: Convert the sorted BAM file back to FASTQ
+samtools fastq "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped_sorted.bam" > "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped_sorted.fastq"
+
+# Optional: Clean up intermediate files if desired
+# rm "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.sam"
+# rm "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.bam"
