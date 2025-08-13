@@ -15,6 +15,16 @@ if [ "$#" -ne 5 ]; then
     exit 1
 fi
 
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
 module load slurm
 module load GCC/11.3.0
 module load SAMtools/1.17
@@ -26,6 +36,12 @@ ASSEMBLER_NAME="$2"
 TEST_NUMBER="$3"
 RAW_READS_FASTQ_PATH="$4"
 DRAFT_ASSEMBLY_FASTA_PATH="$5"
+
+CONDA_ENV="align_minimap2"
+
+# --- Activate Medaka environment ---
+echo "Activating Medaka environment: ${CONDA_ENV}"
+conda activate "${CONDA_ENV}"
 
 # Create output directory
 OUTPUT_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/${TEST_NUMBER}/map/"

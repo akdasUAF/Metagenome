@@ -1,1 +1,0 @@
-./tools/analysis/jellyfish-2.3.1/bin/jellyfish count -t 12 -C -m 19 -s 5G -o 19mer_out --min-qual-char=? data/raw/lr-marine_sediment/SRR27145287/SRR27145287.fastq

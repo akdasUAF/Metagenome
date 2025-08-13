@@ -1,6 +1,0 @@
-#!/bin/bash
-## Assembler: miniasm
-## Dataset: Long read Soil
-
-bash ./code/analysis/quast/miniasm/run_quast_miniasm_lr-soil.bash
-bash ./code/analysis/busco/miniasm/run_busco_miniasm_lr-soil.bash
