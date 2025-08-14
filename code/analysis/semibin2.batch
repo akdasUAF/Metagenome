@@ -85,8 +85,8 @@ echo ">>> Performing Semibin2..."
 echo "    Training self..."
 SemiBin2 \
     train_self \
-    --data "${workdir}/data.csv" \
-    --data_split "${workdir}/data_split.csv" \
+    --data ${workdir}/data.csv \
+    --data_split ${workdir}/data_split.csv \
     --output ${workdir} \
     --engine gpu \
     -t 24 \
@@ -97,10 +97,10 @@ echo ">>> Performing Semibin2..."
 echo "    Bin long"
 SemiBin2 \
     bin_long \
-    -i "${contigs_fasta}" \
-    --model "${workdir}/model.pt" \
-    --data "${workdir}/data.csv" \
-    --output "${workdir}" \
+    -i ${contigs_fasta} \
+    --model ${workdir}/model.pt \
+    --data ${workdir}/data.csv \
+    --output ${workdir} \
     --engine gpu \
     -t 24 \
     --verbose
