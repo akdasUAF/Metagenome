@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name=minipolish2
+#SBATCH --output=logs/slurm_minipolish2_%j.log
+#SBATCH --error=logs/slurm_minipolish2_%j.log.err
+
+# Set unlimited locked memory for processes (good for large jobs)
+ulimit -l unlimited
+ulimit -n 65536 # Increase open file descriptor limit if needed
+
+set -euo pipefail
+
+module load slurm
+module load GCC/11.3.0
+module load SAMtools/1.17
+module load IPython/8.5.0
+module load BCFtools/1.17
+module load HTSlib/1.17
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+
+
+
+# Activate your Medaka conda environment
+conda activate SemiBin
+
+
+if [ $# -ne 4 ]; then
+  echo "Usage: $0 <sample> <assembler> <run> <contigs_fasta>"
+  exit 1
+fi
+
+sample=$1
+assembler=$2
+run=$3
+contigs_fasta=$4
+aligned_bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
+
+workdir="data/${assembler}/${sample}/${run}/semibin2/"
+mkdir -p "${workdir}"
+
+
+
+echo "Sample: ${sample}"
+echo "Assembler: ${assembler}"
+echo "Run: ${run}"
+echo "Contigs FASTA: ${contigs_fasta}"
+echo "Aligned BAM: ${aligned_bam}"
+echo "Output directory: ${workdir}"
+
+
+
+
+
+
+## Step 1: Extract contig→read mappings from BAM
+echo ">>> Performing Semibin2..."
+SemiBin2 \
+    single_easy_bin \
+    --input-fasta ${contigs_fasta} \
+    --input-bam ${aligned_bam} \
+    --output ${workdir} \
+    --verbose
+
+
+echo "Finished. Final emibin2: ${workdir}"
+
+
+
+
+
+
+
