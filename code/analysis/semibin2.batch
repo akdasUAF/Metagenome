@@ -51,7 +51,7 @@ test=$3
 contigs_fasta=$4
 aligned_bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
 
-workdir="data/${assembler}/${dataset}/${test}/semibin2/bin"
+workdir="data/${assembler}/${dataset}/${test}/semibin2/"
 mkdir -p "${workdir}"
 
 
