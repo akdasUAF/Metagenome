@@ -63,5 +63,5 @@ samtools index "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_m
 samtools fastq "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped_sorted.bam" > "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped_sorted.fastq"
 
 # Optional: Clean up intermediate files if desired
-# rm "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.sam"
-# rm "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.bam"
+rm "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.sam"
+rm "${OUTPUT_DIR}/${ASSEMBLER_NAME}_${DATASET_NAME}_${TEST_NUMBER}_mapped.bam"

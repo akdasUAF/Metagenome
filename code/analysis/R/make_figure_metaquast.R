@@ -3,6 +3,51 @@
 library(tidyverse)
 library(ggplot2)
 
+
+{
+  short_hand_reference_names <- data.frame("Long" = NA,
+                                           "Short" = NA)
+  
+  short_hand_reference_names <- rbind(short_hand_reference_names,
+                                      c("Bacillus_subtilis_complete_genome", "Bacillus"),
+                                      c("Enterococcus_faecalis_complete_genome", "Enterococcus"),
+                                      c("Escherichia_coli_complete_genome", "Escherichia"),
+                                      c("Listeria_monocytogenes_complete_genome", "Listeria"),
+                                      c("Pseudomonas_aeruginosa_complete_genome", "Pseudomonas"),
+                                      c("Saccharomyces_cerevisiae_draft_genome", "Saccharomyces"),
+                                      c("Salmonella_enterica_complete_genome", "Salmonella"),
+                                      c("Staphylococcus_aureus_complete_genome", "Staphylococcus"),
+                                      c("not_aligned", "Not Aligned"),
+                                      c("Cohaesibacter_es.047_2615840601", "C. es. 047"),
+                                      c("Halomonas_HL−4_2623620617", "H. hl-4"),
+                                      c("Marinobacter_LV10MA510−1_2616644829", "M. LV10MA510"),
+                                      c("Micromonospora_coxensis_2623620609", "M. coxensis"),
+                                      c("Micromonospora_echinaurantiaca_2623620557", "M. echinaurantiaca"),
+                                      c("Micromonospora_echinofusca_2623620567", "M. echinofusca"),
+                                      c("Muricauda_ES.050_2615840527", "M. ES.050"),
+                                      c("Propionibacteriaceae_bacterium_ES.041_2615840646", "P. bacterium-ES.041"),
+                                      c("Psychrobacter_LV10R520−6_2617270709", "P. LV10R520"),
+                                      c("GCF_000005845.2_Escherichia_coli", "Escherichia"),
+                                      c("GCF_000006765.1_Pseudomonas_aeruginosa", "Pseudomonas"),
+                                      c("GCF_000006945.2_Salmonella_enteric", "Salmonella"),
+                                      c("GCF_000009045.1_Bacillus_subtilis", "Bacillus"),
+                                      c("GCF_000013425.1_Staphylococcus_aureus", "Staphylococcus"),
+                                      c("GCF_000393015.1_Enterococcus_faecalis", "Enterococcus"),
+                                      c("GCF_000196035.1_Listeria_monocytogenes", "Listeria"),
+                                      c("GCF_000091045.1_Cryptococcus_neoformans", "Cryptococcus"),
+                                      c("Psychrobacter_LV10R520-6_2617270709", "Psychrobacter"),
+                                      c("bsubtilis_pb", "Bacillus"),
+                                      c("ecoli_pb", "Escherichia"),
+                                      c("efaecalis_pb", "Enterococcus"),
+                                      c("lmonocytogenes_pb", "Listeria"),
+                                      c("paeruginosa_pb", "Pseudomonas"),
+                                      c("saureus_pb", "Staphylococcus"),
+                                      c("scerevisiae_pb", "Saccharomyces"),
+                                      c("senterica_pb", "Salmonella"))
+  
+}
+
+
 make_figure <- function(dataset_in = "",
                         results_data = results_full) {
   
@@ -59,12 +104,15 @@ make_figure <- function(dataset_in = "",
                         dataset_in,
                         sep = " ") 
 
-    
-    
+  
+    ## Shorten names using a dataframe specified 
+    dataset_for_plotting <- dataset_for_plotting %>%
+      left_join(short_hand_reference_names, by = c("reference" = "Long")) %>%
+      mutate(reference = Short)
     
     ### The actual plot for each metric
     plot <- ggplot(data = dataset_for_plotting,
-           aes(x = reference, 
+           aes(x = Short, 
                y = metric_value,
                shape = assembler, 
                color = assembler)) +
@@ -81,8 +129,8 @@ make_figure <- function(dataset_in = "",
                                     "raven" = "violet")) +
       theme_classic() +
       labs(title = plot_title,
-           x = "Reference",
-           y = metric) + 
+           x = "Reference Organism",
+           y = gsub("_", " ", metric)) + 
       theme(plot.title = element_text(hjust = 0.5, face = "bold"),
             panel.grid.major = element_line(color = "lightgrey", linetype = 1),
             panel.background = element_rect(fill= "white"),
