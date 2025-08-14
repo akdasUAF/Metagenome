@@ -78,7 +78,11 @@ echo "Output directory: ${workdir}"
 
 ## Step 1: Extract contig→read mappings from BAM
 echo ">>> Performing Pileup..."
-samtools mpileup -f ${contigs_fasta} -Ou ${aligned_bam} | bcftools call -mv -Ob -o ${bcf_calls}
+bcftools mpileup \
+  -f ${contigs_fasta} \
+  ${aligned_bam} \
+  -Ou \
+| bcftools call -mv -Ob -o ${bcf_calls}
 
 
 ## Step 2: Derive unique read IDs
