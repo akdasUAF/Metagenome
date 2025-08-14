@@ -10,14 +10,10 @@ for dataset in "${datasets[@]}"; do
   for assembler in "${assemblers[@]}"; do
     for test in "${tests[@]}"; do
 
-      raw_fastq="data/raw/${dataset}/${dataset}_raw.fastq"
       contigs_fasta="data/${assembler}/${dataset}/${test}/medaka_consensus_simple_run/consensus.fasta"
       bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
 
       # Check that inputs exist before submitting
-      if [[ ! -f "${raw_fastq}" ]]; then
-        echo "Missing raw FASTQ: ${raw_fastq}, skipping."
-        continue
       fi
       if [[ ! -f "${contigs_fasta}" ]]; then
         echo "Missing contigs FASTA: ${contigs_fasta}, skipping."
@@ -32,7 +28,6 @@ for dataset in "${datasets[@]}"; do
         "${dataset}" \
         "${assembler}" \
         "${test}" \
-        "${raw_fastq}" \
         "${contigs_fasta}" \
         "${bam}"
 

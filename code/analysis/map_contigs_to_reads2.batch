@@ -19,6 +19,8 @@ module load slurm
 module load GCC/11.3.0
 module load SAMtools/1.17
 module load IPython/8.5.0
+module load BCFtools/1.17
+module load HTSlib/1.17
 
 # --- Conda Initialization ---
 CONDA_BASE=$(conda info --base)
@@ -38,49 +40,55 @@ fi
 conda activate align_minimap2
 
 
-if [ $# -ne 6 ]; then
-  echo "Usage: $0 <sample> <assembler> <run> <raw_fastq> <contigs_fasta> <aligned_bam>"
+if [ $# -ne 5 ]; then
+  echo "Usage: $0 <sample> <assembler> <run> <contigs_fasta> <aligned_bam>"
   exit 1
 fi
 
 sample=$1
 assembler=$2
 run=$3
-raw_fastq=$4
-contigs_fasta=$5
-aligned_bam=$6
+contigs_fasta=$4
+aligned_bam=$5
 
 workdir="data/${assembler}/${sample}/${run}/map"
 mkdir -p "${workdir}"
 
+
+
+
+
+
 # Filenames for intermediate and final outputs
-mapping_txt="${workdir}/${sample}_${assembler}_${run}_contig_read_mapping.txt"
-read_ids_txt="${workdir}/${sample}_${assembler}_${run}_contig_read_ids.txt"
+bcf_calls="${workdir}/${sample}_${assembler}_${run}_calls.bcf"
 final_fastq="${workdir}/final-contigs.fastq"
+
 
 echo "Sample: ${sample}"
 echo "Assembler: ${assembler}"
 echo "Run: ${run}"
-echo "Raw FASTQ: ${raw_fastq}"
 echo "Contigs FASTA: ${contigs_fasta}"
 echo "Aligned BAM: ${aligned_bam}"
 echo "Output directory: ${workdir}"
 
+
+
+
+
+
 ## Step 1: Extract contig→read mappings from BAM
-echo ">>> Extracting mappings from BAM..."
-samtools view -F 0x900 "${aligned_bam}" | \
-awk '{print $1, $3}' \
-  > "${mapping_txt}"
+echo ">>> Performing Pileup..."
+samtools mpileup -f ${contigs_fasta} -Ou ${aligned_bam} | bcftools call -mv -Ob -o ${bcf_calls}
+
 
 ## Step 2: Derive unique read IDs
-echo ">>> Collecting unique read IDs..."
-awk '{print $2}' "${mapping_txt}" | \
-sort -u \
-  > "${read_ids_txt}"
+echo ">>> Perfoming Index..."
+bcftools index ${bcf_calls}
 
 ## Step 3: Subset raw FASTQ by read IDs
 echo ">>> Subsetting FASTQ..."
-seqtk subseq "${contigs_fasta}" "${read_ids_txt}" \
-  > "${final_fastq}"
+bcftools view ${bcf_calls} \
+  | vcfutils.pl vcf2fq -d 1 -D 100 \
+  > ${final_fastq}
 
 echo "Finished. Final FASTQ: ${final_fastq}"
