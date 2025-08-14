@@ -1,13 +1,3 @@
-
-
-
-
-
- 
-
-data/${assembler}/${dataset}/${test}/
-
-
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -40,9 +30,9 @@ for dataset in "${datasets[@]}"; do
 
 
 
-      assembly_post_fasta="data/${assembler}/${dataset}/${test}/${assembler}_${dataset}_${test}_final-contigs.fasta
+      assembly_post_fasta="data/${assembler}/${dataset}/${test}/${assembler}_${dataset}_${test}_final-contigs.fasta"
 
-      sbatch code/analysis/map_contigs_to_reads2.batch \
+      sbatch code/analysis/filter_by_length.batch \
         ${assembly_pre_fasta} \
         ${assembly_post_fasta}
 
