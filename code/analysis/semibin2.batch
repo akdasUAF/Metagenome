@@ -41,22 +41,22 @@ conda activate SemiBin
 
 
 if [ $# -ne 4 ]; then
-  echo "Usage: $0 <sample> <assembler> <run> <contigs_fasta>"
+  echo "Usage: $0 <dataset> <assembler> <run> <contigs_fasta>"
   exit 1
 fi
 
-sample=$1
+dataset=$1
 assembler=$2
 run=$3
 contigs_fasta=$4
 aligned_bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
 
-workdir="data/${assembler}/${sample}/${run}/semibin2/"
+workdir="data/${assembler}/${dataset}/${run}/semibin2/"
 mkdir -p "${workdir}"
 
 
 
-echo "Sample: ${sample}"
+echo "dataset: ${dataset}"
 echo "Assembler: ${assembler}"
 echo "Run: ${run}"
 echo "Contigs FASTA: ${contigs_fasta}"
