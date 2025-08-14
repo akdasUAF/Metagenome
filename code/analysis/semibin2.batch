@@ -64,6 +64,7 @@ echo "Aligned BAM: ${aligned_bam}"
 echo "Output directory: ${workdir}"
 
 
+data_split="${workdir}/data_split.csv"
 
 
 
@@ -86,11 +87,14 @@ echo "    Training self..."
 SemiBin2 \
     train_self \
     --data ${workdir}/data.csv \
-    --data_split ${workdir}/data_split.csv \
+    --data-split ${data_split} \
     --output ${workdir} \
-    --engine gpu \
+    --engine "gpu" \
     -t 24 \
     --verbose
+
+
+    'generate_sequence_features_single', '--input-fasta', 'data/metaflye/lr-ms/test5/medaka_consensus_simple_run/consensus.fasta', '--input-bam', 'data/metaflye/lr-ms/test5/map/metaflye_lr-ms_test5_mapped_sorted.bam', '--min-len', '1000', '--output', 'data/metaflye/lr-ms/test5/semibin2/bin', '--verbose'
 
 ## Step 3: "SemiBin2... Bin long"
 echo ">>> Performing Semibin2..."
