@@ -51,7 +51,7 @@ test=$3
 contigs_fasta=$4
 aligned_bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
 
-workdir="data/${assembler}/${dataset}/${test}/semibin2/"
+workdir="data/${assembler}/${dataset}/${test}/semibin2/bin"
 mkdir -p "${workdir}"
 
 
@@ -68,21 +68,42 @@ echo "Output directory: ${workdir}"
 
 
 
-## Step 1: Extract contig→read mappings from BAM
+## Step 1: "SemiBin2. Generating Sequence Features"
 echo ">>> Performing Semibin2..."
+echo "    Generating Sequence Features...."
 SemiBin2 \
-    single_easy_bin \
+    generate_sequence_features_single \
     --input-fasta ${contigs_fasta} \
     --input-bam ${aligned_bam} \
     --output ${workdir} \
     --verbose
 
 
-echo "Finished. Final emibin2: ${workdir}"
+## Step 2: "SemiBin2... Training self"
+echo ">>> Performing Semibin2..."
+echo "    Training self..."
+SemiBin2 \
+    train_self \
+    --data "${workdir}/data.csv" \
+    --data_split "${workdir}/data_split.csv" \
+    --output ${workdir} \
+    --engine gpu \
+    -t 24 \
+    --verbose
+
+## Step 3: "SemiBin2... Bin long"
+echo ">>> Performing Semibin2..."
+echo "    Bin long"
+SemiBin2 \
+    bin_long \
+    -i "${contigs_fasta}" \
+    --model "${workdir}/model.pt" \
+    --data "${workdir}/data.csv" \
+    --output "${workdir}" \
+    --engine gpu \
+    -t 24 \
+    --verbose
 
 
-
-
-
-
+echo "Finished. Final Semibin2: ${workdir}"
 
