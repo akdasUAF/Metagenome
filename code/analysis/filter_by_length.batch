@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1 
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name=map2reads
+#SBATCH --output=logs/slurm_filter-sr_%j.log
+#SBATCH --error=logs/slurm_filter-sr_%j.log.err
+
+# Set unlimited locked memory for processes (good for large jobs)
+ulimit -l unlimited
+ulimit -n 65536 # Increase open file descriptor limit if needed
+
+set -euo pipefail
+
+module load slurm
+module load GCC/11.3.0
+module load SAMtools/1.17
+module load IPython/8.5.0
+
+# --- Conda Initialization ---
+CONDA_BASE=$(conda info --base)
+if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    . "${CONDA_BASE}/etc/profile.d/conda.sh"
+    echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
+else
+    echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
+    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    exit 1
+fi
+
+# Activate minimap2 environment
+conda activate align_minimap2
+
+
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 <pre_fasta> <post_fasta>"
+  exit 1
+fi
+
+pre_fasta=$1
+post_fasta=$2
+
+
+seqtk seq -L 1000 ${pre_fasta} > ${post_fasta}

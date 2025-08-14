@@ -1,7 +1,7 @@
 library(tidyverse)
 library(tools)
 
-results_dir_base <- "../metagenome_results/new/results/"
+results_dir_base <- "../metagenome_results/version3/"
 
 assemblers_list_lr <- c("raven", "metaflye", "canu")
 datasets_list_lr <- c("lr-even", "lr-log", "lr-ms")

@@ -3,7 +3,6 @@
 library(tidyverse)
 library(ggplot2)
 
-
 {
   short_hand_reference_names <- data.frame("Long" = NA,
                                            "Short" = NA)
