@@ -5,9 +5,9 @@
 #SBATCH --mem=64G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name=minipolish2
-#SBATCH --output=logs/slurm_minipolish2_%j.log
-#SBATCH --error=logs/slurm_minipolish2_%j.log.err
+#SBATCH --job-name=semibin2
+#SBATCH --output=logs/slurm_semibin2_%j.log
+#SBATCH --error=logs/slurm_semibin2_%j.log.err
 
 # Set unlimited locked memory for processes (good for large jobs)
 ulimit -l unlimited
@@ -75,6 +75,7 @@ SemiBin2 \
     generate_sequence_features_single \
     --input-fasta ${contigs_fasta} \
     --input-bam ${aligned_bam} \
+    --min-len 1000 \
     --output ${workdir} \
     --verbose
 
