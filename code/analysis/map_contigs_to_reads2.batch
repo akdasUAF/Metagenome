@@ -80,7 +80,7 @@ sort -u \
 
 ## Step 3: Subset raw FASTQ by read IDs
 echo ">>> Subsetting FASTQ..."
-seqtk subseq "${raw_fastq}" "${read_ids_txt}" \
+seqtk subseq "${contigs_fasta}" "${read_ids_txt}" \
   > "${final_fastq}"
 
 echo "Finished. Final FASTQ: ${final_fastq}"

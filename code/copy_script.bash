@@ -7,6 +7,8 @@ cp data/megahit/sr-even/test1/final.contigs.fa results/megahit/sr-even/test1/ass
 cp data/megahit/sr-even/test1/log results/megahit/sr-even/test1/assembly_output/megahit_sr-even_test1.log
 cp data/megahit/sr-even/test1/checkpoints.txt results/megahit/sr-even/test1/assembly_output/megahit_sr-even_test1_checkpoints.txt
 cp data/megahit/sr-even/test1/options.json results/megahit/sr-even/test1/assembly_output/megahit_sr-even_test1_options.json
+cp data/megahit/sr-even/test1/megahit_sr-even_test1_final-contigs.fasta results/megahit/sr-even/test1/megahit_sr-even_test1_final-contigs.fasta
+
 
 ## test2
 mkdir -p results/megahit/sr-even/test2/assembly_output/
@@ -14,6 +16,8 @@ cp data/megahit/sr-even/test2/final.contigs.fa results/megahit/sr-even/test2/ass
 cp data/megahit/sr-even/test2/log results/megahit/sr-even/test2/assembly_output/megahit_sr-even_test2.log
 cp data/megahit/sr-even/test2/checkpoints.txt results/megahit/sr-even/test2/assembly_output/megahit_sr-even_test2_checkpoints.txt
 cp data/megahit/sr-even/test2/options.json results/megahit/sr-even/test2/assembly_output/megahit_sr-even_test2_options.json
+cp data/megahit/sr-even/test2/megahit_sr-even_test2_final-contigs.fasta results/megahit/sr-even/test2/megahit_sr-even_test2_final-contigs.fasta
+
 
 ## test3
 mkdir -p results/megahit/sr-even/test3/assembly_output/
@@ -21,6 +25,8 @@ cp data/megahit/sr-even/test3/final.contigs.fa results/megahit/sr-even/test3/ass
 cp data/megahit/sr-even/test3/log results/megahit/sr-even/test3/assembly_output/megahit_sr-even_test3.log
 cp data/megahit/sr-even/test3/checkpoints.txt results/megahit/sr-even/test3/assembly_output/megahit_sr-even_test3_checkpoints.txt
 cp data/megahit/sr-even/test3/options.json results/megahit/sr-even/test3/assembly_output/megahit_sr-even_test3_options.json
+cp data/megahit/sr-even/test3/megahit_sr-even_test3_final-contigs.fasta results/megahit/sr-even/test3/megahit_sr-even_test3_final-contigs.fasta
+
 
 ## test4
 mkdir -p results/megahit/sr-even/test4/assembly_output/
@@ -28,6 +34,8 @@ cp data/megahit/sr-even/test4/final.contigs.fa results/megahit/sr-even/test4/ass
 cp data/megahit/sr-even/test4/log results/megahit/sr-even/test4/assembly_output/megahit_sr-even_test4.log
 cp data/megahit/sr-even/test4/checkpoints.txt results/megahit/sr-even/test4/assembly_output/megahit_sr-even_test4_checkpoints.txt
 cp data/megahit/sr-even/test4/options.json results/megahit/sr-even/test4/assembly_output/megahit_sr-even_test4_options.json
+cp data/megahit/sr-even/test4/megahit_sr-even_test4_final-contigs.fasta results/megahit/sr-even/test4/megahit_sr-even_test4_final-contigs.fasta
+
 
 ## test5
 mkdir -p results/megahit/sr-even/test5/assembly_output/
@@ -35,6 +43,8 @@ cp data/megahit/sr-even/test5/final.contigs.fa results/megahit/sr-even/test5/ass
 cp data/megahit/sr-even/test5/log results/megahit/sr-even/test5/assembly_output/megahit_sr-even_test5.log
 cp data/megahit/sr-even/test5/checkpoints.txt results/megahit/sr-even/test5/assembly_output/megahit_sr-even_test5_checkpoints.txt
 cp data/megahit/sr-even/test5/options.json results/megahit/sr-even/test5/assembly_output/megahit_sr-even_test5_options.json
+cp data/megahit/sr-even/test5/megahit_sr-even_test5_final-contigs.fasta results/megahit/sr-even/test5/megahit_sr-even_test5_final-contigs.fasta
+
 
 
 ### sr-log
@@ -44,6 +54,8 @@ cp data/megahit/sr-log/test1/final.contigs.fa results/megahit/sr-log/test1/assem
 cp data/megahit/sr-log/test1/log results/megahit/sr-log/test1/assembly_output/megahit_sr-log_test1.log
 cp data/megahit/sr-log/test1/checkpoints.txt results/megahit/sr-log/test1/assembly_output/megahit_sr-log_test1_checkpoints.txt
 cp data/megahit/sr-log/test1/options.json results/megahit/sr-log/test1/assembly_output/megahit_sr-log_test1_options.json
+cp data/megahit/sr-log/test1/megahit_sr-log_test1_final-contigs.fasta results/megahit/sr-log/test1/megahit_sr-log_test1_final-contigs.fasta
+
 
 ## test2
 mkdir -p results/megahit/sr-log/test2/assembly_output/
@@ -51,6 +63,8 @@ cp data/megahit/sr-log/test2/final.contigs.fa results/megahit/sr-log/test2/assem
 cp data/megahit/sr-log/test2/log results/megahit/sr-log/test2/assembly_output/megahit_sr-log_test2.log
 cp data/megahit/sr-log/test2/checkpoints.txt results/megahit/sr-log/test2/assembly_output/megahit_sr-log_test2_checkpoints.txt
 cp data/megahit/sr-log/test2/options.json results/megahit/sr-log/test2/assembly_output/megahit_sr-log_test2_options.json
+cp data/megahit/sr-log/test2/megahit_sr-log_test2_final-contigs.fasta results/megahit/sr-log/test2/megahit_sr-log_test2_final-contigs.fasta
+
 
 ## test3
 mkdir -p results/megahit/sr-log/test3/assembly_output/
@@ -58,6 +72,8 @@ cp data/megahit/sr-log/test3/final.contigs.fa results/megahit/sr-log/test3/assem
 cp data/megahit/sr-log/test3/log results/megahit/sr-log/test3/assembly_output/megahit_sr-log_test3.log
 cp data/megahit/sr-log/test3/checkpoints.txt results/megahit/sr-log/test3/assembly_output/megahit_sr-log_test3_checkpoints.txt
 cp data/megahit/sr-log/test3/options.json results/megahit/sr-log/test3/assembly_output/megahit_sr-log_test3_options.json
+cp data/megahit/sr-log/test3/megahit_sr-log_test3_final-contigs.fasta results/megahit/sr-log/test3/megahit_sr-log_test3_final-contigs.fasta
+
 
 ## test4
 mkdir -p results/megahit/sr-log/test4/assembly_output/
@@ -65,6 +81,8 @@ cp data/megahit/sr-log/test4/final.contigs.fa results/megahit/sr-log/test4/assem
 cp data/megahit/sr-log/test4/log results/megahit/sr-log/test4/assembly_output/megahit_sr-log_test4.log
 cp data/megahit/sr-log/test4/checkpoints.txt results/megahit/sr-log/test4/assembly_output/megahit_sr-log_test4_checkpoints.txt
 cp data/megahit/sr-log/test4/options.json results/megahit/sr-log/test4/assembly_output/megahit_sr-log_test4_options.json
+cp data/megahit/sr-log/test4/megahit_sr-log_test4_final-contigs.fasta results/megahit/sr-log/test4/megahit_sr-log_test4_final-contigs.fasta
+
 
 ## test5
 mkdir -p results/megahit/sr-log/test5/assembly_output/
@@ -72,6 +90,8 @@ cp data/megahit/sr-log/test5/final.contigs.fa results/megahit/sr-log/test5/assem
 cp data/megahit/sr-log/test5/log results/megahit/sr-log/test5/assembly_output/megahit_sr-log_test5.log
 cp data/megahit/sr-log/test5/checkpoints.txt results/megahit/sr-log/test5/assembly_output/megahit_sr-log_test5_checkpoints.txt
 cp data/megahit/sr-log/test5/options.json results/megahit/sr-log/test5/assembly_output/megahit_sr-log_test5_options.json
+cp data/megahit/sr-log/test5/megahit_sr-log_test5_final-contigs.fasta results/megahit/sr-log/test5/megahit_sr-log_test5_final-contigs.fasta
+
 
 
 ### sr-ms
@@ -81,6 +101,9 @@ cp data/megahit/sr-ms/test1/final.contigs.fa results/megahit/sr-ms/test1/assembl
 cp data/megahit/sr-ms/test1/log results/megahit/sr-ms/test1/assembly_output/megahit_sr-ms_test1.log
 cp data/megahit/sr-ms/test1/checkpoints.txt results/megahit/sr-ms/test1/assembly_output/megahit_sr-ms_test1_checkpoints.txt
 cp data/megahit/sr-ms/test1/options.json results/megahit/sr-ms/test1/assembly_output/megahit_sr-ms_test1_options.json
+cp data/megahit/sr-log/test1/megahit_sr-log_test1_final-contigs.fasta results/megahit/sr-log/test1/megahit_sr-log_test1_final-contigs.fasta
+
+
 
 ## test2
 mkdir -p results/megahit/sr-ms/test2/assembly_output/
@@ -88,6 +111,8 @@ cp data/megahit/sr-ms/test2/final.contigs.fa results/megahit/sr-ms/test2/assembl
 cp data/megahit/sr-ms/test2/log results/megahit/sr-ms/test2/assembly_output/megahit_sr-ms_test2.log
 cp data/megahit/sr-ms/test2/checkpoints.txt results/megahit/sr-ms/test2/assembly_output/megahit_sr-ms_test2_checkpoints.txt
 cp data/megahit/sr-ms/test2/options.json results/megahit/sr-ms/test2/assembly_output/megahit_sr-ms_test2_options.json
+cp data/megahit/sr-ms/test2/megahit_sr-ms_test2_final-contigs.fasta results/megahit/sr-ms/test2/megahit_sr-ms_test2_final-contigs.fasta
+
 
 ## test3
 mkdir -p results/megahit/sr-ms/test3/assembly_output/
@@ -95,6 +120,8 @@ cp data/megahit/sr-ms/test3/final.contigs.fa results/megahit/sr-ms/test3/assembl
 cp data/megahit/sr-ms/test3/log results/megahit/sr-ms/test3/assembly_output/megahit_sr-ms_test3.log
 cp data/megahit/sr-ms/test3/checkpoints.txt results/megahit/sr-ms/test3/assembly_output/megahit_sr-ms_test3_checkpoints.txt
 cp data/megahit/sr-ms/test3/options.json results/megahit/sr-ms/test3/assembly_output/megahit_sr-ms_test3_options.json
+cp data/megahit/sr-ms/test3/megahit_sr-ms_test3_final-contigs.fasta results/megahit/sr-ms/test3/megahit_sr-ms_test3_final-contigs.fasta
+
 
 ## test4
 mkdir -p results/megahit/sr-ms/test4/assembly_output/
@@ -102,6 +129,8 @@ cp data/megahit/sr-ms/test4/final.contigs.fa results/megahit/sr-ms/test4/assembl
 cp data/megahit/sr-ms/test4/log results/megahit/sr-ms/test4/assembly_output/megahit_sr-ms_test4.log
 cp data/megahit/sr-ms/test4/checkpoints.txt results/megahit/sr-ms/test4/assembly_output/megahit_sr-ms_test4_checkpoints.txt
 cp data/megahit/sr-ms/test4/options.json results/megahit/sr-ms/test4/assembly_output/megahit_sr-ms_test4_options.json
+cp data/megahit/sr-ms/test4/megahit_sr-ms_test4_final-contigs.fasta results/megahit/sr-ms/test4/megahit_sr-ms_test4_final-contigs.fasta
+
 
 ## test5
 mkdir -p results/megahit/sr-ms/test5/assembly_output/
@@ -109,6 +138,7 @@ cp data/megahit/sr-ms/test5/final.contigs.fa results/megahit/sr-ms/test5/assembl
 cp data/megahit/sr-ms/test5/log results/megahit/sr-ms/test5/assembly_output/megahit_sr-ms_test5.log
 cp data/megahit/sr-ms/test5/checkpoints.txt results/megahit/sr-ms/test5/assembly_output/megahit_sr-ms_test5_checkpoints.txt
 cp data/megahit/sr-ms/test5/options.json results/megahit/sr-ms/test5/assembly_output/megahit_sr-ms_test5_options.json
+cp data/megahit/sr-ms/test5/megahit_sr-ms_test5_final-contigs.fasta results/megahit/sr-ms/test5/megahit_sr-ms_test5_final-contigs.fasta
 
 
 
@@ -229,6 +259,7 @@ cp data/metaspades/sr-even/test1/params.txt results/metaspades/sr-even/test1/ass
 cp data/metaspades/sr-even/test1/scaffolds.fasta results/metaspades/sr-even/test1/assembly_output/metaspades_sr-even_test1_scaffolds.fasta
 cp data/metaspades/sr-even/test1/scaffolds.paths results/metaspades/sr-even/test1/assembly_output/metaspades_sr-even_test1_scaffolds.paths
 cp data/metaspades/sr-even/test1/spades.log results/metaspades/sr-even/test1/assembly_output/metaspades_sr-even_test1_spades.log
+cp data/metaspades/sr-even/test1/metaspades_sr-even_test1_final-contigs.fasta results/metaspades/sr-even/test1/metaspades_sr-even_test1_final-contigs.fasta
 
 
 
@@ -241,6 +272,7 @@ cp data/metaspades/sr-even/test2/params.txt results/metaspades/sr-even/test2/ass
 cp data/metaspades/sr-even/test2/scaffolds.fasta results/metaspades/sr-even/test2/assembly_output/metaspades_sr-even_test2_scaffolds.fasta
 cp data/metaspades/sr-even/test2/scaffolds.paths results/metaspades/sr-even/test2/assembly_output/metaspades_sr-even_test2_scaffolds.paths
 cp data/metaspades/sr-even/test2/spades.log results/metaspades/sr-even/test2/assembly_output/metaspades_sr-even_test2_spades.log
+cp data/metaspades/sr-even/test1/metaspades_sr-even_test1_final-contigs.fasta results/metaspades/sr-even/test1/metaspades_sr-even_test1_final-contigs.fasta
 
 
 
@@ -253,6 +285,7 @@ cp data/metaspades/sr-even/test3/params.txt results/metaspades/sr-even/test3/ass
 cp data/metaspades/sr-even/test3/scaffolds.fasta results/metaspades/sr-even/test3/assembly_output/metaspades_sr-even_test3_scaffolds.fasta
 cp data/metaspades/sr-even/test3/scaffolds.paths results/metaspades/sr-even/test3/assembly_output/metaspades_sr-even_test3_scaffolds.paths
 cp data/metaspades/sr-even/test3/spades.log results/metaspades/sr-even/test3/assembly_output/metaspades_sr-even_test3_spades.log
+cp data/metaspades/sr-even/test3/metaspades_sr-even_test3_final-contigs.fasta results/metaspades/sr-even/test3/metaspades_sr-even_test3_final-contigs.fasta
 
 
 
@@ -265,6 +298,7 @@ cp data/metaspades/sr-even/test4/params.txt results/metaspades/sr-even/test4/ass
 cp data/metaspades/sr-even/test4/scaffolds.fasta results/metaspades/sr-even/test4/assembly_output/metaspades_sr-even_test4_scaffolds.fasta
 cp data/metaspades/sr-even/test4/scaffolds.paths results/metaspades/sr-even/test4/assembly_output/metaspades_sr-even_test4_scaffolds.paths
 cp data/metaspades/sr-even/test4/spades.log results/metaspades/sr-even/test4/assembly_output/metaspades_sr-even_test4_spades.log
+cp data/metaspades/sr-even/test4/metaspades_sr-even_test4_final-contigs.fasta results/metaspades/sr-even/test4/metaspades_sr-even_test4_final-contigs.fasta
 
 
 
@@ -278,6 +312,7 @@ cp data/metaspades/sr-even/test5/params.txt results/metaspades/sr-even/test5/ass
 cp data/metaspades/sr-even/test5/scaffolds.fasta results/metaspades/sr-even/test5/assembly_output/metaspades_sr-even_test5_scaffolds.fasta
 cp data/metaspades/sr-even/test5/scaffolds.paths results/metaspades/sr-even/test5/assembly_output/metaspades_sr-even_test5_scaffolds.paths
 cp data/metaspades/sr-even/test5/spades.log results/metaspades/sr-even/test5/assembly_output/metaspades_sr-even_test5_spades.log
+cp data/metaspades/sr-even/test5/metaspades_sr-even_test5_final-contigs.fasta results/metaspades/sr-even/test5/metaspades_sr-even_test5_final-contigs.fasta
 
 
 
@@ -308,6 +343,8 @@ cp data/metaspades/sr-log/test1/params.txt results/metaspades/sr-log/test1/assem
 cp data/metaspades/sr-log/test1/scaffolds.fasta results/metaspades/sr-log/test1/assembly_output/metaspades_sr-log_test1_scaffolds.fasta
 cp data/metaspades/sr-log/test1/scaffolds.paths results/metaspades/sr-log/test1/assembly_output/metaspades_sr-log_test1_scaffolds.paths
 cp data/metaspades/sr-log/test1/spades.log results/metaspades/sr-log/test1/assembly_output/metaspades_sr-log_test1_spades.log
+cp data/metaspades/sr-log/test1/metaspades_sr-log_test1_final-contigs.fasta results/metaspades/sr-log/test1/metaspades_sr-log_test1_final-contigs.fasta
+
 
 
 
@@ -320,6 +357,8 @@ cp data/metaspades/sr-log/test2/params.txt results/metaspades/sr-log/test2/assem
 cp data/metaspades/sr-log/test2/scaffolds.fasta results/metaspades/sr-log/test2/assembly_output/metaspades_sr-log_test2_scaffolds.fasta
 cp data/metaspades/sr-log/test2/scaffolds.paths results/metaspades/sr-log/test2/assembly_output/metaspades_sr-log_test2_scaffolds.paths
 cp data/metaspades/sr-log/test2/spades.log results/metaspades/sr-log/test2/assembly_output/metaspades_sr-log_test2_spades.log
+cp data/metaspades/sr-log/test2/metaspades_sr-log_test2_final-contigs.fasta results/metaspades/sr-log/test2/metaspades_sr-log_test2_final-contigs.fasta
+
 
 
 
@@ -332,6 +371,7 @@ cp data/metaspades/sr-log/test3/params.txt results/metaspades/sr-log/test3/assem
 cp data/metaspades/sr-log/test3/scaffolds.fasta results/metaspades/sr-log/test3/assembly_output/metaspades_sr-log_test3_scaffolds.fasta
 cp data/metaspades/sr-log/test3/scaffolds.paths results/metaspades/sr-log/test3/assembly_output/metaspades_sr-log_test3_scaffolds.paths
 cp data/metaspades/sr-log/test3/spades.log results/metaspades/sr-log/test3/assembly_output/metaspades_sr-log_test3_spades.log
+cp data/metaspades/sr-log/test3/metaspades_sr-log_test3_final-contigs.fasta results/metaspades/sr-log/test3/metaspades_sr-log_test3_final-contigs.fasta
 
 
 
@@ -344,6 +384,7 @@ cp data/metaspades/sr-log/test4/params.txt results/metaspades/sr-log/test4/assem
 cp data/metaspades/sr-log/test4/scaffolds.fasta results/metaspades/sr-log/test4/assembly_output/metaspades_sr-log_test4_scaffolds.fasta
 cp data/metaspades/sr-log/test4/scaffolds.paths results/metaspades/sr-log/test4/assembly_output/metaspades_sr-log_test4_scaffolds.paths
 cp data/metaspades/sr-log/test4/spades.log results/metaspades/sr-log/test4/assembly_output/metaspades_sr-log_test4_spades.log
+cp data/metaspades/sr-log/test4/metaspades_sr-log_test4_final-contigs.fasta results/metaspades/sr-log/test4/metaspades_sr-log_test4_final-contigs.fasta
 
 
 
@@ -357,6 +398,7 @@ cp data/metaspades/sr-log/test5/params.txt results/metaspades/sr-log/test5/assem
 cp data/metaspades/sr-log/test5/scaffolds.fasta results/metaspades/sr-log/test5/assembly_output/metaspades_sr-log_test5_scaffolds.fasta
 cp data/metaspades/sr-log/test5/scaffolds.paths results/metaspades/sr-log/test5/assembly_output/metaspades_sr-log_test5_scaffolds.paths
 cp data/metaspades/sr-log/test5/spades.log results/metaspades/sr-log/test5/assembly_output/metaspades_sr-log_test5_spades.log
+cp data/metaspades/sr-log/test5/metaspades_sr-log_test5_final-contigs.fasta results/metaspades/sr-log/test5/metaspades_sr-log_test5_final-contigs.fasta
 
 
 
@@ -381,6 +423,7 @@ cp data/metaspades/sr-ms/test1/params.txt results/metaspades/sr-ms/test1/assembl
 cp data/metaspades/sr-ms/test1/scaffolds.fasta results/metaspades/sr-ms/test1/assembly_output/metaspades_sr-ms_test1_scaffolds.fasta
 cp data/metaspades/sr-ms/test1/scaffolds.paths results/metaspades/sr-ms/test1/assembly_output/metaspades_sr-ms_test1_scaffolds.paths
 cp data/metaspades/sr-ms/test1/spades.log results/metaspades/sr-ms/test1/assembly_output/metaspades_sr-ms_test1_spades.log
+cp data/metaspades/sr-ms/test1/metaspades_sr-ms_test1_final-contigs.fasta results/metaspades/sr-ms/test1/metaspades_sr-ms_test1_final-contigs.fasta
 
 
 
@@ -393,6 +436,7 @@ cp data/metaspades/sr-ms/test2/params.txt results/metaspades/sr-ms/test2/assembl
 cp data/metaspades/sr-ms/test2/scaffolds.fasta results/metaspades/sr-ms/test2/assembly_output/metaspades_sr-ms_test2_scaffolds.fasta
 cp data/metaspades/sr-ms/test2/scaffolds.paths results/metaspades/sr-ms/test2/assembly_output/metaspades_sr-ms_test2_scaffolds.paths
 cp data/metaspades/sr-ms/test2/spades.log results/metaspades/sr-ms/test2/assembly_output/metaspades_sr-ms_test2_spades.log
+cp data/metaspades/sr-ms/test2/metaspades_sr-ms_test2_final-contigs.fasta results/metaspades/sr-ms/test2/metaspades_sr-ms_test2_final-contigs.fasta
 
 
 
@@ -405,6 +449,7 @@ cp data/metaspades/sr-ms/test3/params.txt results/metaspades/sr-ms/test3/assembl
 cp data/metaspades/sr-ms/test3/scaffolds.fasta results/metaspades/sr-ms/test3/assembly_output/metaspades_sr-ms_test3_scaffolds.fasta
 cp data/metaspades/sr-ms/test3/scaffolds.paths results/metaspades/sr-ms/test3/assembly_output/metaspades_sr-ms_test3_scaffolds.paths
 cp data/metaspades/sr-ms/test3/spades.log results/metaspades/sr-ms/test3/assembly_output/metaspades_sr-ms_test3_spades.log
+cp data/metaspades/sr-ms/test3/metaspades_sr-ms_test3_final-contigs.fasta results/metaspades/sr-ms/test3/metaspades_sr-ms_test3_final-contigs.fasta
 
 
 
@@ -417,6 +462,7 @@ cp data/metaspades/sr-ms/test4/params.txt results/metaspades/sr-ms/test4/assembl
 cp data/metaspades/sr-ms/test4/scaffolds.fasta results/metaspades/sr-ms/test4/assembly_output/metaspades_sr-ms_test4_scaffolds.fasta
 cp data/metaspades/sr-ms/test4/scaffolds.paths results/metaspades/sr-ms/test4/assembly_output/metaspades_sr-ms_test4_scaffolds.paths
 cp data/metaspades/sr-ms/test4/spades.log results/metaspades/sr-ms/test4/assembly_output/metaspades_sr-ms_test4_spades.log
+cp data/metaspades/sr-ms/test4/metaspades_sr-ms_test4_final-contigs.fasta results/metaspades/sr-ms/test4/metaspades_sr-ms_test4_final-contigs.fasta
 
 
 
@@ -430,6 +476,7 @@ cp data/metaspades/sr-ms/test5/params.txt results/metaspades/sr-ms/test5/assembl
 cp data/metaspades/sr-ms/test5/scaffolds.fasta results/metaspades/sr-ms/test5/assembly_output/metaspades_sr-ms_test5_scaffolds.fasta
 cp data/metaspades/sr-ms/test5/scaffolds.paths results/metaspades/sr-ms/test5/assembly_output/metaspades_sr-ms_test5_scaffolds.paths
 cp data/metaspades/sr-ms/test5/spades.log results/metaspades/sr-ms/test5/assembly_output/metaspades_sr-ms_test5_spades.log
+cp data/metaspades/sr-ms/test5/metaspades_sr-ms_test5_final-contigs.fasta results/metaspades/sr-ms/test5/metaspades_sr-ms_test5_final-contigs.fasta
 
 
 
@@ -445,6 +492,8 @@ cp data/unicycler/sr-even/test1/assembly.fasta results/unicycler/sr-even/test1/a
 cp data/unicycler/sr-even/test1/unicycler.log results/unicycler/sr-even/test1/assembly_output/unicycler_sr-even_test1_unicycler.log
 cp data/unicycler/sr-even/test1/unicycler_console_output.log results/unicycler/sr-even/test1/assembly_output/unicycler_sr-even_test1_console_output.log
 cp data/unicycler/sr-even/test1/assembly.gfa results/unicycler/sr-even/test1/assembly_output/unicycler_sr-even_test1_assembly.gfa
+cp data/unicycler/sr-even/test1/unicycler_sr-even_test1_final-contigs.fasta results/unicycler/sr-even/test1/unicycler_sr-even_test1_final-contigs.fasta
+
 
 
 ## test2
@@ -453,6 +502,7 @@ cp data/unicycler/sr-even/test2/assembly.fasta results/unicycler/sr-even/test2/a
 cp data/unicycler/sr-even/test2/unicycler.log results/unicycler/sr-even/test2/assembly_output/unicycler_sr-even_test2_unicycler.log
 cp data/unicycler/sr-even/test2/unicycler_console_output.log results/unicycler/sr-even/test2/assembly_output/unicycler_sr-even_test2_console_output.log
 cp data/unicycler/sr-even/test2/assembly.gfa results/unicycler/sr-even/test2/assembly_output/unicycler_sr-even_test2_assembly.gfa
+cp data/unicycler/sr-even/test2/unicycler_sr-even_test2_final-contigs.fasta results/unicycler/sr-even/test2/unicycler_sr-even_test2_final-contigs.fasta
 
 ## test3
 mkdir -p results/unicycler/sr-even/test3/assembly_output/
@@ -460,6 +510,8 @@ cp data/unicycler/sr-even/test3/assembly.fasta results/unicycler/sr-even/test3/a
 cp data/unicycler/sr-even/test3/unicycler.log results/unicycler/sr-even/test3/assembly_output/unicycler_sr-even_test3_unicycler.log
 cp data/unicycler/sr-even/test3/unicycler_console_output.log results/unicycler/sr-even/test3/assembly_output/unicycler_sr-even_test3_console_output.log
 cp data/unicycler/sr-even/test3/assembly.gfa results/unicycler/sr-even/test3/assembly_output/unicycler_sr-even_test3_assembly.gfa
+cp data/unicycler/sr-even/test3/unicycler_sr-even_test3_final-contigs.fasta results/unicycler/sr-even/test3/unicycler_sr-even_test3_final-contigs.fasta
+
 
 ## test4
 mkdir -p results/unicycler/sr-even/test4/assembly_output/
@@ -467,6 +519,8 @@ cp data/unicycler/sr-even/test4/assembly.fasta results/unicycler/sr-even/test4/a
 cp data/unicycler/sr-even/test4/unicycler.log results/unicycler/sr-even/test4/assembly_output/unicycler_sr-even_test4_unicycler.log
 cp data/unicycler/sr-even/test4/unicycler_console_output.log results/unicycler/sr-even/test4/assembly_output/unicycler_sr-even_test4_console_output.log
 cp data/unicycler/sr-even/test4/assembly.gfa results/unicycler/sr-even/test4/assembly_output/unicycler_sr-even_test4_assembly.gfa
+cp data/unicycler/sr-even/test4/unicycler_sr-even_test4_final-contigs.fasta results/unicycler/sr-even/test4/unicycler_sr-even_test4_final-contigs.fasta
+
 
 ## test5
 mkdir -p results/unicycler/sr-even/test5/assembly_output/
@@ -474,6 +528,7 @@ cp data/unicycler/sr-even/test5/assembly.fasta results/unicycler/sr-even/test5/a
 cp data/unicycler/sr-even/test5/unicycler.log results/unicycler/sr-even/test5/assembly_output/unicycler_sr-even_test5_unicycler.log
 cp data/unicycler/sr-even/test5/unicycler_console_output.log results/unicycler/sr-even/test5/assembly_output/unicycler_sr-even_test5_console_output.log
 cp data/unicycler/sr-even/test5/assembly.gfa results/unicycler/sr-even/test5/assembly_output/unicycler_sr-even_test5_assembly.gfa
+cp data/unicycler/sr-even/test5/unicycler_sr-even_test5_final-contigs.fasta results/unicycler/sr-even/test5/unicycler_sr-even_test5_final-contigs.fasta
 
 
 
@@ -484,6 +539,8 @@ cp data/unicycler/sr-log/test1/assembly.fasta results/unicycler/sr-log/test1/ass
 cp data/unicycler/sr-log/test1/unicycler.log results/unicycler/sr-log/test1/assembly_output/unicycler_sr-log_test1_unicycler.log
 cp data/unicycler/sr-log/test1/unicycler_console_output.log results/unicycler/sr-log/test1/assembly_output/unicycler_sr-log_test1_console_output.log
 cp data/unicycler/sr-log/test1/assembly.gfa results/unicycler/sr-log/test1/assembly_output/unicycler_sr-log_test1_assembly.gfa
+cp data/unicycler/sr-log/test1/unicycler_sr-log_test1_final-contigs.fasta results/unicycler/sr-log/test1/unicycler_sr-log_test1_final-contigs.fasta
+
 
 ## test2
 mkdir -p results/unicycler/sr-log/test2/assembly_output/
@@ -491,6 +548,8 @@ cp data/unicycler/sr-log/test2/assembly.fasta results/unicycler/sr-log/test2/ass
 cp data/unicycler/sr-log/test2/unicycler.log results/unicycler/sr-log/test2/assembly_output/unicycler_sr-log_test2_unicycler.log
 cp data/unicycler/sr-log/test2/unicycler_console_output.log results/unicycler/sr-log/test2/assembly_output/unicycler_sr-log_test2_console_output.log
 cp data/unicycler/sr-log/test2/assembly.gfa results/unicycler/sr-log/test2/assembly_output/unicycler_sr-log_test2_assembly.gfa
+cp data/unicycler/sr-log/test2/unicycler_sr-log_test2_final-contigs.fasta results/unicycler/sr-log/test2/unicycler_sr-log_test2_final-contigs.fasta
+
 
 ## test3
 mkdir -p results/unicycler/sr-log/test3/assembly_output/
@@ -498,6 +557,8 @@ cp data/unicycler/sr-log/test3/assembly.fasta results/unicycler/sr-log/test3/ass
 cp data/unicycler/sr-log/test3/unicycler.log results/unicycler/sr-log/test3/assembly_output/unicycler_sr-log_test3_unicycler.log
 cp data/unicycler/sr-log/test3/unicycler_console_output.log results/unicycler/sr-log/test3/assembly_output/unicycler_sr-log_test3_console_output.log
 cp data/unicycler/sr-log/test3/assembly.gfa results/unicycler/sr-log/test3/assembly_output/unicycler_sr-log_test3_assembly.gfa
+cp data/unicycler/sr-log/test3/unicycler_sr-log_test3_final-contigs.fasta results/unicycler/sr-log/test3/unicycler_sr-log_test3_final-contigs.fasta
+
 
 ## test4
 mkdir -p results/unicycler/sr-log/test4/assembly_output/
@@ -505,6 +566,8 @@ cp data/unicycler/sr-log/test4/assembly.fasta results/unicycler/sr-log/test4/ass
 cp data/unicycler/sr-log/test4/unicycler.log results/unicycler/sr-log/test4/assembly_output/unicycler_sr-log_test4_unicycler.log
 cp data/unicycler/sr-log/test4/unicycler_console_output.log results/unicycler/sr-log/test4/assembly_output/unicycler_sr-log_test4_console_output.log
 cp data/unicycler/sr-log/test4/assembly.gfa results/unicycler/sr-log/test4/assembly_output/unicycler_sr-log_test4_assembly.gfa
+cp data/unicycler/sr-log/test4/unicycler_sr-log_test4_final-contigs.fasta results/unicycler/sr-log/test4/unicycler_sr-log_test4_final-contigs.fasta
+
 
 ## test5
 mkdir -p results/unicycler/sr-log/test5/assembly_output/
@@ -512,6 +575,8 @@ cp data/unicycler/sr-log/test5/assembly.fasta results/unicycler/sr-log/test5/ass
 cp data/unicycler/sr-log/test5/unicycler.log results/unicycler/sr-log/test5/assembly_output/unicycler_sr-log_test5_unicycler.log
 cp data/unicycler/sr-log/test5/unicycler_console_output.log results/unicycler/sr-log/test5/assembly_output/unicycler_sr-log_test5_console_output.log
 cp data/unicycler/sr-log/test5/assembly.gfa results/unicycler/sr-log/test5/assembly_output/unicycler_sr-log_test5_assembly.gfa
+cp data/unicycler/sr-log/test5/unicycler_sr-log_test5_final-contigs.fasta results/unicycler/sr-log/test5/unicycler_sr-log_test5_final-contigs.fasta
+
 
 
 
@@ -525,6 +590,8 @@ cp data/unicycler/sr-ms/test1/assembly.fasta results/unicycler/sr-ms/test1/assem
 cp data/unicycler/sr-ms/test1/unicycler.log results/unicycler/sr-ms/test1/assembly_output/unicycler_sr-ms_test1_unicycler.log
 cp data/unicycler/sr-ms/test1/unicycler_console_output.log results/unicycler/sr-ms/test1/assembly_output/unicycler_sr-ms_test1_console_output.log
 cp data/unicycler/sr-ms/test1/assembly.gfa results/unicycler/sr-ms/test1/assembly_output/unicycler_sr-ms_test1_assembly.gfa
+cp data/unicycler/sr-ms/test1/unicycler_sr-ms_test1_final-contigs.fasta results/unicycler/sr-ms/test1/unicycler_sr-ms_test1_final-contigs.fasta
+
 
 
 ## test2
@@ -533,6 +600,8 @@ cp data/unicycler/sr-ms/test2/assembly.fasta results/unicycler/sr-ms/test2/assem
 cp data/unicycler/sr-ms/test2/unicycler.log results/unicycler/sr-ms/test2/assembly_output/unicycler_sr-ms_test2_unicycler.log
 cp data/unicycler/sr-ms/test2/unicycler_console_output.log results/unicycler/sr-ms/test2/assembly_output/unicycler_sr-ms_test2_console_output.log
 cp data/unicycler/sr-ms/test2/assembly.gfa results/unicycler/sr-ms/test2/assembly_output/unicycler_sr-ms_test2_assembly.gfa
+cp data/unicycler/sr-ms/test2/unicycler_sr-ms_test2_final-contigs.fasta results/unicycler/sr-ms/test2/unicycler_sr-ms_test2_final-contigs.fasta
+
 
 ## test3
 mkdir -p results/unicycler/sr-ms/test3/assembly_output/
@@ -540,6 +609,8 @@ cp data/unicycler/sr-ms/test3/assembly.fasta results/unicycler/sr-ms/test3/assem
 cp data/unicycler/sr-ms/test3/unicycler.log results/unicycler/sr-ms/test3/assembly_output/unicycler_sr-ms_test3_unicycler.log
 cp data/unicycler/sr-ms/test3/unicycler_console_output.log results/unicycler/sr-ms/test3/assembly_output/unicycler_sr-ms_test3_console_output.log
 cp data/unicycler/sr-ms/test3/assembly.gfa results/unicycler/sr-ms/test3/assembly_output/unicycler_sr-ms_test3_assembly.gfa
+cp data/unicycler/sr-ms/test3/unicycler_sr-ms_test3_final-contigs.fasta results/unicycler/sr-ms/test3/unicycler_sr-ms_test3_final-contigs.fasta
+
 
 ## test4
 mkdir -p results/unicycler/sr-ms/test4/assembly_output/
@@ -547,6 +618,8 @@ cp data/unicycler/sr-ms/test4/assembly.fasta results/unicycler/sr-ms/test4/assem
 cp data/unicycler/sr-ms/test4/unicycler.log results/unicycler/sr-ms/test4/assembly_output/unicycler_sr-ms_test4_unicycler.log
 cp data/unicycler/sr-ms/test4/unicycler_console_output.log results/unicycler/sr-ms/test4/assembly_output/unicycler_sr-ms_test4_console_output.log
 cp data/unicycler/sr-ms/test4/assembly.gfa results/unicycler/sr-ms/test4/assembly_output/unicycler_sr-ms_test4_assembly.gfa
+cp data/unicycler/sr-ms/test4/unicycler_sr-ms_test4_final-contigs.fasta results/unicycler/sr-ms/test4/unicycler_sr-ms_test4_final-contigs.fasta
+
 
 ## test5
 mkdir -p results/unicycler/sr-ms/test5/assembly_output/
@@ -554,6 +627,7 @@ cp data/unicycler/sr-ms/test5/assembly.fasta results/unicycler/sr-ms/test5/assem
 cp data/unicycler/sr-ms/test5/unicycler.log results/unicycler/sr-ms/test5/assembly_output/unicycler_sr-ms_test5_unicycler.log
 cp data/unicycler/sr-ms/test5/unicycler_console_output.log results/unicycler/sr-ms/test5/assembly_output/unicycler_sr-ms_test5_console_output.log
 cp data/unicycler/sr-ms/test5/assembly.gfa results/unicycler/sr-ms/test5/assembly_output/unicycler_sr-ms_test5_assembly.gfa
+cp data/unicycler/sr-ms/test5/unicycler_sr-ms_test5_final-contigs.fasta results/unicycler/sr-ms/test5/unicycler_sr-ms_test5_final-contigs.fasta
 
 
 
