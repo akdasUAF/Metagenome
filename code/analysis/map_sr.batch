@@ -1,0 +1,55 @@
+#!/bin/bash
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G 
+#SBATCH --mail-user=wwinnett@alaska.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --job-name="map_quality_scores"
+#SBATCH --output=logs/slurm_map_quality_scores_%j.log
+#SBATCH --error=logs/slurm_map_quality_scores_err_%j.log
+
+# --- Argument Parsing ---
+if [ "$#" -ne 6 ]; then
+    echo "Usage: sbatch $0 <dataset_name> <assembler_name> <test_number> <reads_R1.fastq> <reads_R2.fastq> <draft_assembly.fasta>"
+    exit 1
+fi
+
+DATASET_NAME="$1"
+ASSEMBLER_NAME="$2"
+TEST_NUMBER="$3"
+READS_R1="$4"
+READS_R2="$5"
+DRAFT_ASSEMBLY="$6"
+
+# --- Conda Setup ---
+CONDA_BASE=$(conda info --base)
+source "${CONDA_BASE}/etc/profile.d/conda.sh" || {
+    echo "ERROR: conda.sh not found"; exit 1; }
+conda activate align_minimap2
+
+# --- Modules ---
+module load slurm
+module load GCC/11.3.0
+module load SAMtools/1.17
+
+# --- Output Directory ---
+OUTPUT_DIR="data/${ASSEMBLER_NAME}/${DATASET_NAME}/${TEST_NUMBER}/map"
+mkdir -p "${OUTPUT_DIR}"
+
+# Step 1: Map paired-end reads
+minimap2 -ax sr "${DRAFT_ASSEMBLY}" "${READS_R1}" "${READS_R2}" \
+    | samtools sort -@ 8 -o "${OUTPUT_DIR}/mapped_sorted.bam"
+
+# Step 2: Index BAM
+samtools index "${OUTPUT_DIR}/mapped_sorted.bam"
+
+# Step 3: Extract paired FASTQ of mapped reads
+samtools fastq \
+    -1 "${OUTPUT_DIR}/mapped_R1.fastq" \
+    -2 "${OUTPUT_DIR}/mapped_R2.fastq" \
+    -0 /dev/null -s /dev/null \
+    "${OUTPUT_DIR}/mapped_sorted.bam"
+
+# Optional cleanup
+# rm "${OUTPUT_DIR}/mapped_sorted.bam" "${OUTPUT_DIR}/mapped_sorted.bam.bai"

@@ -3,6 +3,10 @@
 library(tidyverse)
 library(ggplot2)
 
+
+
+
+
 {
   short_hand_reference_names <- data.frame("Long" = NA,
                                            "Short" = NA)
@@ -93,6 +97,7 @@ make_figure <- function(dataset_in = "",
     
     dataset_for_plotting$test <- factor(dataset_for_plotting$test, 
                                         levels = c("1", "2", "3", "4", "5"))
+  
     
     dataset_for_plotting$metric_value <- as.numeric(dataset_for_plotting$metric_value)
     
@@ -108,6 +113,8 @@ make_figure <- function(dataset_in = "",
     dataset_for_plotting <- dataset_for_plotting %>%
       left_join(short_hand_reference_names, by = c("reference" = "Long")) %>%
       mutate(reference = Short)
+    
+      
     
     ### The actual plot for each metric
     plot <- ggplot(data = dataset_for_plotting,

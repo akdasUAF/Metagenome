@@ -7,7 +7,7 @@
 ## 431667
 ## Test 1
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-even/test1/assembly_output/megahit_sr-even_test1_final-contigs.fasta" \
+    "results/megahit/sr-even/test1/megahit_sr-even_test1_final-contigs.fasta" \
     "results/megahit/sr-even/test1/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -15,7 +15,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 431677
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-even/test2/assembly_output/megahit_sr-even_test2_final-contigs.fasta" \
+    "results/megahit/sr-even/test2/megahit_sr-even_test2_final-contigs.fasta" \
     "results/megahit/sr-even/test2/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -23,7 +23,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 431678
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-even/test3/assembly_output/megahit_sr-even_test3_final-contigs.fasta" \
+    "results/megahit/sr-even/test3/megahit_sr-even_test3_final-contigs.fasta" \
     "results/megahit/sr-even/test3/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -31,7 +31,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 431679
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-even/test4/assembly_output/megahit_sr-even_test4_final-contigs.fasta" \
+    "results/megahit/sr-even/test4/megahit_sr-even_test4_final-contigs.fasta" \
     "results/megahit/sr-even/test4/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -39,7 +39,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 431680
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-even/test5/assembly_output/megahit_sr-even_test5_final-contigs.fasta" \
+    "results/megahit/sr-even/test5/megahit_sr-even_test5_final-contigs.fasta" \
     "results/megahit/sr-even/test5/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -49,7 +49,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## 431663
 ## Test 1
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-log/test1/assembly_output/megahit_sr-log_test1_final-contigs.fasta" \
+    "results/megahit/sr-log/test1/megahit_sr-log_test1_final-contigs.fasta" \
     "results/megahit/sr-log/test1/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -57,7 +57,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 431673
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-log/test2/assembly_output/megahit_sr-log_test2_final-contigs.fasta" \
+    "results/megahit/sr-log/test2/megahit_sr-log_test2_final-contigs.fasta" \
     "results/megahit/sr-log/test2/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -65,7 +65,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 431674
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-log/test3/assembly_output/megahit_sr-log_test3_final-contigs.fasta" \
+    "results/megahit/sr-log/test3/megahit_sr-log_test3_final-contigs.fasta" \
     "results/megahit/sr-log/test3/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -73,7 +73,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 431675
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-log/test4/assembly_output/megahit_sr-log_test4_final-contigs.fasta" \
+    "results/megahit/sr-log/test4/megahit_sr-log_test4_final-contigs.fasta" \
     "results/megahit/sr-log/test4/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -81,7 +81,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 431676
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-log/test5/assembly_output/megahit_sr-log_test5_final-contigs.fasta" \
+    "results/megahit/sr-log/test5/megahit_sr-log_test5_final-contigs.fasta" \
     "results/megahit/sr-log/test5/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -92,7 +92,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## 
 ## Test 1
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-ms/test1/assembly_output/megahit_sr-ms_test1_final-contigs.fasta" \
+    "results/megahit/sr-ms/test1/megahit_sr-ms_test1_final-contigs.fasta" \
     "results/megahit/sr-ms/test1/metaquast/" \
     "NO_REFERENCE"
 
@@ -100,7 +100,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-ms/test2/assembly_output/megahit_sr-ms_test2_final-contigs.fasta" \
+    "results/megahit/sr-ms/test2/megahit_sr-ms_test2_final-contigs.fasta" \
     "results/megahit/sr-ms/test2/metaquast/" \
     "NO_REFERENCE"
 
@@ -108,7 +108,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-ms/test3/assembly_output/megahit_sr-ms_test3_final-contigs.fasta" \
+    "results/megahit/sr-ms/test3/megahit_sr-ms_test3_final-contigs.fasta" \
     "results/megahit/sr-ms/test3/metaquast/" \
     "NO_REFERENCE"
 
@@ -116,7 +116,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-ms/test4/assembly_output/megahit_sr-ms_test4_final-contigs.fasta" \
+    "results/megahit/sr-ms/test4/megahit_sr-ms_test4_final-contigs.fasta" \
     "results/megahit/sr-ms/test4/metaquast/" \
     "NO_REFERENCE"
 
@@ -124,7 +124,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/megahit/sr-ms/test5/assembly_output/megahit_sr-ms_test5_final-contigs.fasta" \
+    "results/megahit/sr-ms/test5/megahit_sr-ms_test5_final-contigs.fasta" \
     "results/megahit/sr-ms/test5/metaquast/" \
     "NO_REFERENCE"
 
@@ -149,7 +149,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 1
 ## 431681
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-even/test1/assembly_output/metaspades_sr-even_test1_contigs.fasta" \
+    "results/metaspades/sr-even/test1/metaspades_sr-even_test1_final-contigs.fasta" \
     "results/metaspades/sr-even/test1/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -157,7 +157,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 431682
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-even/test2/assembly_output/metaspades_sr-even_test2_contigs.fasta" \
+    "results/metaspades/sr-even/test2/metaspades_sr-even_test2_final-contigs.fasta" \
     "results/metaspades/sr-even/test2/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -165,7 +165,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 431683
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-even/test3/assembly_output/metaspades_sr-even_test3_contigs.fasta" \
+    "results/metaspades/sr-even/test3/metaspades_sr-even_test3_final-contigs.fasta" \
     "results/metaspades/sr-even/test3/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -173,7 +173,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 431684
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-even/test4/assembly_output/metaspades_sr-even_test4_contigs.fasta" \
+    "results/metaspades/sr-even/test4/metaspades_sr-even_test4_final-contigs.fasta" \
     "results/metaspades/sr-even/test4/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -181,7 +181,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 431685
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-even/test5/assembly_output/metaspades_sr-even_test5_contigs.fasta" \
+    "results/metaspades/sr-even/test5/metaspades_sr-even_test5_final-contigs.fasta" \
     "results/metaspades/sr-even/test5/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -192,7 +192,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 1
 ## 432039
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-log/test1/assembly_output/metaspades_sr-log_test1_contigs.fasta" \
+    "results/metaspades/sr-log/test1/metaspades_sr-log_test1_final-contigs.fasta" \
 	"results/metaspades/sr-log/test1/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -200,7 +200,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 432040
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-log/test2/assembly_output/metaspades_sr-log_test2_contigs.fasta" \
+    "results/metaspades/sr-log/test2/metaspades_sr-log_test2_final-contigs.fasta" \
     "results/metaspades/sr-log/test2/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -208,7 +208,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 432041
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-log/test3/assembly_output/metaspades_sr-log_test3_contigs.fasta" \
+    "results/metaspades/sr-log/test3/metaspades_sr-log_test3_final-contigs.fasta" \
 	"results/metaspades/sr-log/test3/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -216,7 +216,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 432042
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-log/test4/assembly_output/metaspades_sr-log_test4_contigs.fasta" \
+    "results/metaspades/sr-log/test4/metaspades_sr-log_test4_final-contigs.fasta" \
 	"results/metaspades/sr-log/test4/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -224,7 +224,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 432043
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-log/test5/assembly_output/metaspades_sr-log_test5_contigs.fasta" \
+    "results/metaspades/sr-log/test5/metaspades_sr-log_test5_final-contigs.fasta" \
 	"results/metaspades/sr-log/test5/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -240,7 +240,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## 
 ## Test 1
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-ms/test1/assembly_output/metaspades_sr-ms_test1_contigs.fasta" \
+    "results/metaspades/sr-ms/test1/metaspades_sr-ms_test1_final-contigs.fasta" \
     "results/metaspades/sr-ms/test1/metaquast/" \
     "NO_REFERENCE"
 
@@ -248,14 +248,14 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-ms/test2/assembly_output/metaspades_sr-ms_test2_contigs.fasta" \
+    "results/metaspades/sr-ms/test2/metaspades_sr-ms_test2_final-contigs.fasta" \
     "results/metaspades/sr-ms/test2/metaquast/" \
     "NO_REFERENCE"
 
 ## Test 3
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-ms/test3/assembly_output/metaspades_sr-ms_test3_contigs.fasta" \
+    "results/metaspades/sr-ms/test3/metaspades_sr-ms_test3_final-contigs.fasta" \
     "results/metaspades/sr-ms/test3/metaquast/" \
     "NO_REFERENCE"
 
@@ -263,7 +263,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-ms/test4/assembly_output/metaspades_sr-ms_test4_contigs.fasta" \
+    "results/metaspades/sr-ms/test4/metaspades_sr-ms_test4_final-contigs.fasta" \
     "results/metaspades/sr-ms/test4/metaquast/" \
     "NO_REFERENCE"
 
@@ -271,7 +271,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 432069
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/metaspades/sr-ms/test5/assembly_output/metaspades_sr-ms_test5_contigs.fasta" \
+    "results/metaspades/sr-ms/test5/metaspades_sr-ms_test5_final-contigs.fasta" \
     "results/metaspades/sr-ms/test5/metaquast/" \
     "NO_REFERENCE"
 
@@ -294,7 +294,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 1
 ## 431681
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-even/test1/assembly_output/unicycler_sr-even_test1_assembly.fasta" \
+    "results/metaspades/sr-even/test1/metaspades_sr-even_test1_final-contigs.fasta" \
     "results/unicycler/sr-even/test1/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -302,7 +302,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 431682
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-even/test2/assembly_output/unicycler_sr-even_test2_assembly.fasta" \
+    "results/metaspades/sr-even/test2/metaspades_sr-even_test2_final-contigs.fasta" \
     "results/unicycler/sr-even/test2/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -310,7 +310,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 431683
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-even/test3/assembly_output/unicycler_sr-even_test3_assembly.fasta" \
+    "results/metaspades/sr-even/test3/metaspades_sr-even_test3_final-contigs.fasta" \
     "results/unicycler/sr-even/test3/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -318,7 +318,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 431684
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-even/test4/assembly_output/unicycler_sr-even_test4_assembly.fasta" \
+    "results/metaspades/sr-even/test4/metaspades_sr-even_test4_final-contigs.fasta" \
     "results/unicycler/sr-even/test4/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -326,7 +326,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 431685
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-even/test5/assembly_output/unicycler_sr-even_test5_assembly.fasta" \
+    "results/metaspades/sr-even/test5/metaspades_sr-even_test5_final-contigs.fasta" \
     "results/unicycler/sr-even/test5/metaquast/" \
     "data/reference/sr-even/sr-even_reference.txt"
 
@@ -337,7 +337,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 1
 ## 432039
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-log/test1/assembly_output/unicycler_sr-log_test1_assembly.fasta" \
+    "results/metaspades/sr-log/test1/metaspades_sr-log_test1_final-contigs.fasta" \
 	"results/unicycler/sr-log/test1/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -345,7 +345,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 2
 ## 432040
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-log/test2/assembly_output/unicycler_sr-log_test2_assembly.fasta" \
+    "results/metaspades/sr-log/test2/metaspades_sr-log_test2_final-contigs.fasta" \
     "results/unicycler/sr-log/test2/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -353,7 +353,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 3
 ## 432041
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-log/test3/assembly_output/unicycler_sr-log_test3_assembly.fasta" \
+    "results/metaspades/sr-log/test3/metaspades_sr-log_test3_final-contigs.fasta" \
 	"results/unicycler/sr-log/test3/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -361,7 +361,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 4
 ## 432042
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-log/test4/assembly_output/unicycler_sr-log_test4_assembly.fasta" \
+    "results/metaspades/sr-log/test4/metaspades_sr-log_test4_final-contigs.fasta" \
 	"results/unicycler/sr-log/test4/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 
@@ -369,7 +369,7 @@ sbatch code/analysis/metaquast/metaquast.batch \
 ## Test 5
 ## 432043
 sbatch code/analysis/metaquast/metaquast.batch \
-    "results/unicycler/sr-log/test5/assembly_output/unicycler_sr-log_test5_assembly.fasta" \
+    "results/metaspades/sr-log/test5/metaspades_sr-log_test5_final-contigs.fasta" \
 	"results/unicycler/sr-log/test5/metaquast/" \
     "data/reference/sr-log/sr-log_references.txt"
 

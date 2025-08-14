@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-#SBATCH --partition=t1small       # Or your preferred partition
-#SBATCH --ntasks=1                # Total number of tasks
-#SBATCH --cpus-per-task=24        # Number of CPU cores per task (adjust as needed for --threads)
-#SBATCH --mem=64G                 # Total memory for the job (adjust based on assembly/read size)
+#SBATCH --partition=t1small
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=64G
 #SBATCH --mail-user=wwinnett@alaska.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --job-name=map2reads
-#SBATCH --output=logs/slurm_map2reads_%j.log
-#SBATCH --error=logs/slurm_map2reads_%j.log.err
+#SBATCH --job-name=pomoxis
+#SBATCH --output=logs/slurm_pomoxis_%j.log
+#SBATCH --error=logs/slurm_pomoxis_%j.log.err
 
 # Set unlimited locked memory for processes (good for large jobs)
 ulimit -l unlimited
@@ -37,11 +37,11 @@ fi
 
 
 # Activate your Medaka conda environment
-conda activate align_minimap2
+conda activate pomoxis
 
 
 if [ $# -ne 5 ]; then
-  echo "Usage: $0 <sample> <assembler> <run> <contigs_fasta> <aligned_bam>"
+  echo "Usage: $0 <sample> <assembler> <run> <contigs_fasta> <reference_fasta>"
   exit 1
 fi
 
@@ -49,9 +49,9 @@ sample=$1
 assembler=$2
 run=$3
 contigs_fasta=$4
-aligned_bam=$5
+reference_fasta=$5
 
-workdir="data/${assembler}/${sample}/${run}/map"
+workdir="results/${assembler}/${sample}/${run}/pomoxis/"
 mkdir -p "${workdir}"
 
 
@@ -68,7 +68,7 @@ echo "Sample: ${sample}"
 echo "Assembler: ${assembler}"
 echo "Run: ${run}"
 echo "Contigs FASTA: ${contigs_fasta}"
-echo "Aligned BAM: ${aligned_bam}"
+echo "Reference FASTA: ${reference_fasta}"
 echo "Output directory: ${workdir}"
 
 
@@ -77,25 +77,18 @@ echo "Output directory: ${workdir}"
 
 
 ## Step 1: Extract contig→read mappings from BAM
-echo ">>> Performing Pileup..."
-bcftools mpileup \
-  -f ${contigs_fasta} \
-  ${aligned_bam} \
-  -Ou \
-| bcftools call -mv -Ob -o ${bcf_calls}
+echo ">>> Performing Pomoxis..."
+
+assess_assembly \
+ -i ${contigs_fasta} \
+ -r ${reference_fasta} \
+ -p ${workdir} \
+ -l 50 \
+ -t 4 \
+ -e -T
 
 
-## Step 2: Derive unique read IDs
-echo ">>> Perfoming Index..."
-bcftools index ${bcf_calls}
-
-## Step 3: Subset raw FASTQ by read IDs
-echo ">>> Subsetting FASTQ..."
-bcftools view ${bcf_calls} \
-  | vcfutils.pl vcf2fq -d 1 -D 100 \
-  > ${final_fastq}
-
-echo "Finished. Final FASTQ: ${final_fastq}"
+echo "Finished. Final FASTQ: ${workdir}"
 
 
 
