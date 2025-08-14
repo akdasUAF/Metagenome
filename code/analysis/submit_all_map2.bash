@@ -14,7 +14,6 @@ for dataset in "${datasets[@]}"; do
       bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
 
       # Check that inputs exist before submitting
-      fi
       if [[ ! -f "${contigs_fasta}" ]]; then
         echo "Missing contigs FASTA: ${contigs_fasta}, skipping."
         continue
