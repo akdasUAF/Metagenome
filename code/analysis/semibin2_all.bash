@@ -19,7 +19,7 @@ for dataset in "${datasets[@]}"; do
       fi
 
       sbatch code/analysis/semibin2.batch \
-	  	${sample} \
+	  	${datasets} \
 		${assembler} \
 		${run} \
 		${contigs_fasta}
