@@ -29,7 +29,7 @@ if [ -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
     echo "Conda initialized from ${CONDA_BASE}/etc/profile.d/conda.sh"
 else
     echo "ERROR: conda.sh not found at ${CONDA_BASE}/etc/profile.d/conda.sh."
-    echo "Please ensure Conda is installed and 'conda init bash' has been run."
+    echo "Please ensure Conda is installed and 'conda init bash' has been test."
     exit 1
 fi
 
@@ -41,24 +41,24 @@ conda activate SemiBin
 
 
 if [ $# -ne 4 ]; then
-  echo "Usage: $0 <dataset> <assembler> <run> <contigs_fasta>"
+  echo "Usage: $0 <dataset> <assembler> <test> <contigs_fasta>"
   exit 1
 fi
 
 dataset=$1
 assembler=$2
-run=$3
+test=$3
 contigs_fasta=$4
 aligned_bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
 
-workdir="data/${assembler}/${dataset}/${run}/semibin2/"
+workdir="data/${assembler}/${dataset}/${test}/semibin2/"
 mkdir -p "${workdir}"
 
 
 
 echo "dataset: ${dataset}"
 echo "Assembler: ${assembler}"
-echo "Run: ${run}"
+echo "test: ${test}"
 echo "Contigs FASTA: ${contigs_fasta}"
 echo "Aligned BAM: ${aligned_bam}"
 echo "Output directory: ${workdir}"
