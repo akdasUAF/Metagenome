@@ -51,7 +51,7 @@ run=$3
 contigs_fasta=$4
 reference_fasta=$5
 
-workdir="results/${assembler}/${sample}/${run}/pomoxis/"
+workdir="results/${assembler}/${sample}/${run}/pomoxis/${assembler}_${sample}_${run}"
 mkdir -p "${workdir}"
 
 
