@@ -80,6 +80,21 @@ for (assembler in assemblers_list_lr) {
       # View
       print(df_global)
       
+      df_global <- df_global %>%
+        filter(metric != "name")
+      
+      df_global$mean_err <- as.numeric(df_global$mean_err)
+      df_global$q10_err <- as.numeric(df_global$q10_err)
+      df_global$q50_err <- as.numeric(df_global$q50_err)
+      df_global$q90_err <- as.numeric(df_global$q90_err)
+      df_global$mean_q <- as.numeric(df_global$mean_q)
+      df_global$q10_q <- as.numeric(df_global$q10_q)
+      df_global$q50_q <- as.numeric(df_global$q50_q)
+      df_global$q90_q <- as.numeric(df_global$q90_q)
+      
+        
+      
+      
       # 1. Identify the “Ref Coverage” block
       ref_block <- keep(blocks, ~ .x$name == "Ref Coverage")[[1]]$lines
       df_ref <- read_table2(paste(ref_block, collapse="\n"),
@@ -133,7 +148,7 @@ for (assembler in assemblers_list_lr) {
 
 
 
-
+print(df_global)
 
 
 

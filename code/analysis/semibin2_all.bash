@@ -10,11 +10,26 @@ for dataset in "${datasets[@]}"; do
   for assembler in "${assemblers[@]}"; do
     for test in "${tests[@]}"; do
 
+	  raw_reads="data/raw/${dataset}/${dataset}_raw.fastq"
       contigs_fasta="data/${assembler}/${dataset}/${test}/medaka_consensus_simple_run/consensus.fasta"
+	  reference_fasta="data/reference/${dataset}/${dataset}_reference_cat.fasta"
+
 
       # Check that inputs exist before submitting
+      if [[ ! -f "${raw_reads}" ]]; then
+        echo "Missing contigs FASTA: ${raw_reads}, skipping."
+        continue
+      fi
+
+	  # Check that inputs exist before submitting
       if [[ ! -f "${contigs_fasta}" ]]; then
         echo "Missing contigs FASTA: ${contigs_fasta}, skipping."
+        continue
+      fi
+
+	  # Check that inputs exist before submitting
+      if [[ ! -f "${reference_fasta}" ]]; then
+        echo "Missing contigs FASTA: ${reference_fasta}, skipping."
         continue
       fi
 
@@ -22,7 +37,9 @@ for dataset in "${datasets[@]}"; do
 	  	${dataset} \
 		${assembler} \
 		${test} \
-		${contigs_fasta}
+		${raw_reads} \
+		${contigs_fasta} \
+		${reference_fasta}
 
     done
   done

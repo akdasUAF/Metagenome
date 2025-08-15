@@ -19,8 +19,8 @@ module load slurm
 module load GCC/11.3.0
 module load SAMtools/1.17
 module load IPython/8.5.0
-module load BCFtools/1.17
-module load HTSlib/1.17
+#module load BCFtools/1.17
+# module load HTSlib/1.17
 
 # --- Conda Initialization ---
 CONDA_BASE=$(conda info --base)
@@ -33,40 +33,57 @@ else
     exit 1
 fi
 
-
-
-
-# Activate your Medaka conda environment
-conda activate SemiBin
-
-
-if [ $# -ne 4 ]; then
-  echo "Usage: $0 <dataset> <assembler> <test> <contigs_fasta>"
+if [ $# -ne 6 ]; then
+  echo "Usage: $0 <dataset> <assembler> <test> <raw_reads> <contigs_fasta> <reference_fasta>"
   exit 1
 fi
 
+# Variables
 dataset=$1
 assembler=$2
 test=$3
-contigs_fasta=$4
-aligned_bam="data/${assembler}/${dataset}/${test}/map/${assembler}_${dataset}_${test}_mapped_sorted.bam"
+raw_reads=$4
+contigs_fasta=$5
+reference_fasta=$6
 
-workdir="data/${assembler}/${dataset}/${test}/semibin2/"
+workdir="data/${assembler}/${dataset}/${test}/mapping/"
+aligned_bam="${workdir}/${assembler}_${dataset}_${test}_mapped_sorted.bam"
+aligned_list="${workdir}/${assembler}_${dataset}_${test}_mapped_sorted.lst"
+data_split="${workdir}/data_split.csv"
+
 mkdir -p "${workdir}"
-
-
 
 echo "dataset: ${dataset}"
 echo "Assembler: ${assembler}"
 echo "test: ${test}"
+echo "Raw reads: ${raw_reads}"
 echo "Contigs FASTA: ${contigs_fasta}"
 echo "Aligned BAM: ${aligned_bam}"
+echo "List of for aligned BAM: ${aligned_list}"
 echo "Output directory: ${workdir}"
 
+# Activate minimap2 first
+conda activate align_minimap2
 
-data_split="${workdir}/data_split.csv"
+## Generate the reads list
+grep '^@' "${raw_reads}" | cut -d ' ' -f1 | tr -d '@' > "${aligned_list}"
+
+# grabbing reads
+seqtk subseq "${raw_reads}" "${aligned_list}" | \
+    minimap2 -ax map-ont \
+    -t 24 "${reference_fasta}" - | \
+    samtools view -F 4 -b | \
+    samtools sort - > "${aligned_bam}"
+
+        # making a bam index file
+        samtools index "${aligned_bam}"
+        # making the list of mapped reads
+        samtools view -F 2308 "${aligned_bam}" | cut -f1 | sort > "${aligned_list}"
 
 
+### Now to semibin
+conda activate 
+conda activate SemiBin
 
 
 ## Step 1: "SemiBin2. Generating Sequence Features"
