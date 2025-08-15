@@ -89,8 +89,7 @@ conda activate SemiBin
 ## Step 1: "SemiBin2. Generating Sequence Features"
 echo ">>> Performing Semibin2..."
 echo "    Generating Sequence Features...."
-SemiBin2 \
-    generate_sequence_features_single \
+SemiBin2 generate_sequence_features_single \
     --input-fasta ${contigs_fasta} \
     --input-bam ${aligned_bam} \
     --min-len 1000 \
@@ -101,8 +100,7 @@ SemiBin2 \
 ## Step 2: "SemiBin2... Training self"
 echo ">>> Performing Semibin2..."
 echo "    Training self..."
-SemiBin2 \
-    train_self \
+SemiBin2 train_self \
     --data ${workdir}/data.csv \
     --data-split ${data_split} \
     --output ${workdir} \
@@ -111,13 +109,10 @@ SemiBin2 \
     --verbose
 
 
-    'generate_sequence_features_single', '--input-fasta', 'data/metaflye/lr-ms/test5/medaka_consensus_simple_run/consensus.fasta', '--input-bam', 'data/metaflye/lr-ms/test5/map/metaflye_lr-ms_test5_mapped_sorted.bam', '--min-len', '1000', '--output', 'data/metaflye/lr-ms/test5/semibin2/bin', '--verbose'
-
 ## Step 3: "SemiBin2... Bin long"
 echo ">>> Performing Semibin2..."
 echo "    Bin long"
-SemiBin2 \
-    bin_long \
+SemiBin2 bin_long \
     -i ${contigs_fasta} \
     --model ${workdir}/model.pt \
     --data ${workdir}/data.csv \

@@ -20,6 +20,9 @@ results_full_lr <- data.frame(assembler = character(),
                               stringsAsFactors = FALSE)
 
 
+global_results <- list()
+species_results <- list()
+
 
 for (assembler in assemblers_list_lr) {
   for (dataset in datasets_list_lr) {
@@ -28,6 +31,11 @@ for (assembler in assemblers_list_lr) {
       test_str <- paste("test", 
                         test,
                         sep = "")
+      
+      identifier <- paste(assembler,
+                          dataset,
+                          test,
+                          sep = "_")
       
       raw_pomoxis <- paste(results_dir_base, 
                            assembler,
@@ -92,7 +100,15 @@ for (assembler in assemblers_list_lr) {
       df_global$q50_q <- as.numeric(df_global$q50_q)
       df_global$q90_q <- as.numeric(df_global$q90_q)
       
-        
+      
+      
+      global_results[[identifier]] <- df_global
+      
+      
+     # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ 
+      # Per Species (at a reference level)
+     # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ # ~~~~~ 
+      
       
       
       # 1. Identify the “Ref Coverage” block
@@ -110,6 +126,46 @@ for (assembler in assemblers_list_lr) {
       # 3. Group into pairs: Percentage Errors, Q Scores
       #    Each pair has a header like “bsubtilis1 Percentage Errors”, then “bsubtilis1 Q Scores”
       pairs <- split(rem, rep(1:(length(rem)/2), each = 2))
+      
+      
+      for (refere in pairs) {
+        
+        ##
+        reference_perc_error <- refere[[1]]
+        reference_q_score <- refere[[2]]
+        
+        reference_perc_error_table <- data.frame(reference_perc_error$lines)
+        reference_q_score_table <- data.frame(reference_q_score$lines)
+        
+        reference_perc_error_table <- read.table(
+          text      = data.frame(reference_perc_error$lines)[,1],
+          header    = TRUE,
+          stringsAsFactors = FALSE
+        )
+        
+        reference_q_score_table <- read.table(
+          text      = data.frame(reference_q_score$lines)[,1],
+          header    = TRUE,
+          stringsAsFactors = FALSE
+        )
+        
+        
+        print(df)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      }
+      
+      
+      
       
       # 4. For each species, parse both tables and widen
       list_species <- imap(pairs, ~{
