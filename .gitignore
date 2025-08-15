@@ -5,3 +5,4 @@ Paper
 *.fastq'
 output*
 assembly_stats*
+final_output*
