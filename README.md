@@ -18,15 +18,16 @@ Dependencies include:
 ## Running the Pipeline
 Basic execution:
 ```bash
-python main.py -r <input.fastq> -k 31 -t 12 --min-cov 2 --scaffold
+python main.py -r <input.fastq> -k 31 --min-cov 2 --scaffold
 ```
 
 ### Arguments:
-- `-r` : Input FASTQ file (required)  
-- `-k` : k-mer size (default: 31)  
-- `-t` : Number of threads (default: 8)  
-- `--min-cov` : Minimum coverage threshold  
-- `--scaffold` : Enable scaffolding mode  
+- `-r`, `--reads` : Input FASTQ file (required)  
+- `-k`, `--k-values` : k-mer size (default: 31)    
+- `-m`, `--min-contig-len` : Minimum contig length  
+- `-n`, `--num-rounds` : Number of compression/assembly rounds
+- `-g`,`--graph-cleanup-rounds` : Number of graph cleanup rounds during contig generation
+- `-o`, `--output-dir` : Directory to save final contigs
 
 ---
 
@@ -53,7 +54,7 @@ python main.py -r <input.fastq> -k 31 -t 12 --min-cov 2 --scaffold
 
 ## Example
 ```bash
-python main.py -r test_data/SRR2628505.fastq -k 21 -t 12 --min-cov 2 --scaffold
+python main.py -r test_data/SRR2628505.fastq -k 21 -m 200 -g 1
 ```
 
 Output:
